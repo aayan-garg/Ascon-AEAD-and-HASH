@@ -1,0 +1,57 @@
+# Git ignores for Ascon RTL Project
+
+# Vivado project files
+*.runs/
+*.cache/
+*.hw/
+*.ip_user_files/
+*.sim/
+*.srcs/
+*.gen/
+*.xpr
+*.jou
+*.log
+*.str
+*.bit
+*.ltx
+*.dcp
+*.wdb
+*.wcfg
+vivado_*.backup.*
+
+# Simulation dumps
+*.vcd
+*.fst
+*.ghw
+*.lxt
+*.lxt2
+
+# Compiled simulation
+*.vvp
+*.out
+a.out
+obj_dir/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+
+# Editor temps
+*.swp
+*.swo
+*~
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Large results (keep summaries only)
+results/**/*.dcp
+results/**/*.bit
+results/**/*.wdb
