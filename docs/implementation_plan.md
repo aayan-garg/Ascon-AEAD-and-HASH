@@ -36,7 +36,7 @@ Phase 11 ──→ Phase 12 (Final Documentation & Handoff)
 
 ### Tasks
 - [x] Extract all requirements from `Project_PS.md` into the traceability matrix
-- [ ] Complete research tasks R-1 through R-8 (see [`research_plan.md`](research_plan.md))
+- [x] Complete research tasks R-1 through R-8 (see [`research_plan.md`](research_plan.md))
   - [x] R-1: Read and document SP 800-232 algorithm details
   - [x] R-2: Verify Zybo Z7-10 hardware constraints (not Z7-20)
   - [x] R-3: Compare RISC-V candidates and document decision
@@ -44,14 +44,14 @@ Phase 11 ──→ Phase 12 (Final Documentation & Handoff)
   - [x] R-5: Research S-box optimization techniques
   - [x] R-6: Read ≥3 Ascon hardware papers; select one technique
   - [x] R-7: Install and test formal verification tools (nuXmv, Verilog2SMV)
-  - [ ] R-8: Identify and prepare golden model sources
+  - [x] R-8: Identify and prepare golden model sources
 - [x] Audit toolchain availability (Vivado, RISC-V GCC, Icarus/Verilator, SymbiYosys, nuXmv)
 - [x] Record all tool versions in `docs/decisions/tooling.md`
 - [x] Identify and document all instructor questions (§18 of Initial Research)
 
 ### Exit Gate
-- [ ] `docs/requirements_traceability.md` has all R1–R19 rows with phase/artifact assignments
-- [ ] All R-1 through R-8 research tasks have at least initial findings documented (R-1 to R-7 complete)
+- [x] `docs/requirements_traceability.md` has all R1–R19 rows with phase/artifact assignments
+- [x] All R-1 through R-8 research tasks have at least initial findings documented (R-1 to R-8 complete)
 - [x] `docs/decisions/tooling.md` lists all tool versions
 - [x] Every ambiguity from §18 is recorded in `docs/decisions/`
 
@@ -70,22 +70,22 @@ Phase 11 ──→ Phase 12 (Final Documentation & Handoff)
 **Feeds:** All subsequent phases.
 
 ### Tasks
-- [ ] Verify directory structure matches `docs/directory_structure.md`
-- [ ] Create `.gitignore` (exclude Vivado projects, simulation dumps, `__pycache__/`, `.runs/`)
-- [ ] Create a trivial "hello world" testbench in `tb/unit/` that compiles and passes
-- [ ] Set up `scripts/run_regression.sh` — runs all unit tests, reports pass/fail
-- [ ] Verify a fresh clone + documented install steps produces a passing trivial test
-- [ ] Pin tool versions in `docs/decisions/tooling.md`
-- [ ] Create placeholder `docs/architecture.md`, `docs/threat_model.md`, `docs/register_map.md`
+- [x] Verify directory structure matches `docs/directory_structure.md`
+- [x] Create `.gitignore` (exclude Vivado projects, simulation dumps, `__pycache__/`, `.runs/`, `sim_build/`)
+- [x] Create a trivial "hello world" testbench in `tb/unit/` that compiles and passes (`tb/unit/tb_hello.sv`)
+- [x] Set up `scripts/run_regression.sh` and `scripts/run_regression.ps1` — runs all unit tests, reports pass/fail
+- [x] Verify a fresh clone + documented install steps produces a passing trivial test
+- [x] Pin tool versions in `docs/decisions/tooling.md`
+- [x] Create placeholder `docs/architecture.md`, `docs/threat_model.md`, `docs/register_map.md`
 
 ### Exit Gate
-- [ ] `git status` shows clean checkout matching the documented layout
-- [ ] `scripts/run_regression.sh` runs and reports pass/fail with zero manual steps
-- [ ] A trivial simulation test passes
+- [x] `git status` shows clean checkout matching the documented layout
+- [x] `scripts/run_regression.sh` runs and reports pass/fail with zero manual steps
+- [x] A trivial simulation test passes
 
 ### Artifacts
 - `.gitignore`
-- `scripts/run_regression.sh`
+- `scripts/run_regression.sh`, `scripts/run_regression.ps1`, `scripts/run_regression.py`
 - `tb/unit/tb_hello.sv`
 
 ---

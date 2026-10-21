@@ -18,6 +18,8 @@
 *.wdb
 *.wcfg
 *.pb
+dfx_runtime.txt
+webtalk*
 vivado_*.backup.*
 
 # Simulation dumps
@@ -32,6 +34,8 @@ vivado_*.backup.*
 *.out
 a.out
 obj_dir/
+sim_build/
+xsim.dir/
 
 # Python
 __pycache__/

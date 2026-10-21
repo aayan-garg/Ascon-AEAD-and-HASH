@@ -17,7 +17,7 @@
 | R-5 | S-box Optimization Techniques | `[x] COMPLETED` | Phase 0, 4 |
 | R-6 | Ascon Hardware Papers (Mandatory Research) | `[x] COMPLETED` | Phase 0, 12 |
 | R-7 | Formal Verification (CTL) Tooling | `[x] COMPLETED` | Phase 0, 9 |
-| R-8 | Golden Model & KAT Vectors | `[ ] NOT STARTED` | Phase 0, 3 |
+| R-8 | Golden Model & KAT Vectors | `[x] COMPLETED` | Phase 0, 3 |
 
 ---
 
@@ -234,19 +234,19 @@ Establish a trusted golden software model that passes all official NIST KATs bef
 | ashiduDissanayake/ASCON | https://github.com/ashiduDissanayake/ASCON | 3-layer verification chain example |
 
 ### Tasks
-- [ ] Clone/vendor `pyascon` into `reference/`
-- [ ] Download official KAT files from `ascon-c`
-- [ ] Run the golden model against ALL official KAT vectors (AEAD + Hash)
-- [ ] Record SHA-256 hashes of the KAT files for integrity
-- [ ] Add edge-case tests: empty AD, empty message, multi-block, tag mismatch
-- [ ] Create `reference/run_kats.py` that produces a pass/fail log
+- [x] Clone/vendor `pyascon` into `reference/pyascon`
+- [x] Download official KAT files from `ascon-c` and organize into `reference/kat/`
+- [x] Run the golden model against ALL official KAT vectors (1,089 AEAD + 1,025 Hash = 2,114 vectors)
+- [x] Record SHA-256 hashes of the KAT files for integrity
+- [x] Add edge-case tests: empty AD, empty message, multi-block, tag mismatch/corruption
+- [x] Create `reference/run_kats.py` that produces a pass/fail log and summary
 
 ### Exit Gate (Hard)
-The golden model must pass **100% of official vectors** before it is trusted as the RTL oracle. This is the Phase 3 exit gate.
+The golden model must pass **100% of official vectors** before it is trusted as the RTL oracle. This is the Phase 3 exit gate. (`[x] PASSED 100% — 2,120/2,120 vectors passed`)
 
 ### Deliverables
-- `reference/` — vendored golden model + KAT harness
-- `results/kat/golden_model_pass.log` — evidence of full KAT pass
+- `reference/` — vendored golden model (`reference/pyascon/ascon.py`) + KAT harness (`reference/run_kats.py`) (Completed)
+- `results/kat/golden_model_pass.log` & `results/kat/golden_model_summary.md` — evidence of full KAT pass (Completed)
 
 ---
 
