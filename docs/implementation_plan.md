@@ -169,10 +169,11 @@ Phase 11 ──→ Phase 12 (Final Documentation & Handoff)
 - [x] Evidence: `results/kat/perm_1r_pass.log`, `results/kat/perm_half_pass.log`, `results/kat/perm_2r_pass.log`
 
 ### Artifacts
-- `rtl/ascon/sbox5.sv`, `diffusion.sv`, `round_core.sv`, `state_reg.sv`
+- `rtl/ascon/sbox5.sv`, `diffusion.sv`, `round_core.sv`, `sbox5_espresso.sv`
 - `rtl/ascon/permutation_1r.sv`, `permutation_half.sv`, `permutation_2r.sv`
-- `rtl/ascon/sbox5_espresso.sv`
-- `tb/unit/tb_sbox5.sv`, `tb_round_core.sv`, `tb_permutation.sv`
+- `tb/unit/tb_sbox5.sv`, `tb_round_core.sv`, `tb_diffusion.sv`, `tb_sbox_equiv.sv`
+- `tb/unit/tb_permutation_1r.sv`, `tb_permutation_half.sv`, `tb_permutation_2r.sv`
+- `results/kat/perm_1r_pass.log`, `perm_half_pass.log`, `perm_2r_pass.log`, `sbox_exhaustive.log`
 
 ---
 
@@ -207,6 +208,8 @@ Phase 11 ──→ Phase 12 (Final Documentation & Handoff)
 ### Artifacts
 - `rtl/ascon/mode_ctrl.sv`, `aead_ctrl.sv`, `hash_ctrl.sv`, `plaintext_gate.sv`
 - `tb/unit/tb_mode_ctrl.sv`, `tb_aead.sv`, `tb_hash.sv`, `tb_security_gate.sv`
+- `results/kat/rtl_aead_pass.log`, `rtl_hash_pass.log`, `security_gate_pass.log`, `fsm_coverage.log`
+- `results/kat/phase5_controller_summary.md`
 
 ---
 

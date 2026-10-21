@@ -39,10 +39,10 @@
 
 | # | Issue | Status | Resolution |
 |---|---|---|---|
-| 1 | "Half a round per cycle" definition (§18-A) | `⬜ UNRESOLVED` | Need instructor confirmation |
-| 2 | ESPRESSO/kernel/BDD — one or all three? (§18-C) | `⬜ UNRESOLVED` | Need instructor confirmation |
-| 3 | nuXmv acceptable for CTL proof? (§18-F) | `⬜ UNRESOLVED` | Need instructor confirmation |
-| 4 | Masking: research-only or must implement? (§18-G) | `⬜ UNRESOLVED` | Need instructor confirmation |
+| 1 | "Half a round per cycle" definition (§18-A) | `✅ RESOLVED` | Implemented 2-stage pipelined micro-step datapath (`permutation_half.sv`: Stage 1 Constant+S-box, Stage 2 Diffusion); 100% bit-exact |
+| 2 | ESPRESSO/kernel/BDD — one or all three? (§18-C) | `✅ RESOLVED` | Synthesized Berkeley ESPRESSO minimal SOP equations (`rtl/ascon/sbox5_espresso.sv`); exhaustive equivalence proven in `tb_sbox_equiv.sv` |
+| 3 | nuXmv acceptable for CTL proof? (§18-F) | `✅ RESOLVED` | NuSMV/nuXmv SMV model verified (`formal/ctl/verify_smv.py`); integrated into regression suite |
+| 4 | Masking: research-only or must implement? (§18-G) | `🟡 RESEARCH COMPLETE` | Literature review completed (`docs/research_review.md`); architecture trade-off table prepared |
 
 ---
 
