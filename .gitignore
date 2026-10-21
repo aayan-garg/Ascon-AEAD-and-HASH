@@ -66,6 +66,7 @@ results/**/*.wdb
 # Scratch and binaries
 scratch/
 build/
+vivado_proj/
 *.exe
 *.elf
 *.bin
