@@ -11,8 +11,8 @@
 | # | Research Area | Status | Phase Dependency |
 |---|---|---|---|
 | R-1 | Ascon Algorithm (SP 800-232) | `[x] COMPLETED` | Phase 0, 3 |
-| R-2 | Zybo Z7-10 Hardware Constraints | `[ ] NOT STARTED` | Phase 0, 2 |
-| R-3 | RISC-V Core Selection | `[ ] NOT STARTED` | Phase 0, 2 |
+| R-2 | Zybo Z7-10 Hardware Constraints | `[x] COMPLETED` | Phase 0, 2 |
+| R-3 | RISC-V Core Selection | `[x] COMPLETED` | Phase 0, 2 |
 | R-4 | AXI4-Lite / DMA Architecture | `[ ] NOT STARTED` | Phase 0, 6, 7 |
 | R-5 | S-box Optimization Techniques | `[ ] NOT STARTED` | Phase 0, 4 |
 | R-6 | Ascon Hardware Papers (Mandatory Research) | `[ ] NOT STARTED` | Phase 0, 12 |
@@ -66,18 +66,18 @@ Verify all hardware constraints for the **Z7-10** variant (NOT the Z7-20, which 
 | XC7Z010 Datasheet | AMD/Xilinx DS190 | PL resource counts, speed grades |
 
 ### Tasks
-- [ ] Confirm part number: XC7Z010-1CLG400C
-- [ ] Confirm PL cells: 35,200 (not 106,400 = Z7-20)
-- [ ] Confirm BRAM: 270 KB (not 630 KB = Z7-20)
-- [ ] Confirm DSP slices: 80 (not 220 = Z7-20)
-- [ ] Confirm clock sources: 125 MHz on pin K17 (PL), 33.333 MHz PS_CLK
-- [ ] Confirm I/O: 4 LEDs, 1 RGB LED, 4 switches, 4 buttons
-- [ ] Document DDR3L is PS-side only (not directly PL-attached)
-- [ ] Document the MMCM plan: 125 MHz → 100 MHz via MMCM
+- [x] Confirm part number: XC7Z010-1CLG400C
+- [x] Confirm PL cells: 35,200 (not 106,400 = Z7-20)
+- [x] Confirm BRAM: 270 KB (not 630 KB = Z7-20)
+- [x] Confirm DSP slices: 80 (not 220 = Z7-20)
+- [x] Confirm clock sources: 125 MHz on pin K17 (PL), 33.333 MHz PS_CLK
+- [x] Confirm I/O: 4 LEDs, 1 RGB LED, 4 switches, 4 buttons
+- [x] Document DDR3L is PS-side only (not directly PL-attached)
+- [x] Document the MMCM plan: 125 MHz → 100 MHz via MMCM
 
 ### Deliverables
-- `docs/architecture.md` §Hardware Constraints
-- `board/zybo_z7_10.xdc` (constraints file, when ready)
+- `docs/architecture.md` §Hardware Constraints (Completed)
+- `board/zybo_z7_10.xdc` (Completed)
 
 ---
 
@@ -100,13 +100,13 @@ Compare PicoRV32, VexRiscv, and Ibex for this project's needs and justify the fi
 4. Area footprint on XC7Z010
 
 ### Tasks
-- [ ] Read PicoRV32 README — confirm `picorv32_axi` variant and `picorv32_axi_adapter`
-- [ ] Read VexRiscv docs — confirm AXI4 plugin (note: full AXI4, not AXI4-Lite)
-- [ ] Read Ibex README — confirm bus interface situation
-- [ ] Document decision in `docs/decisions/riscv_core.md`
+- [x] Read PicoRV32 README — confirm `picorv32_axi` variant and `picorv32_axi_adapter`
+- [x] Read VexRiscv docs — confirm AXI4 plugin (note: full AXI4, not AXI4-Lite)
+- [x] Read Ibex README — confirm bus interface situation
+- [x] Document decision in `docs/decisions/riscv_core.md`
 
 ### Deliverables
-- `docs/decisions/riscv_core.md` — comparison table and final choice
+- `docs/decisions/riscv_core.md` — comparison table and final choice (Completed)
 - Recommendation: **PicoRV32** (primary), **VexRiscv** (fallback)
 
 ---

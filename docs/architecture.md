@@ -378,11 +378,57 @@ The top-level Ascon controller implements a clean separation between control and
 ## 8. Hardware Constraints Summary (Zybo Z7-10)
 
 `[SOURCE]` AMD-Xilinx DS190 & Digilent Zybo Z7 Reference Manual:
-- **FPGA Device:** XC7Z010-1CLG400C (Zynq-7000 family)
-- **Logic Cells:** 35,200
-- **Look-Up Tables (LUT6):** 17,600
-- **Flip-Flops (FF):** 35,200
-- **Block RAM:** 270 KB (60 blocks of 36 Kb or 120 blocks of 18 Kb)
-- **DSP Slices:** 80 DSP48E1
-- **Clocking:** 125 MHz reference clock from Ethernet PHY pin `K17`; synthesized to 100 MHz via on-chip MMCM/PLL.
-- **Target Budget:** The Ascon coprocessor with 1 round/cycle consumes $\approx 1,500 - 2,500$ LUTs ($< 15\%$ of PL), leaving ample resources for PicoRV32, BRAM controllers, and interconnect.
+
+### 8.1 Device Resource Budget: Z7-10 vs Z7-20
+The project targets the **Zybo Z7-10** specifically. All resource utilization budgets must respect the Z7-10 fabric limits:
+
+| Feature | Zybo Z7-10 (Our Target) | Zybo Z7-20 (Larger Variant) | Source |
+|---|---|---|---|
+| **FPGA Part** | **XC7Z010-1CLG400C** | XC7Z020-1CLG400C | Digilent Reference Manual |
+| **Logic Cells** | **35,200** | 106,400 | AMD DS190 |
+| **Slice LUT6** | **17,600** | 53,200 | AMD DS190 |
+| **Slice Flip-Flops** | **35,200** | 106,400 | AMD DS190 |
+| **Block RAM (36 Kb blocks)** | **60 (270 KB / 2,160 Kb)** | 140 (630 KB / 5,040 Kb) | AMD DS190 |
+| **DSP48E1 Slices** | **80** | 220 | AMD DS190 |
+| **Clock Management Tiles** | **2 CMTs (2 MMCM + 2 PLL)** | 4 CMTs (4 MMCM + 4 PLL) | AMD DS190 |
+| **RGB LEDs** | **1 (LD6 only)** | 2 (LD5, LD6) | Digilent Reference Manual |
+
+### 8.2 Clock and Reset Architecture
+- **Primary Oscillator:** 125 MHz differential/single-ended clock from on-board Realtek Ethernet PHY RTL8211E-VL routed to PL pin `K17` (Bank 35, 3.3V LVCMOS).
+- **MMCM Clock Generator:**
+  - Input: 125.0 MHz (`CLKIN1`, period 8.000 ns).
+  - VCO Frequency: $125.0 \times 8.0 = 1000.0\text{ MHz}$ (`CLKFBOUT_MULT_F = 8.000`).
+  - Output 0: $1000.0 / 10.0 = 100.0\text{ MHz}$ (`CLKOUT0_DIVIDE_F = 10.000`), 50% duty cycle, driving the global clock buffer (`BUFG`).
+- **Reset Network:**
+  - External Reset: Active-high push-button `btn[0]` (pin `K18`).
+  - System Reset: Asserted when `btn[0]` is pressed OR when MMCM `locked == 0`.
+  - De-asserted synchronously to the 100 MHz clock edge using a 2-stage synchronizer.
+
+### 8.3 Pinout Mapping Table
+Physical pin constraints are formalized in [`board/zybo_z7_10.xdc`](../board/zybo_z7_10.xdc):
+
+| Port Name | Direction | Pin | IO Standard | Description |
+|---|---|---|---|---|
+| `clk_125mhz` | Input | `K17` | `LVCMOS33` | 125 MHz reference clock |
+| `rst_btn` | Input | `K18` | `LVCMOS33` | Button 0 (Active-high reset) |
+| `btn[1]` | Input | `P16` | `LVCMOS33` | Button 1 (User trigger / Boot initiate) |
+| `btn[2]` | Input | `K19` | `LVCMOS33` | Button 2 (Reserved) |
+| `btn[3]` | Input | `Y16` | `LVCMOS33` | Button 3 (Reserved) |
+| `sw[0]` | Input | `G15` | `LVCMOS33` | Switch 0: Tamper Bit 0 injection |
+| `sw[1]` | Input | `P15` | `LVCMOS33` | Switch 1: Tamper Bit 1 injection |
+| `sw[2]` | Input | `W13` | `LVCMOS33` | Switch 2: Tamper Mode select |
+| `sw[3]` | Input | `T16` | `LVCMOS33` | Switch 3: Bypass / Diagnostic mode |
+| `led[0]` | Output | `M14` | `LVCMOS33` | Green LED 0: **Boot OK** (Digest/Tag valid) |
+| `led[1]` | Output | `M15` | `LVCMOS33` | Green LED 1: **Boot Refused / Error** |
+| `led[2]` | Output | `G14` | `LVCMOS33` | Green LED 2: Ascon Core Busy |
+| `led[3]` | Output | `D18` | `LVCMOS33` | Green LED 3: CPU Heartbeat |
+| `led6_r` | Output | `V16` | `LVCMOS33` | RGB LED 6 Red (Refusal indication) |
+| `led6_g` | Output | `F17` | `LVCMOS33` | RGB LED 6 Green (Authentication passed) |
+| `led6_b` | Output | `M17` | `LVCMOS33` | RGB LED 6 Blue (Permutation executing) |
+
+### 8.4 Memory Topology (PL BRAM vs PS DDR3L)
+- **DDR3L Memory:** Attached to the Processing System (PS) memory controller, not directly wired to PL fabric.
+- **PL On-Chip Storage:** The entire secure boot sequence and demo firmware execute from **PL Block RAM**:
+  - Boot ROM BRAM: 8 KB to 16 KB (2–4 BRAM36 blocks) holding the immutable secure bootloader.
+  - Firmware Image / Scratch BRAM: 32 KB to 64 KB (8–16 BRAM36 blocks) holding the staged firmware binary and manifest.
+  - Total BRAM consumption: $\le 80\text{ KB}$, well within the 270 KB Z7-10 ceiling ($\approx 30\%$ utilization).

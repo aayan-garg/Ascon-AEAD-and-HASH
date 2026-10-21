@@ -9,9 +9,9 @@
 | Field | Value |
 |---|---|
 | **Current Phase** | Phase 0 — Specification Audit & Research Setup |
-| **Last Action** | Phase 0 R-1 completed: verified SP 800-232 algorithm details, S-box truth table, round constants, padding, little-endian ordering; cross-checked against ascon-c with passing KATs; updated architecture.md & algorithm_version.md |
+| **Last Action** | Phase 0 R-2 & R-3 completed: Verified Zybo Z7-10 constraints and generated board/zybo_z7_10.xdc; formalized PicoRV32 core selection in docs/decisions/riscv_core.md; updated architecture.md Section 8 and implementation_plan.md |
 | **Date** | 2026-10-21 |
-| **Overall Progress** | █░░░░░░░░░ ~8% (R-1 completed, reference repo vendored, architecture spec active) |
+| **Overall Progress** | █▓░░░░░░░░ ~12% (R-1, R-2, R-3 complete; board constraints & RISC-V decision committed) |
 
 ---
 
@@ -19,7 +19,7 @@
 
 | Phase | Name | Status | Notes |
 |---|---|---|---|
-| 0 | Spec Audit & Research | `🟡 IN PROGRESS` | R-1 complete; R-2 through R-8 pending |
+| 0 | Spec Audit & Research | `🟡 IN PROGRESS` | R-1, R-2, R-3 complete; R-4 through R-8 pending |
 | 1 | Repo & Environment | `🟡 IN PROGRESS` | Directory created; .gitignore and regression script pending |
 | 2 | RISC-V Bring-up | `⬜ NOT STARTED` | Blocked on Phase 1 |
 | 3 | Golden Model | `⬜ NOT STARTED` | Blocked on Phase 0 R-8 |
@@ -50,6 +50,7 @@
 
 | Date | Action | Files Changed |
 |---|---|---|
+| 2026-10-21 | Phase 0 R-2 & R-3 completed (Zybo Z7-10 constraints & RISC-V selection) | `board/zybo_z7_10.xdc`, `docs/decisions/riscv_core.md`, `docs/architecture.md`, `docs/research_plan.md`, `docs/implementation_plan.md` |
 | 2026-10-21 | Phase 0 R-1 completed (SP 800-232 algorithm audit) | `docs/architecture.md`, `docs/decisions/algorithm_version.md`, `docs/research_plan.md`, `docs/implementation_plan.md`, `reference/ascon-c/` |
 | 2026-10-21 | Project structure initialized | All directories, AGENTS.md, docs/*.md |
 | 2026-10-21 | GitHub repo linked | Cloned https://github.com/aayan-garg/Ascon-AEAD-and-HASH.git |
@@ -58,9 +59,9 @@
 
 ## Next Steps (Immediate)
 
-1. Proceed with Phase 0 R-2: Verify Zybo Z7-10 hardware constraints (XC7Z010-1CLG400C)
-2. Phase 0 R-3: Compare RISC-V candidates and document PicoRV32 decision in `docs/decisions/riscv_core.md`
-3. Phase 1: Complete `.gitignore` and `scripts/run_regression.sh`
+1. Proceed with Phase 0 R-4: AXI4-Lite / DMA Architecture patterns (`docs/register_map.md` field detail)
+2. Phase 0 R-5: S-box Optimization Techniques planning (`tools/sbox_opt/`)
+3. Phase 1: Complete `scripts/run_regression.sh` and trivial simulation testbench
 4. Phase 0 R-8 / Phase 3: Setup Python/C golden model harnessing with official KATs
 
 ---
