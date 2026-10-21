@@ -8,10 +8,10 @@
 
 | Field | Value |
 |---|---|
-| **Current Phase** | Phase 10 — Synthesis & Performance Evaluation |
-| **Last Action** | Phase 9 Formal CTL Verification 100% Complete: Abstracted SMV model `boot_safety.smv` verified with 5/5 CTL properties proved true ($AG(\text{jump} \rightarrow \text{hash\_ok})$, $AG(\text{jump} \rightarrow \text{verified\_before\_jump})$, $AG(\text{tamper\_latched} \rightarrow \neg EF(\text{jump}))$, deterministic refusal, terminal lockout); flawed model `boot_safety_broken.smv` evaluated with counterexample synthesis confirming failure detection; generated `results/formal/proof_correct.log`, `results/formal/counterexample_broken.log`, and `results/formal/phase9_formal_summary.md` |
+| **Current Phase** | Phase 11 — Board Validation & Demo |
+| **Last Action** | Phase 10 Synthesis & Performance Evaluation 100% Complete: Synthesized, placed, and routed all 4 architectural permutation variants (`permutation_1r`, `permutation_2r`, `permutation_half`, `permutation_1r_espresso`) plus full SoC `top_bringup_board` on Digilent Zybo Z7-10 AMD-Xilinx XC7Z010-1CLG400C @ 100 MHz. Extracted real post-route metrics (100% timing met with positive WNS across all variants), computed exact SP 800-232 cryptographic throughputs, and generated `results/performance/comparison_table.md` with zero fabricated data. |
 | **Date** | 2026-10-21 |
-| **Overall Progress** | █████████▍ ~93% (Phases 0, 1, 3, 4, 5, 6, 7, 8, 9 complete; Phase 2 bitstream ready; 21/21 regression suites passing) |
+| **Overall Progress** | █████████▋ ~96% (Phases 0, 1, 3, 4, 5, 6, 7, 8, 9, 10 complete; Phase 2 bitstream ready; 21/21 regression suites passing) |
 
 ---
 
@@ -29,8 +29,8 @@
 | 7 | DMA Integration | `✅ COMPLETED` | Custom DMA engine dma_master.sv, streaming data plane, boundary testing 40/40 PASS, tb_soc_dma passing; unblocks Phase 8 |
 | 8 | Secure Boot | `✅ COMPLETED` | Boot ROM firmware, boot_ctrl FSM, 64B header, provision_image.py, full 9-case matrix 31/31 PASS; unblocks Phase 9 |
 | 9 | Formal CTL | `✅ COMPLETED` | Proved AG (jump -> hash_ok), AG (jump -> verified_before_jump), counterexample synthesized on broken model; unblocks Phase 10 |
-| 10 | Synthesis/Performance | `🟡 READY / NEXT` | Out-of-context synthesis of 1R, 2R, 1/2R variants on XC7Z010 @ 100 MHz; extract LUT/FF/BRAM/Fmax/WNS |
-| 11 | Board Validation | `⬜ NOT STARTED` | Blocked on Phase 10 |
+| 10 | Synthesis/Performance | `✅ COMPLETED` | All 4 variants + full SoC synthesized OOC on XC7Z010 @ 100 MHz; 100% timing met; comparison_table.md populated with zero fabrication |
+| 11 | Board Validation | `🟡 READY / NEXT` | Blocked on board programming / hardware verification |
 | 12 | Final Docs/Handoff | `⬜ NOT STARTED` | Blocked on Phase 11 |
 
 ---
@@ -49,6 +49,7 @@
 ## Recent Activity Log
 
 | Date | Action | Files Changed |
+| 2026-10-21 | Phase 10 Synthesis & Performance Evaluation completed (Unified Vivado batch synthesis script `scripts/synth_variants.tcl` targeting AMD-Xilinx Zynq-7000 XC7Z010-1CLG400C @ 100 MHz OOC; synthesized, placed, and routed all 4 permutation variants [`permutation_1r`, `permutation_2r`, `permutation_half`, `permutation_1r_espresso`] plus full SoC `top_bringup_board`; 100% timing met across all designs; extracted real metrics and calculated NIST SP 800-232 cryptographic throughputs using `scripts/parse_synth_reports.py`; generated `results/performance/comparison_table.md` with zero fabrication) | `scripts/synth_variants.tcl`, `scripts/parse_synth_reports.py`, `board/timing_ooc.xdc`, `results/synthesis/*`, `results/timing/*`, `results/performance/comparison_table.md`, `docs/*` |
 | 2026-10-21 | Phase 9 Formal CTL Verification completed (Abstracted SMV model `formal/ctl/boot_safety.smv` updated with `verified_before_jump` monitor register; verified `AG (jump -> hash_ok)`, `AG (jump -> verified_before_jump)`, `AG (tamper_latched -> !EF jump)`, `AG (DECIDE & !hash_ok -> AX REFUSE)`, `AG (refuse -> AG refuse)` across 320 reachable states and 65,536 transitions; built deliberately broken model `boot_safety_broken.smv` and proved failure with automated counterexample trace synthesis; generated `results/formal/proof_correct.log`, `results/formal/counterexample_broken.log`, and `results/formal/phase9_formal_summary.md`) | `formal/ctl/boot_safety.smv`, `formal/ctl/boot_safety_broken.smv`, `formal/ctl/verify_smv.py`, `results/formal/*`, `docs/*` |
 | 2026-10-21 | Phase 8 Secure Boot & Boot ROM Software completed (64-byte authenticated header format §12.4, automated provision script `scripts/provision_image.py`, hardware secure boot controller `boot_ctrl.sv` with 256-bit comparator and sticky tamper register, unit testbench `tb_boot_ctrl.sv` with 31/31 assertions PASS, immutable Boot ROM firmware `firmware/bootrom/secure_boot.c` compiled to `.hex`, candidate payload `app_payload.c` linked at `0x0000_1040`, integration testbench `tb_secure_boot.sv` verifying all 9 cases of §12.5 Boot Matrix with 31/31 assertions PASS and zero hung states, per-case logs and summary report in `results/board/boot_matrix/`) | `docs/threat_model.md`, `rtl/soc/boot_ctrl.sv`, `rtl/bus/axil_regs.sv`, `rtl/soc/top_bringup.sv`, `firmware/bootrom/*`, `firmware/linker/app.ld`, `firmware/tests/app_payload.c`, `scripts/provision_image.py`, `tb/unit/tb_boot_ctrl.sv`, `tb/integration/tb_secure_boot.sv`, `results/board/boot_matrix/*`, `docs/*` |
 | 2026-10-21 | Phase 7 Direct Memory Access (DMA) Integration completed (`dma_master.sv` custom burst-to-stream engine reading Port B of 16 KB BRAM, `top_bringup.sv` integration, `tb_dma.sv` with 40/40 boundary assertions PASS, `accel_dma_test.c` RISC-V firmware compiled to `.hex`, `tb_soc_dma.sv` full SoC simulation passing in 2,122 cycles with `GPIO[31]=1`, `results/board/dma_boundary.log`, `results/board/phase7_dma_summary.md`) | `rtl/dma/dma_master.sv`, `rtl/soc/top_bringup.sv`, `tb/integration/tb_dma.sv`, `tb/integration/tb_soc_dma.sv`, `firmware/tests/accel_dma_test.*`, `results/board/*`, `docs/*` |
@@ -69,12 +70,14 @@
 
 ## Next Steps (Immediate)
 
-1. **Proceed to Phase 10: Synthesis & Performance Evaluation**
-   - Synthesize and implement all three datapath variants on XC7Z010 @ 100 MHz (`permutation_1r.sv`, `permutation_2r.sv`, `permutation_half.sv`)
-   - Run synthesis for the complete `top_bringup.sv` SoC
-   - Extract exact LUT, FF, BRAM, DSP, F_max, and WNS metrics from Vivado reports
-   - Compute throughput (Mbit/s) for AEAD128 and Hash256 across all variants
-   - Generate populated `results/performance/comparison_table.md` with zero fabricated numbers
+1. **Proceed to Phase 11: Board Validation & Demo**
+   - Run cryptographic KATs on the actual Digilent Zybo Z7-10 board
+   - Confirm 100 MHz clock generation via onboard MMCM and PL oscillator
+   - Measure boot-time cycles for a stated firmware image size
+   - Execute interactive hardware tamper demo:
+     - Normal image verification $\rightarrow$ "Boot OK" LED pattern
+     - Slide-switch tamper injection $\rightarrow$ "Boot Refused" sticky lockout LED pattern
+   - Record logs in `results/board/board_kat_pass.log` and `results/board/boot_time_measurement.md`
 
 
 

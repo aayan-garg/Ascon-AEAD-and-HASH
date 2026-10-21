@@ -331,20 +331,20 @@ Phase 11 ──→ Phase 12 (Final Documentation & Handoff)
 **Feeds:** Phase 11 (board), Phase 12 (final results).
 
 ### Tasks
-- [ ] Create common Vivado project with 100 MHz constraint for XC7Z010
-- [ ] Synthesize and implement: ½ round/cycle variant
-- [ ] Synthesize and implement: 1 round/cycle variant (baseline)
-- [ ] Synthesize and implement: 2 rounds/cycle variant
-- [ ] Synthesize and implement: paper-based technique variant
-- [ ] Extract from each: LUT, FF, BRAM, DSP, F_max (routed), WNS
-- [ ] Compute throughput (Mbit/s) using correct sponge rate and cycle count
-- [ ] Fill in the results table in `results/performance/comparison_table.md`
-- [ ] **NO FABRICATED NUMBERS** — every cell comes from an actual Vivado report
+- [x] Create common Vivado project with 100 MHz constraint for XC7Z010
+- [x] Synthesize and implement: ½ round/cycle variant
+- [x] Synthesize and implement: 1 round/cycle variant (baseline)
+- [x] Synthesize and implement: 2 rounds/cycle variant
+- [x] Synthesize and implement: paper-based technique variant
+- [x] Extract from each: LUT, FF, BRAM, DSP, F_max (routed), WNS
+- [x] Compute throughput (Mbit/s) using correct sponge rate and cycle count
+- [x] Fill in the results table in `results/performance/comparison_table.md`
+- [x] **NO FABRICATED NUMBERS** — every cell comes from an actual Vivado report
 
 ### Exit Gate
-- [ ] All 4 variants synthesized with results recorded
-- [ ] 100 MHz timing status explicitly stated per variant (met / not met, with WNS)
-- [ ] Evidence: `results/synthesis/`, `results/timing/`, `results/performance/`
+- [x] All 4 variants synthesized with results recorded
+- [x] 100 MHz timing status explicitly stated per variant (met / not met, with WNS)
+- [x] Evidence: `results/synthesis/`, `results/timing/`, `results/performance/`
 
 ### Artifacts
 - `results/performance/comparison_table.md`

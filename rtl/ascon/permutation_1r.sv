@@ -12,7 +12,9 @@
 `timescale 1ns / 1ps
 `default_nettype wire
 
-module permutation_1r (
+module permutation_1r #(
+    parameter SBOX_TYPE = "BASELINE"
+) (
     input  wire        clk,
     input  wire        rst_n,
 
@@ -78,7 +80,7 @@ module permutation_1r (
     wire [63:0] next_x0, next_x1, next_x2, next_x3, next_x4;
     wire [ 7:0] current_rc = get_round_const(r_const_idx);
 
-    round_core u_round_core (
+    round_core #(.SBOX_TYPE(SBOX_TYPE)) u_round_core (
         .in_x0       (r_x0),
         .in_x1       (r_x1),
         .in_x2       (r_x2),

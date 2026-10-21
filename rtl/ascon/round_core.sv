@@ -11,7 +11,9 @@
 `timescale 1ns / 1ps
 `default_nettype wire
 
-module round_core (
+module round_core #(
+    parameter SBOX_TYPE = "BASELINE" // "BASELINE" or "ESPRESSO"
+) (
     input  wire [63:0] in_x0,
     input  wire [63:0] in_x1,
     input  wire [63:0] in_x2,
@@ -51,10 +53,17 @@ module round_core (
             wire [4:0] sbox_in  = {pc_x0[i], pc_x1[i], pc_x2[i], pc_x3[i], pc_x4[i]};
             wire [4:0] sbox_out;
 
-            sbox5 u_sbox5 (
-                .in_x  (sbox_in),
-                .out_y (sbox_out)
-            );
+            if (SBOX_TYPE == "ESPRESSO") begin : gen_espresso
+                sbox5_espresso u_sbox5 (
+                    .in_x  (sbox_in),
+                    .out_y (sbox_out)
+                );
+            end else begin : gen_baseline
+                sbox5 u_sbox5 (
+                    .in_x  (sbox_in),
+                    .out_y (sbox_out)
+                );
+            end
 
             assign ps_x0[i] = sbox_out[4];
             assign ps_x1[i] = sbox_out[3];
