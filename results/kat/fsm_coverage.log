@@ -1,0 +1,41 @@
+
+****** xsim v2025.1 (64-bit)
+  **** SW Build 6140274 on Thu May 22 00:12:29 MDT 2025
+  **** IP Build 6138677 on Thu May 22 03:10:11 MDT 2025
+  **** SharedData Build 6139179 on Tue May 20 17:58:58 MDT 2025
+  **** Start of session at: Wed Oct 21 19:33:56 2026
+    ** Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.
+    ** Copyright 2022-2025 Advanced Micro Devices, Inc. All Rights Reserved.
+
+source xsim.dir/tb_mode_ctrl_sim/xsim_script.tcl
+# xsim {tb_mode_ctrl_sim} -autoloadwcfg -runall
+Time resolution is 1 ps
+run -all
+================================================================================
+STARTING ASCON MODE CONTROLLER (mode_ctrl.sv) VERIFICATION
+================================================================================
+
+[TEST 1] Ascon-Hash256 Empty Message Vector...
+  Computed Digest: H0=0x986b2f0f85e53b0b, H1=0x649ba8de8f9ff2ca, H2=0x838f9b24aa70faa1, H3=0xb2924d30aa3bd59b
+  [PASS] Test 1 Hash exactly matches NIST KAT Count 1 (0B3BE585...)!
+
+[TEST 2] Ascon-Hash256 1-Byte Message Vector ('00')...
+  Computed Digest: H0=0xd23eaf3510622807, H1=0xf900e9fdf63ba0bc, H2=0x23eeb5e430536f45, H3=0x80bc9102e7a1f6e7
+  [PASS] Test 2 Hash exactly matches NIST KAT Count 2 (07286210...)!
+
+[TEST 3] Ascon-AEAD128 Encryption Count 1 (Empty PT/AD)...
+  Computed Tag: T0=0x31c9be1182279c4f, T1=0xc62e8bee468ff66b
+  [PASS] Test 3 AEAD Tag matches NIST KAT Count 1 (4F9C2782...)!
+
+[TEST 4] Ascon-AEAD128 Decryption with Valid Tag...
+  [PASS] Valid decryption successfully authenticated: tag_ok = 1, error = 0.
+
+[TEST 5] Ascon-AEAD128 Decryption with Corrupted Tag...
+  [PASS] Tampered tag rejected: tag_ok = 0, error = 1, shadow buffer zeroized.
+
+================================================================================
+MODE CONTROLLER VERIFICATION RESULT: 100  PASS - ALL TESTS MATCH NIST KATs
+================================================================================
+$finish called at time : 2615 ns : File "C:/Users/Aayan/Desktop/RTL_Project/Ascon-AEAD-and-HASH/tb/unit/tb_mode_ctrl.sv" Line 284
+exit
+INFO: [Common 17-206] Exiting xsim at Wed Oct 21 19:33:58 2026...

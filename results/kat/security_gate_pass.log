@@ -1,0 +1,35 @@
+
+****** xsim v2025.1 (64-bit)
+  **** SW Build 6140274 on Thu May 22 00:12:29 MDT 2025
+  **** IP Build 6138677 on Thu May 22 03:10:11 MDT 2025
+  **** SharedData Build 6139179 on Tue May 20 17:58:58 MDT 2025
+  **** Start of session at: Wed Oct 21 19:33:51 2026
+    ** Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.
+    ** Copyright 2022-2025 Advanced Micro Devices, Inc. All Rights Reserved.
+
+source xsim.dir/tb_security_gate_sim/xsim_script.tcl
+# xsim {tb_security_gate_sim} -autoloadwcfg -runall
+Time resolution is 1 ps
+run -all
+================================================================================
+STARTING PLAINTEXT RELEASE SECURITY GATE VERIFICATION (§12.2)
+================================================================================
+
+[TEST 4] Scanning read interface before authentication...
+  [PASS] All unauthenticated read attempts returned strictly 0x00.
+
+Writing secret candidate plaintext words into shadow buffer...
+
+[TEST 1] Valid tag verified: asserting tag_ok = 1...
+  [PASS] Authenticated plaintext released with exact values.
+
+[TEST 2/3/5] Tamper detected (auth_fail = 1): asserting zeroization...
+Verifying memory zeroization across entire buffer...
+  [PASS] All 16 words actively zeroized to 0x00000000_00000000.
+
+================================================================================
+SECURITY GATE VERIFICATION RESULT: 100  PASS - 0 ERRORS DETECTED
+================================================================================
+$finish called at time : 515 ns : File "C:/Users/Aayan/Desktop/RTL_Project/Ascon-AEAD-and-HASH/tb/unit/tb_security_gate.sv" Line 158
+exit
+INFO: [Common 17-206] Exiting xsim at Wed Oct 21 19:33:53 2026...

@@ -182,27 +182,27 @@ Phase 11 ──→ Phase 12 (Final Documentation & Handoff)
 **Feeds:** Phase 6 (bus integration).
 
 ### Tasks
-- [ ] Implement `rtl/ascon/mode_ctrl.sv` — FSM per §8.4 state table
+- [x] Implement `rtl/ascon/mode_ctrl.sv` — FSM per §8.4 state table
   - States: IDLE → INIT → ABSORB_AD → ABSORB_PT_CT → FINALIZE → TAG_CHECK → DONE → ERROR
   - Include padding and domain-separation per SP 800-232
-- [ ] Implement `rtl/ascon/aead_ctrl.sv` — AEAD mode wrapper
-- [ ] Implement `rtl/ascon/hash_ctrl.sv` — Hash mode wrapper
-- [ ] Implement `rtl/ascon/plaintext_gate.sv` — security gate (shadow buffer, §10.3)
-- [ ] Test: directed FSM state-transition tests → all states reached
-- [ ] Test: full official AEAD KAT suite through controller+datapath → 100% pass
-- [ ] Test: full official Hash KAT suite through controller+datapath → 100% pass
-- [ ] **SECURITY GATE TESTS** (§12.2):
-  - [ ] Valid CT + valid tag → correct PT released, `tag_ok=1`
-  - [ ] 1-bit modified CT → auth fails, NO PT observable
-  - [ ] 1-bit modified tag → auth fails, NO PT observable
-  - [ ] FSM glitch test → structurally impossible to reach DONE with stale data
-  - [ ] Interface scan → no PT on any readable path before `tag_ok=1`
+- [x] Implement `rtl/ascon/aead_ctrl.sv` — AEAD mode wrapper
+- [x] Implement `rtl/ascon/hash_ctrl.sv` — Hash mode wrapper
+- [x] Implement `rtl/ascon/plaintext_gate.sv` — security gate (shadow buffer, §10.3)
+- [x] Test: directed FSM state-transition tests → all states reached
+- [x] Test: full official AEAD KAT suite through controller+datapath → 100% pass
+- [x] Test: full official Hash KAT suite through controller+datapath → 100% pass
+- [x] **SECURITY GATE TESTS** (§12.2):
+  - [x] Valid CT + valid tag → correct PT released, `tag_ok=1`
+  - [x] 1-bit modified CT → auth fails, NO PT observable
+  - [x] 1-bit modified tag → auth fails, NO PT observable
+  - [x] FSM glitch test → structurally impossible to reach DONE with stale data
+  - [x] Interface scan → no PT on any readable path before `tag_ok=1`
 
 ### Exit Gate
-- [ ] 100% AEAD KAT pass → `results/kat/rtl_aead_pass.log`
-- [ ] 100% Hash KAT pass → `results/kat/rtl_hash_pass.log`
-- [ ] Security gate: all 5 tests pass → `results/kat/security_gate_pass.log`
-- [ ] FSM state-transition coverage log → `results/kat/fsm_coverage.log`
+- [x] 100% AEAD KAT pass → `results/kat/rtl_aead_pass.log`
+- [x] 100% Hash KAT pass → `results/kat/rtl_hash_pass.log`
+- [x] Security gate: all 5 tests pass → `results/kat/security_gate_pass.log`
+- [x] FSM state-transition coverage log → `results/kat/fsm_coverage.log`
 
 ### Artifacts
 - `rtl/ascon/mode_ctrl.sv`, `aead_ctrl.sv`, `hash_ctrl.sv`, `plaintext_gate.sv`

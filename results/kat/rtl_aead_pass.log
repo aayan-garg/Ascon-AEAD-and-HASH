@@ -1,0 +1,49 @@
+
+****** xsim v2025.1 (64-bit)
+  **** SW Build 6140274 on Thu May 22 00:12:29 MDT 2025
+  **** IP Build 6138677 on Thu May 22 03:10:11 MDT 2025
+  **** SharedData Build 6139179 on Tue May 20 17:58:58 MDT 2025
+  **** Start of session at: Wed Oct 21 19:33:41 2026
+    ** Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.
+    ** Copyright 2022-2025 Advanced Micro Devices, Inc. All Rights Reserved.
+
+source xsim.dir/tb_aead_sim/xsim_script.tcl
+# xsim {tb_aead_sim} -autoloadwcfg -runall
+Time resolution is 1 ps
+run -all
+================================================================================
+STARTING OFFICIAL NIST KAT ASCON-AEAD128 VERIFICATION: tb_aead
+================================================================================
+
+[AEAD TEST 1] Count 1: PT_len = 0, AD_len = 0...
+  Computed Tag: T0=0x31c9be1182279c4f, T1=0xc62e8bee468ff66b
+  [PASS] Count 1 Tag Matches NIST KAT (4F9C2782...)!
+
+[AEAD TEST 2] Count 2: PT_len = 0, AD_len = 1 (AD='30')...
+  Computed Tag: T0=0xa2098ae14f67cbcc, T1=0xc07556b311abd685
+  [PASS] Count 2 Tag Matches NIST KAT (CCCB674F...)!
+
+[AEAD TEST 3] Count 17: PT_len = 0, AD_len = 16 (Full 16-byte AD block)...
+  Computed Tag: T0=0x9dee3083db0c23e4, T1=0xdce646b3c7d7cfc0
+  [PASS] Count 17 Tag Matches NIST KAT (E4230CDB...)!
+
+[AEAD TEST 4] Count 35 Encryption: PT_len = 1, AD_len = 1...
+  Computed Ciphertext: 0x96 (Expected: 0x96)
+  Computed Tag: T0=0xd8a7756c8316802b, T1=0x86d845a28c586668
+  [PASS] Count 35 Ciphertext & Tag Match NIST KAT (962B8016...)!
+
+[AEAD TEST 5] Count 35 Decryption with Valid Tag...
+  Decryption Status: tag_ok = 1, error = 0
+  Released Plaintext: 0x20 (Expected: 0x20)
+  [PASS] Count 35 Decryption Authenticated: Plaintext 0x20 correctly released!
+
+[AEAD TEST 6] Count 35 Decryption with Corrupted Ciphertext (0x97 instead of 0x96)...
+  Decryption Status: tag_ok = 0, error = 1, pt_rd_data = 0x0000000000000000
+  [PASS] Tampered ciphertext correctly rejected: tag_ok = 0, error = 1, shadow buffer zeroized.
+
+================================================================================
+ASCON-AEAD128 NIST KAT RESULT: 100  PASS (ALL VECTORS MATCH)
+================================================================================
+$finish called at time : 2795 ns : File "C:/Users/Aayan/Desktop/RTL_Project/Ascon-AEAD-and-HASH/tb/unit/tb_aead.sv" Line 363
+exit
+INFO: [Common 17-206] Exiting xsim at Wed Oct 21 19:33:43 2026...

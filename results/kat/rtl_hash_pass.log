@@ -1,0 +1,43 @@
+
+****** xsim v2025.1 (64-bit)
+  **** SW Build 6140274 on Thu May 22 00:12:29 MDT 2025
+  **** IP Build 6138677 on Thu May 22 03:10:11 MDT 2025
+  **** SharedData Build 6139179 on Tue May 20 17:58:58 MDT 2025
+  **** Start of session at: Wed Oct 21 19:33:47 2026
+    ** Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.
+    ** Copyright 2022-2025 Advanced Micro Devices, Inc. All Rights Reserved.
+
+source xsim.dir/tb_hash_sim/xsim_script.tcl
+# xsim {tb_hash_sim} -autoloadwcfg -runall
+Time resolution is 1 ps
+run -all
+================================================================================
+STARTING OFFICIAL NIST KAT ASCON-HASH256 VERIFICATION: tb_hash
+================================================================================
+
+[HASH TEST] Count 1 (0-byte) (Length = 0 bytes)...
+  Computed: H0=0x986b2f0f85e53b0b, H1=0x649ba8de8f9ff2ca, H2=0x838f9b24aa70faa1, H3=0xb2924d30aa3bd59b
+  Expected: H0=0x986b2f0f85e53b0b, H1=0x649ba8de8f9ff2ca, H2=0x838f9b24aa70faa1, H3=0xb2924d30aa3bd59b
+  [PASS] Count 1 (0-byte) Exact NIST KAT Match!
+
+[HASH TEST] Count 2 (1-byte) (Length = 1 bytes)...
+  Computed: H0=0xd23eaf3510622807, H1=0xf900e9fdf63ba0bc, H2=0x23eeb5e430536f45, H3=0x80bc9102e7a1f6e7
+  Expected: H0=0xd23eaf3510622807, H1=0xf900e9fdf63ba0bc, H2=0x23eeb5e430536f45, H3=0x80bc9102e7a1f6e7
+  [PASS] Count 2 (1-byte) Exact NIST KAT Match!
+
+[HASH TEST] Count 9 (8-byte) (Length = 8 bytes)...
+  Computed: H0=0x64fbe6e87a498eb8, H1=0xfcf2b82e62ef871b, H2=0xbefe7f3f3895eda0, H3=0x4f76ba9910cf7a16
+  Expected: H0=0x64fbe6e87a498eb8, H1=0xfcf2b82e62ef871b, H2=0xbefe7f3f3895eda0, H3=0x4f76ba9910cf7a16
+  [PASS] Count 9 (8-byte) Exact NIST KAT Match!
+
+[HASH TEST] unt 17 (16-byte) (Length = 16 bytes)...
+  Computed: H0=0xdbba2f0a94c15831, H1=0xb959787761b68ad6, H2=0x115937fc4e9e684a, H3=0x385c8341d6dd7a46
+  Expected: H0=0xdbba2f0a94c15831, H1=0xb959787761b68ad6, H2=0x115937fc4e9e684a, H3=0x385c8341d6dd7a46
+  [PASS] unt 17 (16-byte) Exact NIST KAT Match!
+
+================================================================================
+ASCON-HASH256 NIST KAT RESULT: 100  PASS (ALL VECTORS MATCH)
+================================================================================
+$finish called at time : 3565 ns : File "C:/Users/Aayan/Desktop/RTL_Project/Ascon-AEAD-and-HASH/tb/unit/tb_hash.sv" Line 167
+exit
+INFO: [Common 17-206] Exiting xsim at Wed Oct 21 19:33:48 2026...
