@@ -8,10 +8,10 @@
 
 | Field | Value |
 |---|---|
-| **Current Phase** | Phase 4 — Permutation Datapath & Phase 5 Controller |
-| **Last Action** | Phase 4 Permutation Datapath Core Implemented: Implemented and 100% verified rtl/ascon/sbox5.sv (32-vector exhaustive match, results/kat/sbox_exhaustive.log), rtl/ascon/diffusion.sv (directed + 1,000 random vectors), rtl/ascon/round_core.sv (combinational round core), and rtl/ascon/permutation_1r.sv (1-round/cycle sequential core bit-exact on p^12 and p^6, results/kat/perm_1r_pass.log); all 8 regression suites passing in 34.56s |
+| **Current Phase** | Phase 5 — AEAD and Hash Mode Controller |
+| **Last Action** | Phase 4 Datapath Architecture Exploration Complete: Designed, simulated, and 100% verified all three Ascon permutation datapath variants (1-round baseline `permutation_1r.sv`, 2-round unrolled `permutation_2r.sv` in 6 cycles for p^12, and 1/2-round pipelined `permutation_half.sv` in 24 cycles for p^12); all pass logs generated (perm_1r_pass.log, perm_2r_pass.log, perm_half_pass.log); 10/10 regression suites passing green |
 | **Date** | 2026-10-21 |
-| **Overall Progress** | ████▌░░░░░ ~45% (Phase 0, 1, 3 complete; Phase 2 bitstream built & sim verified; Phase 4 core datapath verified) |
+| **Overall Progress** | █████▌░░░░ ~55% (Phase 0, 1, 3, 4 complete; Phase 2 bitstream ready; 10/10 regression passing) |
 
 ---
 
@@ -23,7 +23,7 @@
 | 1 | Repo & Environment | `✅ COMPLETED` | Clean repo; .gitignore active; tb_hello.sv passing; regression script passing |
 | 2 | RISC-V Bring-up | `🟡 BITSTREAM BUILT` | Simulation verified in Vivado GUI; build/top_bringup.bit ready for hardware flash |
 | 3 | Golden Model | `✅ COMPLETED` | 100% KAT pass in reference/run_kats.py (2,120 vectors); ready as RTL oracle |
-| 4 | Permutation Datapath | `🟡 CORE VERIFIED` | sbox5, diffusion, round_core, permutation_1r passing bit-exact; unblocks Phase 5 |
+| 4 | Permutation Datapath | `✅ COMPLETED` | All 3 variants (1R, 2R, 1/2R) bit-exact; unblocks Phase 5 |
 | 5 | AEAD/Hash Controller | `🟡 READY / NEXT` | Mode FSM, absorbing/squeezing, tag verification, security plaintext gate |
 | 6 | Bus Integration | `⬜ NOT STARTED` | Blocked on Phase 2 + 5 |
 | 7 | DMA Integration | `⬜ NOT STARTED` | Blocked on Phase 6 |

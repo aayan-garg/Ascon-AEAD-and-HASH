@@ -157,16 +157,16 @@ Phase 11 ──→ Phase 12 (Final Documentation & Handoff)
 - [x] Implement `rtl/ascon/round_core.sv` — one full combinational round (`tb/unit/tb_round_core.sv` passing)
 - [x] Implement `rtl/ascon/permutation_1r.sv` — 1 round/cycle (baseline)
 - [x] Test: round-by-round differential against golden model → 0 mismatches (`results/kat/perm_1r_pass.log`)
-- [ ] Implement `rtl/ascon/permutation_half.sv` — ½ round/cycle (2 micro-steps)
-- [ ] Implement `rtl/ascon/permutation_2r.sv` — 2 rounds/cycle (chained)
-- [ ] Test: all 3 variants pass full KAT differential test
+- [x] Implement `rtl/ascon/permutation_half.sv` — ½ round/cycle (2 micro-steps)
+- [x] Implement `rtl/ascon/permutation_2r.sv` — 2 rounds/cycle (chained)
+- [x] Test: all 3 variants pass full KAT differential test
 - [ ] Implement `rtl/ascon/sbox5_espresso.sv` — ESPRESSO/BDD-derived variant
 - [ ] Test: same exhaustive truth-table check passes
 
 ### Exit Gate
 - [x] S-box exhaustive test: 0 mismatches → `results/kat/sbox_exhaustive.log`
-- [ ] All 3 permutation variants: bit-exact against golden model over full KAT set
-- [ ] Evidence: `results/kat/perm_1r_pass.log`, `results/kat/perm_half_pass.log`, `results/kat/perm_2r_pass.log`
+- [x] All 3 permutation variants: bit-exact against golden model over full KAT set
+- [x] Evidence: `results/kat/perm_1r_pass.log`, `results/kat/perm_half_pass.log`, `results/kat/perm_2r_pass.log`
 
 ### Artifacts
 - `rtl/ascon/sbox5.sv`, `diffusion.sv`, `round_core.sv`, `state_reg.sv`
