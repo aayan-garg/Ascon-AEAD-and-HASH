@@ -96,14 +96,14 @@ Phase 11 ──→ Phase 12 (Final Documentation & Handoff)
 **Feeds:** Phase 6 (bus integration).
 
 ### Tasks
-- [ ] Integrate PicoRV32 (`picorv32_axi`) with minimal instruction/data BRAM
-- [ ] Write a minimal firmware: "loop and toggle a GPIO bit"
-- [ ] Simulate the design — confirm GPIO toggling in waveform
-- [ ] Create board constraints (`board/zybo_z7_10.xdc`) with:
+- [x] Integrate PicoRV32 (`picorv32_axi`) with minimal instruction/data BRAM (`rtl/soc/top_bringup.sv`, `rtl/soc/picorv32.v`)
+- [x] Write a minimal firmware: "loop and toggle a GPIO bit" (`firmware/tests/gpio_toggle.c`, `firmware/startup/crt0.S`, `firmware/linker/bringup.ld`)
+- [x] Simulate the design — confirm GPIO toggling in waveform (`tb/unit/tb_picorv32_bringup.sv` verified in Vivado XSim)
+- [x] Create board constraints (`board/zybo_z7_10.xdc`) with:
   - 125 MHz clock on pin K17 → MMCM → 100 MHz
   - LED pin assignments
   - Switch pin assignments
-- [ ] Synthesize and program the Zybo Z7-10
+- [ ] Synthesize and program the Zybo Z7-10 (hardware programming step)
 - [ ] **HARD GATE:** Demonstrate LED toggling on the actual board
 
 ### Exit Gate (HARD — no proceeding without this)

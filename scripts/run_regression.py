@@ -50,8 +50,24 @@ def run_simulation_test(tb_file: str) -> tuple[bool, float, str]:
     tb_name = os.path.splitext(os.path.basename(tb_file))[0]
     os.makedirs(SIM_BUILD_DIR, exist_ok=True)
     
+    # Sync firmware hex files into sim_build so relative paths resolve cleanly
+    sim_fw_dir = os.path.join(SIM_BUILD_DIR, "firmware", "tests")
+    os.makedirs(sim_fw_dir, exist_ok=True)
+    fw_src = os.path.join(ROOT_DIR, "firmware", "tests")
+    if os.path.exists(fw_src):
+        for f in os.listdir(fw_src):
+            if f.endswith(".hex"):
+                shutil.copy2(os.path.join(fw_src, f), os.path.join(sim_fw_dir, f))
+    
+    # Collect all RTL source files
+    rtl_files = []
+    for root, _, files in os.walk(os.path.join(ROOT_DIR, "rtl")):
+        for f in files:
+            if f.endswith(".v") or f.endswith(".sv"):
+                rtl_files.append(os.path.join(root, f))
+
     # 1. xvlog
-    xvlog_cmd = [XVLOG, "-sv", os.path.abspath(tb_file)]
+    xvlog_cmd = [XVLOG, "-sv"] + rtl_files + [os.path.abspath(tb_file)]
     pass_vlog, dur_vlog, out_vlog = run_step(f"Compile {tb_name} (xvlog)", xvlog_cmd, cwd=SIM_BUILD_DIR)
     if not pass_vlog:
         return False, dur_vlog, f"Compilation failed:\n{out_vlog}"

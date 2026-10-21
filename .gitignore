@@ -64,3 +64,5 @@ results/**/*.wdb
 # Scratch and binaries
 scratch/
 *.exe
+*.elf
+*.bin
