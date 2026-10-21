@@ -8,10 +8,10 @@
 
 | Field | Value |
 |---|---|
-| **Current Phase** | Phase 2 — RISC-V Core Bring-Up & Phase 4 Permutation Datapath |
-| **Last Action** | Phase 2 Bring-Up Simulation Completed: Integrated PicoRV32 AXI core (rtl/soc/picorv32.v) and top_bringup.sv with 16 KB BRAM and GPIO slave; compiled bare-metal C firmware (firmware/tests/gpio_toggle.c) with WSL riscv64-unknown-elf-gcc; verified tb/unit/tb_picorv32_bringup.sv in Vivado XSim (walking 1s across LEDs 0..3 and scratchpad RAM readback passed in 1,384 cycles); added simulation test to automated regression suite (scripts/run_regression.py); documented in results/board/phase2_bringup.md |
+| **Current Phase** | Phase 2 — RISC-V Bring-Up (Bitstream Ready) & Phase 4 Permutation Datapath |
+| **Last Action** | Phase 2 Bitstream Synthesis & Waveform Tools Complete: Synthesized, placed, and routed top_bringup_board for Zybo Z7-10 (XC7Z010-1CLG400C) at 100 MHz using Vivado 2025.1; achieved zero timing violations with WNS = +3.098 ns and 1,001 LUTs (5.69%); generated build/top_bringup.bit; created scripts/program_board.tcl for automated JTAG programming; created scripts/view_waveform.py and scripts/open_wave_gui.bat for waveform visualization; updated results/board/phase2_bringup.md and implementation_plan.md |
 | **Date** | 2026-10-21 |
-| **Overall Progress** | ███░░░░░░░ ~30% (Phase 0, 1 complete; Phase 2 simulation verified; regression framework running 100% green) |
+| **Overall Progress** | ███▌░░░░░░ ~35% (Phase 0, 1 complete; Phase 2 bitstream built; regression running 100% green) |
 
 ---
 
@@ -21,7 +21,7 @@
 |---|---|---|---|
 | 0 | Spec Audit & Research | `✅ COMPLETED` | All R-1 through R-8 complete; all exit gates met |
 | 1 | Repo & Environment | `✅ COMPLETED` | Clean repo; .gitignore active; tb_hello.sv passing; regression script passing |
-| 2 | RISC-V Bring-up | `🟡 SIMULATION VERIFIED` | Simulation & firmware 100% verified; bitstream ready for board demo |
+| 2 | RISC-V Bring-up | `🟡 BITSTREAM BUILT` | Simulation & firmware 100% pass; build/top_bringup.bit ready for board programming |
 | 3 | Golden Model | `✅ COMPLETED` | 100% KAT pass in reference/run_kats.py; ready as RTL oracle |
 | 4 | Permutation Datapath | `🟡 READY / NEXT` | Unblocked by Phase 0 R-5 & Phase 3 |
 | 5 | AEAD/Hash Controller | `⬜ NOT STARTED` | Blocked on Phase 4 |
@@ -50,6 +50,7 @@
 
 | Date | Action | Files Changed |
 |---|---|---|
+| 2026-10-21 | Phase 2 Bitstream Synthesis & Waveform Tools completed (Vivado 2025.1 synthesis, opt, place, route; WNS = +3.098 ns; top_bringup.bit built; program_board.tcl created; view_waveform.py & open_wave_gui.bat created) | `rtl/soc/top_bringup_board.sv`, `firmware/tests/gpio_toggle_board.*`, `scripts/build_bitstream.tcl`, `scripts/program_board.tcl`, `scripts/view_waveform.py`, `scripts/open_wave_gui.bat`, `results/board/phase2_bringup.md`, `docs/implementation_plan.md` |
 | 2026-10-21 | Phase 2 Bring-Up Simulation completed (PicoRV32 AXI core, 16 KB BRAM, AXI4-Lite GPIO peripheral, gpio_toggle.c firmware, tb_picorv32_bringup.sv verified in XSim) | `rtl/soc/picorv32.v`, `rtl/soc/top_bringup.sv`, `firmware/linker/bringup.ld`, `firmware/startup/crt0.S`, `firmware/tests/gpio_toggle.c`, `firmware/build_firmware.py`, `tb/unit/tb_picorv32_bringup.sv`, `results/board/phase2_bringup.md`, `scripts/run_regression.py`, `docs/implementation_plan.md` |
 | 2026-10-21 | Phase 0 R-8 & Phase 1 completed (Golden model KAT verification, tb_hello.sv unit test, and automated regression runner) | `reference/kat/*`, `reference/pyascon/*`, `reference/run_kats.py`, `results/kat/*`, `tb/unit/tb_hello.sv`, `scripts/run_regression.*`, `docs/research_plan.md`, `docs/implementation_plan.md` |
 | 2026-10-21 | Phase 0 R-6 & R-7 completed (Hardware papers literature review, tooling audit, formal CTL specification & model checker) | `docs/research_review.md`, `docs/decisions/tooling.md`, `formal/ctl/*`, `docs/research_plan.md`, `docs/implementation_plan.md` |

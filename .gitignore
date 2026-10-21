@@ -20,6 +20,8 @@
 *.pb
 dfx_runtime.txt
 webtalk*
+clockInfo.txt
+.Xil/
 vivado_*.backup.*
 
 # Simulation dumps
@@ -63,6 +65,7 @@ results/**/*.wdb
 
 # Scratch and binaries
 scratch/
+build/
 *.exe
 *.elf
 *.bin

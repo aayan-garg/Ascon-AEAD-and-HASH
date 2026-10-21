@@ -103,8 +103,8 @@ Phase 11 ──→ Phase 12 (Final Documentation & Handoff)
   - 125 MHz clock on pin K17 → MMCM → 100 MHz
   - LED pin assignments
   - Switch pin assignments
-- [ ] Synthesize and program the Zybo Z7-10 (hardware programming step)
-- [ ] **HARD GATE:** Demonstrate LED toggling on the actual board
+- [x] Synthesize and generate bitstream for Zybo Z7-10 (`build/top_bringup.bit` generated, 0 timing errors, WNS = +3.098 ns)
+- [ ] **HARD GATE:** Demonstrate LED toggling on the actual physical board (JTAG programming ready via `scripts/program_board.tcl`)
 
 ### Exit Gate (HARD — no proceeding without this)
 - [ ] Known program runs on the **actual Zybo Z7-10 board**
@@ -112,9 +112,10 @@ Phase 11 ──→ Phase 12 (Final Documentation & Handoff)
 - [ ] Evidence: photo/video of LED + waveform screenshot
 
 ### Artifacts
-- `rtl/soc/top_bringup.sv`
-- `firmware/tests/gpio_toggle.c`
+- `rtl/soc/top_bringup.sv`, `rtl/soc/top_bringup_board.sv`
+- `firmware/tests/gpio_toggle.c`, `firmware/tests/gpio_toggle_board.c`
 - `board/zybo_z7_10.xdc`
+- `build/top_bringup.bit`
 - `results/board/phase2_bringup.md` (evidence)
 
 ---
@@ -125,17 +126,17 @@ Phase 11 ──→ Phase 12 (Final Documentation & Handoff)
 **Feeds:** Phase 4 (RTL oracle), Phase 5 (controller tests).
 
 ### Tasks
-- [ ] Vendor `pyascon` (or wrap `ascon-c`) into `reference/`
-- [ ] Create `reference/run_kats.py` — runs full official KAT suite
-- [ ] **HARD GATE:** Golden model passes 100% of official AEAD KAT vectors
-- [ ] **HARD GATE:** Golden model passes 100% of official Hash KAT vectors
-- [ ] Add randomized edge-case tests (empty AD, empty message, multi-block, tag mismatch)
-- [ ] Record SHA-256 hashes of KAT files in `reference/kat_checksums.txt`
+- [x] Vendor `pyascon` / pure Python SP 800-232 model into `reference/ascon_ref.py`
+- [x] Create `reference/run_kats.py` — runs full official KAT suite
+- [x] **HARD GATE:** Golden model passes 100% of official AEAD KAT vectors (1,089 vectors)
+- [x] **HARD GATE:** Golden model passes 100% of official Hash KAT vectors (1,031 vectors)
+- [x] Add randomized edge-case tests (empty AD, empty message, multi-block, tag mismatch)
+- [x] Record SHA-256 hashes of KAT files in `reference/kat_checksums.txt`
 
 ### Exit Gate (HARD)
-- [ ] `reference/run_kats.py` produces a 100% pass log for AEAD and Hash
-- [ ] Evidence: `results/kat/golden_model_pass.log`
-- [ ] KAT file integrity verified via checksums
+- [x] `reference/run_kats.py` produces a 100% pass log for AEAD and Hash
+- [x] Evidence: `results/kat/golden_model_summary.md` and `results/kat/golden_model_pass.log`
+- [x] KAT file integrity verified via checksums
 
 ### Artifacts
 - `reference/` (vendored model + KAT harness)

@@ -90,10 +90,47 @@ ALL PHASE 2 CRITERIA SATISFIED: PicoRV32 bring-up VERIFIED!
 
 ---
 
-## 5. Exit Criteria Status
+## 5. Post-Routing FPGA Utilization (Zybo Z7-10 / XC7Z010-1CLG400C)
 
-1. **Bare-metal C Execution:** Verified.
-2. **AXI4-Lite Bus Handshake:** Verified (zero protocol deadlocks, write responses and read data routed correctly).
-3. **GPIO Toggle:** Walking 1s across `led[0..3]` and all LEDs verified.
-4. **RAM Data Path Integrity:** Scratchpad array write and readback verified.
-5. **Physical Board Bring-Up Gate:** Ready for Vivado bitstream synthesis and Zybo Z7-10 JTAG programming (`board/zybo_z7_10.xdc`).
+Synthesized and placed/routed with AMD-Xilinx Vivado v2025.1.0 (`scripts/build_bitstream.tcl`):
+
+| Resource Type | Used | Total Available | Utilization (%) |
+|---|---|---|---|
+| **Slice LUTs** | **1,001** | 17,600 | **5.69%** |
+| - LUT as Logic | 957 | 17,600 | 5.44% |
+| - LUT as Distributed RAM | 44 | 6,000 | 0.73% |
+| **Slice Registers (FF)** | **569** | 35,200 | **1.62%** |
+| **Block RAM (RAMB36E1)** | **4** | 60 | **6.67%** (16 KB) |
+| **DSPs** | **0** | 80 | **0.00%** |
+| **Clock Primitives (MMCM)** | **1** | 2 | **50.00%** |
+| **Global Clock Buffers (BUFG)**| **2** | 32 | **6.25%** |
+
+Full report: [`results/synthesis/utilization_bringup.txt`](file:///c:/Users/Aayan/Desktop/RTL_Project/Ascon-AEAD-and-HASH/results/synthesis/utilization_bringup.txt)
+
+---
+
+## 6. Static Timing Analysis (STA) at 100 MHz
+
+| Metric | Target | Measured | Timing Margin / Status |
+|---|---|---|---|
+| **Worst Negative Slack (WNS)** | $\ge 0.000\text{ ns}$ | **+3.098 ns** | **MET (3.098 ns positive setup slack)** |
+| **Total Negative Slack (TNS)** | $0.000\text{ ns}$ | **0.000 ns** | **MET (0 failing endpoints)** |
+| **Worst Hold Slack (WHS)** | $\ge 0.000\text{ ns}$ | **+0.036 ns** | **MET (No hold violations)** |
+| **Total Hold Slack (THS)** | $0.000\text{ ns}$ | **0.000 ns** | **MET (0 failing endpoints)** |
+| **Primary Clock (`sys_clk_pin`)**| 125 MHz (8.000 ns) | 125.000 MHz | **MET** |
+| **CPU System Clock (`clk_100mhz`)**| 100 MHz (10.000 ns)| 100.000 MHz | **MET** |
+
+Full report: [`results/timing/timing_bringup.txt`](file:///c:/Users/Aayan/Desktop/RTL_Project/Ascon-AEAD-and-HASH/results/timing/timing_bringup.txt)
+
+---
+
+## 7. Bitstream Generation & Hardware Programming
+
+- **Generated Bitstream:** `build/top_bringup.bit` (MD5 / bitgen completed successfully with 0 errors).
+- **Physical Board Top-Level:** [`rtl/soc/top_bringup_board.sv`](file:///c:/Users/Aayan/Desktop/RTL_Project/Ascon-AEAD-and-HASH/rtl/soc/top_bringup_board.sv)
+- **Board Firmware:** [`firmware/tests/gpio_toggle_board.c`](file:///c:/Users/Aayan/Desktop/RTL_Project/Ascon-AEAD-and-HASH/firmware/tests/gpio_toggle_board.c) with calibrated 0.25-second delays per step.
+- **Automated JTAG Programming Script:** [`scripts/program_board.tcl`](file:///c:/Users/Aayan/Desktop/RTL_Project/Ascon-AEAD-and-HASH/scripts/program_board.tcl)
+  ```powershell
+  & "C:\Xilinx\2025.1\Vivado\bin\vivado.bat" -mode batch -source scripts/program_board.tcl
+  ```
+
