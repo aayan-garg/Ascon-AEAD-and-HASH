@@ -40,8 +40,8 @@ Phase 11 ──→ Phase 12 (Final Documentation & Handoff)
   - [x] R-1: Read and document SP 800-232 algorithm details
   - [x] R-2: Verify Zybo Z7-10 hardware constraints (not Z7-20)
   - [x] R-3: Compare RISC-V candidates and document decision
-  - [ ] R-4: Study AXI4-Lite / DMA architecture patterns
-  - [ ] R-5: Research S-box optimization techniques
+  - [x] R-4: Study AXI4-Lite / DMA architecture patterns
+  - [x] R-5: Research S-box optimization techniques
   - [ ] R-6: Read ≥3 Ascon hardware papers; select one technique
   - [ ] R-7: Install and test formal verification tools (nuXmv, Verilog2SMV)
   - [ ] R-8: Identify and prepare golden model sources

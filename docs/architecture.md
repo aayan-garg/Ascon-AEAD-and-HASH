@@ -373,6 +373,40 @@ The top-level Ascon controller implements a clean separation between control and
 | `DONE` | Operation finished | Assert `done`, expose tag/digest | `IDLE` |
 | `ERROR` | Tag mismatch or DMA abort | Wipe shadow buffer, assert `error` | `IDLE` |
 
+### 7.2 Bus Architecture: Control-Plane vs. Data-Plane Separation
+`[SOURCE]` ARM AMBA AXI4-Lite Protocol Specification & Xilinx AXI DMA PG021 architectural principles:
+
+```mermaid
+flowchart LR
+    subgraph ControlPlane["Control Plane (AXI4-Lite)"]
+        CPU["PicoRV32 CPU"] -->|AXI4-Lite Master| XBAR["AXI4-Lite Crossbar"]
+        XBAR -->|Config / Status| ASC_REGS["Ascon Register File\n(axil_regs.sv)"]
+        XBAR -->|Transfer Params| DMA_CTRL["DMA Control Regs"]
+    end
+
+    subgraph DataPlane["Data Plane (Dedicated Stream)"]
+        FW_BRAM["Firmware Image BRAM\n(Port B)"] -->|64-bit Memory Read| DMA_ENG["DMA Master\n(dma_master.sv)"]
+        DMA_ENG -->|64-bit Stream\n(valid/ready/last)| ASC_ABSORB["Ascon Absorb Logic\n(mode_ctrl.sv)"]
+    end
+```
+
+1. **Control-Plane (AXI4-Lite):**
+   - Implemented in `rtl/bus/axil_regs.sv`.
+   - Single-beat, non-burst, 32-bit registers for configuration, control, and status.
+   - Decodes `0x4000_0000` base window per [`docs/register_map.md`](register_map.md).
+   - Dedicated handshake logic ensuring `awready`/`wready` and `arready` cleanly assert and deassert with 0 deadlocks.
+
+2. **Data-Plane (Custom Streaming DMA Engine):**
+   - Implemented in `rtl/dma/dma_master.sv`.
+   - Rather than requiring a full, heavy AXI4 burst master ($\approx 800$ LUTs), the engine interfaces directly to the second port of the dual-port BRAM holding the staged firmware image.
+   - Streams 64-bit words directly into the Ascon absorption path using a standard `valid` / `ready` handshake:
+     - `dma_data[63:0]`: 64-bit data word (absorbed into $S_0$, or $S_0$ and $S_1$ for AEAD).
+     - `dma_valid`: Asserted when BRAM read data is stable.
+     - `dma_ready`: Driven by Ascon mode controller when ready for the next block.
+     - `dma_last`: Asserted on the final payload word.
+     - `dma_rem[2:0]`: Indicates valid byte count in the final beat (0 = 8 bytes, 1..7 = remainder bytes).
+   - This streaming architecture isolates bulk cryptographic throughput from CPU instruction bus arbitration, achieving maximum throughput (up to 1 word per cycle during absorption).
+
 ---
 
 ## 8. Hardware Constraints Summary (Zybo Z7-10)

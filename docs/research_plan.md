@@ -13,8 +13,8 @@
 | R-1 | Ascon Algorithm (SP 800-232) | `[x] COMPLETED` | Phase 0, 3 |
 | R-2 | Zybo Z7-10 Hardware Constraints | `[x] COMPLETED` | Phase 0, 2 |
 | R-3 | RISC-V Core Selection | `[x] COMPLETED` | Phase 0, 2 |
-| R-4 | AXI4-Lite / DMA Architecture | `[ ] NOT STARTED` | Phase 0, 6, 7 |
-| R-5 | S-box Optimization Techniques | `[ ] NOT STARTED` | Phase 0, 4 |
+| R-4 | AXI4-Lite / DMA Architecture | `[x] COMPLETED` | Phase 0, 6, 7 |
+| R-5 | S-box Optimization Techniques | `[x] COMPLETED` | Phase 0, 4 |
 | R-6 | Ascon Hardware Papers (Mandatory Research) | `[ ] NOT STARTED` | Phase 0, 12 |
 | R-7 | Formal Verification (CTL) Tooling | `[ ] NOT STARTED` | Phase 0, 9 |
 | R-8 | Golden Model & KAT Vectors | `[ ] NOT STARTED` | Phase 0, 3 |
@@ -123,14 +123,14 @@ Design the bus topology separating control-plane (AXI4-Lite) from data-plane (cu
 | ARM AMBA AXI Specification | ARM IHI 0022 | AXI4-Lite protocol details |
 
 ### Tasks
-- [ ] Study the Xilinx AXI DMA IP architecture (control vs. data path separation)
-- [ ] Design the register map (see Initial Research §11.2 for proposal)
-- [ ] Define the custom DMA master interface (valid/ready streaming, not full AXI4 burst)
-- [ ] Document in `docs/register_map.md` and `docs/architecture.md`
+- [x] Study the Xilinx AXI DMA IP architecture (control vs. data path separation)
+- [x] Design the register map (see Initial Research §11.2 for proposal)
+- [x] Define the custom DMA master interface (valid/ready streaming, not full AXI4 burst)
+- [x] Document in `docs/register_map.md` and `docs/architecture.md`
 
 ### Deliverables
-- `docs/register_map.md` — complete register map with field definitions
-- `docs/architecture.md` §Bus Architecture
+- `docs/register_map.md` — complete register map with field definitions (Completed)
+- `docs/architecture.md` §Bus Architecture (Completed)
 
 ---
 
@@ -147,17 +147,17 @@ Understand ESPRESSO, kernel extraction, and BDD techniques for the 5×5 Ascon S-
 | NIST LWC Workshop 2023 | https://csrc.nist.gov/csrc/media/Events/2023/lightweight-cryptography-workshop-2023/documents/accepted-papers/07-hardware-implementation-of-ascon.pdf | Hardware S-box implementation details |
 
 ### Tasks
-- [ ] Extract the normative 5×5 S-box truth table from SP 800-232
-- [ ] Research ESPRESSO minimization for the 5-bit S-box (5 output functions of 5 inputs)
-- [ ] Research kernel extraction for multi-level logic optimization
-- [ ] Research BDD-based optimization
-- [ ] Plan the comparison experiment: standard Boolean-equation vs. optimized variant(s)
-- [ ] Clarify with instructor: are all three techniques required, or just one? (`[ASSUME]` — §18-C)
+- [x] Extract the normative 5×5 S-box truth table from SP 800-232
+- [x] Research ESPRESSO minimization for the 5-bit S-box (5 output functions of 5 inputs)
+- [x] Research kernel extraction for multi-level logic optimization
+- [x] Research BDD-based optimization
+- [x] Plan the comparison experiment: standard Boolean-equation vs. optimized variant(s)
+- [x] Clarify with instructor: are all three techniques required, or just one? (`[ASSUME]` — §18-C)
 
 ### Deliverables
-- `docs/research_review.md` §S-box Optimization
-- `tools/sbox_opt/` — optimization scripts and comparison data
-- `docs/decisions/sbox_methodology.md`
+- `docs/decisions/sbox_optimization.md` — methodology and plan (Completed)
+- `tools/sbox_opt/` — optimization scripts and PLA truth table (Completed)
+- `docs/architecture.md` §Substitution Layer (Completed)
 
 ---
 
