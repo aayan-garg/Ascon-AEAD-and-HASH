@@ -54,7 +54,7 @@ module tb_picorv32_bringup;
         $display("================================================================");
 
         // Waveform dump for visual inspection
-        $dumpfile("sim_build/tb_picorv32_bringup.vcd");
+        $dumpfile("tb_picorv32_bringup.vcd");
         $dumpvars(0, tb_picorv32_bringup);
 
         // Reset assertion

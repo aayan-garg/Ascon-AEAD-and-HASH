@@ -42,6 +42,7 @@ add_files -fileset sim_1 [list \
     "$ROOT_DIR/firmware/tests/gpio_toggle.hex" \
 ]
 set_property top tb_picorv32_bringup [get_filesets sim_1]
+set_property -name {xsim.simulate.runtime} -value {20us} -objects [get_filesets sim_1]
 
 puts "================================================================================"
 puts "Vivado Project created successfully at $PROJ_DIR/$PROJ_NAME.xpr"
