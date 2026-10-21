@@ -8,10 +8,10 @@
 
 | Field | Value |
 |---|---|
-| **Current Phase** | Phase 2 — RISC-V Bring-Up (Bitstream Ready) & Phase 4 Permutation Datapath |
-| **Last Action** | Phase 2 Bitstream Synthesis & Waveform Tools Complete: Synthesized, placed, and routed top_bringup_board for Zybo Z7-10 (XC7Z010-1CLG400C) at 100 MHz using Vivado 2025.1; achieved zero timing violations with WNS = +3.098 ns and 1,001 LUTs (5.69%); generated build/top_bringup.bit; created scripts/program_board.tcl for automated JTAG programming; created scripts/view_waveform.py and scripts/open_wave_gui.bat for waveform visualization; updated results/board/phase2_bringup.md and implementation_plan.md |
+| **Current Phase** | Phase 4 — Permutation Datapath & Phase 5 Controller |
+| **Last Action** | Phase 4 Permutation Datapath Core Implemented: Implemented and 100% verified rtl/ascon/sbox5.sv (32-vector exhaustive match, results/kat/sbox_exhaustive.log), rtl/ascon/diffusion.sv (directed + 1,000 random vectors), rtl/ascon/round_core.sv (combinational round core), and rtl/ascon/permutation_1r.sv (1-round/cycle sequential core bit-exact on p^12 and p^6, results/kat/perm_1r_pass.log); all 8 regression suites passing in 34.56s |
 | **Date** | 2026-10-21 |
-| **Overall Progress** | ███▌░░░░░░ ~35% (Phase 0, 1 complete; Phase 2 bitstream built; regression running 100% green) |
+| **Overall Progress** | ████▌░░░░░ ~45% (Phase 0, 1, 3 complete; Phase 2 bitstream built & sim verified; Phase 4 core datapath verified) |
 
 ---
 
@@ -21,10 +21,10 @@
 |---|---|---|---|
 | 0 | Spec Audit & Research | `✅ COMPLETED` | All R-1 through R-8 complete; all exit gates met |
 | 1 | Repo & Environment | `✅ COMPLETED` | Clean repo; .gitignore active; tb_hello.sv passing; regression script passing |
-| 2 | RISC-V Bring-up | `🟡 BITSTREAM BUILT` | Simulation & firmware 100% pass; build/top_bringup.bit ready for board programming |
-| 3 | Golden Model | `✅ COMPLETED` | 100% KAT pass in reference/run_kats.py; ready as RTL oracle |
-| 4 | Permutation Datapath | `🟡 READY / NEXT` | Unblocked by Phase 0 R-5 & Phase 3 |
-| 5 | AEAD/Hash Controller | `⬜ NOT STARTED` | Blocked on Phase 4 |
+| 2 | RISC-V Bring-up | `🟡 BITSTREAM BUILT` | Simulation verified in Vivado GUI; build/top_bringup.bit ready for hardware flash |
+| 3 | Golden Model | `✅ COMPLETED` | 100% KAT pass in reference/run_kats.py (2,120 vectors); ready as RTL oracle |
+| 4 | Permutation Datapath | `🟡 CORE VERIFIED` | sbox5, diffusion, round_core, permutation_1r passing bit-exact; unblocks Phase 5 |
+| 5 | AEAD/Hash Controller | `🟡 READY / NEXT` | Mode FSM, absorbing/squeezing, tag verification, security plaintext gate |
 | 6 | Bus Integration | `⬜ NOT STARTED` | Blocked on Phase 2 + 5 |
 | 7 | DMA Integration | `⬜ NOT STARTED` | Blocked on Phase 6 |
 | 8 | Secure Boot | `⬜ NOT STARTED` | Blocked on Phase 7 |

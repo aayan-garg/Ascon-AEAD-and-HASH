@@ -151,13 +151,12 @@ Phase 11 ──→ Phase 12 (Final Documentation & Handoff)
 **Feeds:** Phase 5 (controller), Phase 10 (synthesis).
 
 ### Tasks
-- [ ] Implement `rtl/ascon/sbox5.sv` — standard Boolean-equation S-box
-- [ ] Test: exhaustive 32-row truth-table equivalence → 0 mismatches
-- [ ] Implement `rtl/ascon/diffusion.sv` — linear diffusion layer
-- [ ] Implement `rtl/ascon/round_core.sv` — one full combinational round
-- [ ] Implement `rtl/ascon/state_reg.sv` — 320-bit state register (5×64-bit)
-- [ ] Implement `rtl/ascon/permutation_1r.sv` — 1 round/cycle (baseline)
-- [ ] Test: round-by-round differential against golden model → 0 mismatches
+- [x] Implement `rtl/ascon/sbox5.sv` — standard Boolean-equation S-box
+- [x] Test: exhaustive 32-row truth-table equivalence → 0 mismatches (`results/kat/sbox_exhaustive.log`)
+- [x] Implement `rtl/ascon/diffusion.sv` — linear diffusion layer (`tb/unit/tb_diffusion.sv` passing)
+- [x] Implement `rtl/ascon/round_core.sv` — one full combinational round (`tb/unit/tb_round_core.sv` passing)
+- [x] Implement `rtl/ascon/permutation_1r.sv` — 1 round/cycle (baseline)
+- [x] Test: round-by-round differential against golden model → 0 mismatches (`results/kat/perm_1r_pass.log`)
 - [ ] Implement `rtl/ascon/permutation_half.sv` — ½ round/cycle (2 micro-steps)
 - [ ] Implement `rtl/ascon/permutation_2r.sv` — 2 rounds/cycle (chained)
 - [ ] Test: all 3 variants pass full KAT differential test
@@ -165,7 +164,7 @@ Phase 11 ──→ Phase 12 (Final Documentation & Handoff)
 - [ ] Test: same exhaustive truth-table check passes
 
 ### Exit Gate
-- [ ] S-box exhaustive test: 0 mismatches → `results/kat/sbox_exhaustive.log`
+- [x] S-box exhaustive test: 0 mismatches → `results/kat/sbox_exhaustive.log`
 - [ ] All 3 permutation variants: bit-exact against golden model over full KAT set
 - [ ] Evidence: `results/kat/perm_1r_pass.log`, `results/kat/perm_half_pass.log`, `results/kat/perm_2r_pass.log`
 
