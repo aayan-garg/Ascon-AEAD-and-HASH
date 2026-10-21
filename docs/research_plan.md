@@ -10,7 +10,7 @@
 
 | # | Research Area | Status | Phase Dependency |
 |---|---|---|---|
-| R-1 | Ascon Algorithm (SP 800-232) | `[ ] NOT STARTED` | Phase 0, 3 |
+| R-1 | Ascon Algorithm (SP 800-232) | `[x] COMPLETED` | Phase 0, 3 |
 | R-2 | Zybo Z7-10 Hardware Constraints | `[ ] NOT STARTED` | Phase 0, 2 |
 | R-3 | RISC-V Core Selection | `[ ] NOT STARTED` | Phase 0, 2 |
 | R-4 | AXI4-Lite / DMA Architecture | `[ ] NOT STARTED` | Phase 0, 6, 7 |
@@ -29,7 +29,7 @@ Fully understand the Ascon-AEAD128 and Ascon-Hash256 algorithms per NIST SP 800-
 ### Key Sources
 | Source | URL | What to extract |
 |---|---|---|
-| NIST SP 800-232 (Final) | https://csrc.nist.gov/pubs/sp/800/232/final | State structure, permutation rounds (pa=12, pb=6/8), rate/capacity, padding, domain separation, byte ordering (little-endian) |
+| NIST SP 800-232 (Final) | https://csrc.nist.gov/pubs/sp/800/232/final | State structure, permutation rounds (pa=12, pb=8/12), rate/capacity, padding, domain separation, byte ordering (little-endian) |
 | ascon/ascon-c (official reference) | https://github.com/ascon/ascon-c | KAT vectors, reference C code, byte-order conventions |
 | meichlseder/pyascon | https://github.com/meichlseder/pyascon | Python reference for golden model |
 | ascon/ascon_collection | https://github.com/ascon/ascon_collection | Index of verified SP 800-232 implementations |
@@ -38,17 +38,18 @@ Fully understand the Ascon-AEAD128 and Ascon-Hash256 algorithms per NIST SP 800-
 SP 800-232 uses **little-endian** byte/word conventions. Pre-2025 "Ascon v1.2" (Ascon-128/128a) used big-endian. These are NOT byte-for-byte compatible. Any pre-2025 RTL (including OpenTitan's Ascon IP) must be re-validated.
 
 ### Tasks
-- [ ] Download and read SP 800-232 §3–§5 (state definition, permutation, AEAD, Hash modes)
-- [ ] Extract the exact S-box truth table from the standard
-- [ ] Document the exact round constants (p_a, p_b round counts and constant-addition values)
-- [ ] Document padding and domain-separation rules for AEAD and Hash
-- [ ] Verify byte ordering (little-endian) against the `ascon-c` reference code
-- [ ] Document the sponge rate for AEAD (64 bits) and Hash (64 bits) per SP 800-232
-- [ ] Create `docs/decisions/algorithm_version.md` confirming SP 800-232 (not v1.2)
+- [x] Download and read SP 800-232 §3–§5 (state definition, permutation, AEAD, Hash modes)
+- [x] Extract the exact S-box truth table from the standard
+- [x] Document the exact round constants (p_a, p_b round counts and constant-addition values)
+- [x] Document padding and domain-separation rules for AEAD and Hash
+- [x] Verify byte ordering (little-endian) against the `ascon-c` reference code
+- [x] Document the sponge rate for AEAD (128 bits / 16 bytes) and Hash (64 bits / 8 bytes) per SP 800-232
+- [x] Create `docs/decisions/algorithm_version.md` confirming SP 800-232 (not v1.2)
 
 ### Deliverables
-- `docs/architecture.md` §Algorithm — detailed Ascon specification summary
-- `docs/decisions/algorithm_version.md` — version confirmation
+- `docs/architecture.md` §Algorithm — detailed Ascon specification summary (Completed)
+- `docs/decisions/algorithm_version.md` — version confirmation (Completed)
+- `reference/ascon-c` — official reference implementation cloned and verified with KAT tests (Completed)
 
 ---
 

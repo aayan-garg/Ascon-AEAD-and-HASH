@@ -37,7 +37,7 @@ Phase 11 ──→ Phase 12 (Final Documentation & Handoff)
 ### Tasks
 - [ ] Extract all requirements from `Project_PS.md` into the traceability matrix
 - [ ] Complete research tasks R-1 through R-8 (see [`research_plan.md`](research_plan.md))
-  - [ ] R-1: Read and document SP 800-232 algorithm details
+  - [x] R-1: Read and document SP 800-232 algorithm details
   - [ ] R-2: Verify Zybo Z7-10 hardware constraints (not Z7-20)
   - [ ] R-3: Compare RISC-V candidates and document decision
   - [ ] R-4: Study AXI4-Lite / DMA architecture patterns

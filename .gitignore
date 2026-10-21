@@ -55,3 +55,7 @@ desktop.ini
 results/**/*.dcp
 results/**/*.bit
 results/**/*.wdb
+
+# Scratch and binaries
+scratch/
+*.exe
