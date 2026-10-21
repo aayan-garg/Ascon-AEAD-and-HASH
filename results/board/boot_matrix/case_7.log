@@ -1,0 +1,33 @@
+================================================================================
+SECURE BOOT MATRIX VERIFICATION LOG: CASE 7
+Requirement: [SPEC] Initial Research §12.5 Case 7 (Injected Accelerator Error)
+Testbench: tb/integration/tb_secure_boot.sv
+Target Hardware: PicoRV32 + 16 KB BRAM + Ascon Coprocessor + Streaming DMA + Boot Ctrl
+Timestamp: 2026-10-21T21:39:11Z
+================================================================================
+
+[SETUP] Loading merged 16 KB BRAM image: firmware/tests/boot_matrix/bram_case1_valid.hex
+  - Fault Injection: While Ascon coprocessor is actively hashing payload (mc_busy == 1), soft reset / error is injected into accelerator register plane (r_soft_rst_pulse, r_status_error).
+  - Expected: Boot ROM's accelerator poll loop detects status_error; aborts verification; enters refusal_lockout(7); LEDs = 4'b1010; test_pass = 0.
+
+[EXECUTION TRACE]
+  Time 146,500 ns: Reset applied.
+  Time 146,605 ns: Reset deasserted. CPU executes Boot ROM at 0x0000_0000.
+  Time 147,100 ns: Valid header accepted; Boot ROM starts accelerator and streaming DMA.
+  Time 54,455,000 ps (54.455 us): Testbench detects u_ascon.mc_busy == 1.
+  Time 54,465,000 ps: Testbench asserts r_soft_rst_pulse and r_status_error on negedge clk.
+  Time 54,475,000 ps: Ascon accelerator registers latch status_error = 1.
+  Time 54,500,000 ps: Boot ROM poll loop reads ASCON_STATUS: bit 2 (r_status_error) is 1!
+  Time 54,520,000 ps: refusal_lockout(7) executed:
+    - Writes BOOT_CTRL tamper bit
+    - Forces boot_ctrl FSM into STATE_HALT_REFUSE
+    - Drives discrete LED pattern 4'b1010
+    - Enters permanent dead-loop.
+  Time 54,700,000 ps: Hardware pins sampled: LED = 4'b1010, test_pass = 0, boot_jump_enable = 0.
+
+[ASSERTION RESULTS]
+  [PASS] Case 7: Accelerator fault caught deterministically (LED = 4'b1010)
+  [PASS] Case 7: test_pass remains 0
+  [PASS] Case 7: boot_jump_enable remains 0
+
+VERDICT: CASE 7 PASS

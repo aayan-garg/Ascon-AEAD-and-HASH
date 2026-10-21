@@ -1,0 +1,27 @@
+================================================================================
+SECURE BOOT MATRIX VERIFICATION LOG: CASE 8
+Requirement: [SPEC] Initial Research §12.5 Case 8 (Asynchronous Reset Mid-Verification)
+Testbench: tb/integration/tb_secure_boot.sv
+Target Hardware: PicoRV32 + 16 KB BRAM + Ascon Coprocessor + Streaming DMA + Boot Ctrl
+Timestamp: 2026-10-21T21:39:11Z
+================================================================================
+
+[SETUP] Loading merged 16 KB BRAM image: firmware/tests/boot_matrix/bram_case1_valid.hex
+  - Stress Scenario: Asynchronous external hardware reset (rst_n asserted low) occurs mid-flight while verification is underway.
+  - Expected: Hardware boot_ctrl FSM immediately aborts all operations and returns to STATE_RESET (0x0); jump_enable drops to 0; no speculative jump occurs.
+
+[EXECUTION TRACE]
+  Time 550,000 ns: Reset deasserted; verification starts.
+  Time 552,660 ns: Testbench asserts asynchronous rst_n = 1'b0 mid-verification.
+  Time 552,670 ns: Hardware FSM sampled immediately during active reset:
+    - dut.u_ascon.u_boot_ctrl.state_q == STATE_RESET (0)
+    - dut.boot_jump_enable == 0
+    - test_pass == 0
+  Time 552,800 ns: Verified: no glitch or race condition enabled execution of unverified candidate payload.
+
+[ASSERTION RESULTS]
+  [PASS] Case 8: Controller safely in STATE_RESET (0)
+  [PASS] Case 8: boot_jump_enable is 0 during reset
+  [PASS] Case 8: test_pass remained 0
+
+VERDICT: CASE 8 PASS

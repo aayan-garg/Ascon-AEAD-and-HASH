@@ -8,10 +8,10 @@
 
 | Field | Value |
 |---|---|
-| **Current Phase** | Phase 8 — Secure Boot & Boot ROM Software |
-| **Last Action** | Phase 7 DMA Integration 100% Complete: Designed, simulated, and verified custom streaming DMA engine `rtl/dma/dma_master.sv` with contention-free Port B dual-port BRAM interface; verified all 10 boundary and functional scenarios (40/40 assertions PASS) in `tb_dma.sv`; created bare-metal C driver `accel_dma_test.c` compiled with RISC-V GCC; verified end-to-end SoC execution `tb_soc_dma.sv` in 2,122 cycles (21.315 µs @ 100 MHz); test pass marker `GPIO[31] = 1` detected |
+| **Current Phase** | Phase 9 — Formal CTL Verification |
+| **Last Action** | Phase 8 Secure Boot & Boot ROM Software 100% Complete: Implemented 64-byte authenticated firmware header specification (§12.4), automated image provisioning tool `scripts/provision_image.py`, hardware secure boot controller FSM `rtl/soc/boot_ctrl.sv` with 256-bit comparator and sticky tamper register, unit testbench `tb_boot_ctrl.sv` (31/31 PASS), immutable Boot ROM software `firmware/bootrom/secure_boot.c` (736 bytes), relocated candidate payload `firmware/tests/app_payload.c` (24 bytes @ 0x0000_1040), and end-to-end integration testbench `tb_secure_boot.sv` covering all 9 cases of §12.5 Boot Matrix (31/31 assertions PASS, deterministic refusal on all faults); generated artifacts in `results/board/boot_matrix/` |
 | **Date** | 2026-10-21 |
-| **Overall Progress** | ████████▌░ ~85% (Phases 0, 1, 3, 4, 5, 6, 7 complete; Phase 2 bitstream ready; 19/19 regression suites passing) |
+| **Overall Progress** | █████████░ ~90% (Phases 0, 1, 3, 4, 5, 6, 7, 8 complete; Phase 2 bitstream ready; 21/21 regression suites passing) |
 
 ---
 
@@ -27,8 +27,8 @@
 | 5 | AEAD/Hash Controller | `✅ COMPLETED` | Mode FSM, absorbing/squeezing, tag verification, security plaintext gate; unblocks Phase 6 |
 | 6 | Bus Integration | `✅ COMPLETED` | Register map per docs/register_map.md, AXI4-Lite slave, firmware driver, tb_axil_regs & tb_soc_ascon passing; unblocks Phase 7 |
 | 7 | DMA Integration | `✅ COMPLETED` | Custom DMA engine dma_master.sv, streaming data plane, boundary testing 40/40 PASS, tb_soc_dma passing; unblocks Phase 8 |
-| 8 | Secure Boot | `🟡 READY / NEXT` | Boot ROM firmware, boot_ctrl FSM, header validation, verification-before-jump |
-| 9 | Formal CTL | `⬜ NOT STARTED` | Blocked on Phase 8 (Model verified in Phase 0 R-7) |
+| 8 | Secure Boot | `✅ COMPLETED` | Boot ROM firmware, boot_ctrl FSM, 64B header, provision_image.py, full 9-case matrix 31/31 PASS; unblocks Phase 9 |
+| 9 | Formal CTL | `🟡 READY / NEXT` | Prove AG (jump -> hash_ok) on RTL boot_ctrl.sv using NuSMV/nuXmv or SVA |
 | 10 | Synthesis/Performance | `⬜ NOT STARTED` | Blocked on Phase 4/5 |
 | 11 | Board Validation | `⬜ NOT STARTED` | Blocked on Phase 9 + 10 |
 | 12 | Final Docs/Handoff | `⬜ NOT STARTED` | Blocked on Phase 11 |
@@ -50,6 +50,7 @@
 
 | Date | Action | Files Changed |
 |---|---|---|
+| 2026-10-21 | Phase 8 Secure Boot & Boot ROM Software completed (64-byte authenticated header format §12.4, automated provision script `scripts/provision_image.py`, hardware secure boot controller `boot_ctrl.sv` with 256-bit comparator and sticky tamper register, unit testbench `tb_boot_ctrl.sv` with 31/31 assertions PASS, immutable Boot ROM firmware `firmware/bootrom/secure_boot.c` compiled to `.hex`, candidate payload `app_payload.c` linked at `0x0000_1040`, integration testbench `tb_secure_boot.sv` verifying all 9 cases of §12.5 Boot Matrix with 31/31 assertions PASS and zero hung states, per-case logs and summary report in `results/board/boot_matrix/`) | `docs/threat_model.md`, `rtl/soc/boot_ctrl.sv`, `rtl/bus/axil_regs.sv`, `rtl/soc/top_bringup.sv`, `firmware/bootrom/*`, `firmware/linker/app.ld`, `firmware/tests/app_payload.c`, `scripts/provision_image.py`, `tb/unit/tb_boot_ctrl.sv`, `tb/integration/tb_secure_boot.sv`, `results/board/boot_matrix/*`, `docs/*` |
 | 2026-10-21 | Phase 7 Direct Memory Access (DMA) Integration completed (`dma_master.sv` custom burst-to-stream engine reading Port B of 16 KB BRAM, `top_bringup.sv` integration, `tb_dma.sv` with 40/40 boundary assertions PASS, `accel_dma_test.c` RISC-V firmware compiled to `.hex`, `tb_soc_dma.sv` full SoC simulation passing in 2,122 cycles with `GPIO[31]=1`, `results/board/dma_boundary.log`, `results/board/phase7_dma_summary.md`) | `rtl/dma/dma_master.sv`, `rtl/soc/top_bringup.sv`, `tb/integration/tb_dma.sv`, `tb/integration/tb_soc_dma.sv`, `firmware/tests/accel_dma_test.*`, `results/board/*`, `docs/*` |
 | 2026-10-21 | Phase 6 Accelerator Bus Integration completed (`axil_regs.sv` AXI4-Lite register file per `docs/register_map.md`, `tb_axil_regs.sv` BFM testbench 100% PASS, `accel_hash_test.c` RISC-V firmware, `tb_soc_ascon.sv` passing in 1,027 cycles with `GPIO[31]=1`, `results/board/axil_integration.log`, `results/board/phase6_axil_summary.md`) | `rtl/bus/axil_regs.sv`, `rtl/soc/top_bringup.sv`, `tb/integration/tb_axil_regs.sv`, `tb/integration/tb_soc_ascon.sv`, `firmware/tests/accel_hash_test.*`, `results/board/*`, `docs/*` |
 | 2026-10-21 | Phase 5 AEAD & Hash Mode Controller completed (`mode_ctrl.sv`, `aead_ctrl.sv`, `hash_ctrl.sv`, hardware security shadow buffer `plaintext_gate.sv`, full testbenches `tb_security_gate.sv`, `tb_mode_ctrl.sv`, `tb_hash.sv`, `tb_aead.sv` verified bit-exact against official NIST SP 800-232 KATs, 15/15 regression suites passing green in 68.88s) | `rtl/ascon/*`, `tb/unit/*`, `results/kat/*`, `docs/implementation_plan.md`, `docs/status.md` |
@@ -68,12 +69,12 @@
 
 ## Next Steps (Immediate)
 
-1. **Proceed to Phase 8: Secure Boot & Boot ROM Software**
-   - Define firmware image format (64-byte authenticated header + payload per §12.4)
-   - Implement `firmware/bootrom/secure_boot.c` Boot ROM verification routine
-   - Implement `rtl/soc/boot_ctrl.sv` hardware reset→verify→jump sequencing FSM
-   - Implement `scripts/provision_image.py` for image signing & header embedding
-   - Test complete 9-case boot matrix in simulation (§12.5)
+1. **Proceed to Phase 9: Formal CTL Verification**
+   - Verify formal property `AG (jump -> hash_ok)` on `boot_ctrl.sv`
+   - Prove refusal invariance `AG (tamper -> AG !jump)`
+   - Verify reset safety `AG (rst_n == 0 -> state == STATE_RESET)`
+   - Formal verification report and proof artifact generation
+
 
 ---
 

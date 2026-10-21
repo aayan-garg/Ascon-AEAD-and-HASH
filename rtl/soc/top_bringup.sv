@@ -11,12 +11,13 @@ module top_bringup #(
     parameter string FIRMWARE_HEX = "firmware/tests/gpio_toggle.hex",
     parameter int    RAM_WORDS    = 4096 // 16 KB = 4096 x 32-bit words
 ) (
-    input  wire        clk,      // 100 MHz clock
-    input  wire        rst_n,    // Active-low asynchronous reset
-    output wire [3:0]  led,      // 4 discrete LEDs on Zybo Z7-10 (LD0..LD3)
-    output wire [2:0]  rgb_led,  // RGB LED on Zybo Z7-10 (LD6: R, G, B)
-    output wire        trap,     // CPU trap indicator
-    output wire        test_pass // Simulation completion marker (bit 31 of GPIO)
+    input  wire        clk,        // 100 MHz clock
+    input  wire        rst_n,      // Active-low asynchronous reset
+    input  wire        tamper_det, // Physical sensor / glitch tamper pulse
+    output wire [3:0]  led,        // 4 discrete LEDs on Zybo Z7-10 (LD0..LD3)
+    output wire [2:0]  rgb_led,    // RGB LED on Zybo Z7-10 (LD6: R, G, B)
+    output wire        trap,       // CPU trap indicator
+    output wire        test_pass   // Simulation completion marker (bit 31 of GPIO)
 );
 
     // =========================================================================
@@ -292,6 +293,10 @@ module top_bringup #(
     wire        ascon_rvalid;
     wire        ascon_irq;
 
+    wire        boot_jump_enable;
+    wire        boot_refuse;
+    wire [3:0]  boot_led_status;
+
     axil_regs #(.BUFFER_DEPTH(256)) u_ascon (
         .clk                (clk),
         .rst_n              (rst_n),
@@ -327,7 +332,11 @@ module top_bringup #(
         .dma_busy           (dma_busy),
         .dma_done           (dma_done),
         .dma_err            (dma_err),
-        .irq                (ascon_irq)
+        .irq                (ascon_irq),
+        .tamper_det         (tamper_det),
+        .boot_jump_enable   (boot_jump_enable),
+        .boot_refuse        (boot_refuse),
+        .boot_led_status    (boot_led_status)
     );
 
     // =========================================================================
@@ -364,7 +373,7 @@ module top_bringup #(
     // =========================================================================
     // 7. Output Port Assignments
     // =========================================================================
-    assign led       = gpio_reg[3:0];
+    assign led       = boot_refuse ? 4'b1010 : (gpio_reg[3:0] | boot_led_status);
     assign rgb_led   = gpio_reg[6:4];
     assign test_pass = gpio_reg[31];
 

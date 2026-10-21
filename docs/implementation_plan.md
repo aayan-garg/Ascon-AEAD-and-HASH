@@ -268,30 +268,32 @@ Phase 11 ──→ Phase 12 (Final Documentation & Handoff)
 **Feeds:** Phase 9 (formal), Phase 11 (board demo).
 
 ### Tasks
-- [ ] Define firmware image format (header + payload per §12.4)
-- [ ] Implement `firmware/bootrom/secure_boot.c`
-- [ ] Implement `rtl/soc/boot_ctrl.sv` — reset→verify→jump sequencing
-- [ ] Create image provisioning script (compute and embed reference digest)
-- [ ] Test the complete boot matrix (§12.5):
-  - [ ] Valid firmware → boots successfully
-  - [ ] Byte-flipped firmware → refuses
-  - [ ] Wrong reference digest → refuses
-  - [ ] Invalid declared length → refuses
-  - [ ] Malformed header → refuses
-  - [ ] DMA timeout → refuses
-  - [ ] Accelerator error → refuses
-  - [ ] Reset mid-verification → refuses
-  - [ ] Repeated attempt after refusal → refuses again
+- [x] Define firmware image format (header + payload per §12.4)
+- [x] Implement `firmware/bootrom/secure_boot.c`
+- [x] Implement `rtl/soc/boot_ctrl.sv` — reset→verify→jump sequencing
+- [x] Create image provisioning script (compute and embed reference digest)
+- [x] Test the complete boot matrix (§12.5):
+  - [x] Valid firmware → boots successfully
+  - [x] Byte-flipped firmware → refuses
+  - [x] Wrong reference digest → refuses
+  - [x] Invalid declared length → refuses
+  - [x] Malformed header → refuses
+  - [x] DMA timeout → refuses
+  - [x] Accelerator error → refuses
+  - [x] Reset mid-verification → refuses
+  - [x] Repeated attempt after refusal → refuses again
 
 ### Exit Gate (HARD)
-- [ ] Valid image boots; every invalid case refuses deterministically
-- [ ] Evidence: per-case boot logs in `results/board/boot_matrix/`
+- [x] Valid image boots; every invalid case refuses deterministically
+- [x] Evidence: per-case boot logs in `results/board/boot_matrix/` (cases 1-9 pass, 31/31 assertions)
 
 ### Artifacts
-- `firmware/bootrom/secure_boot.c`
-- `rtl/soc/boot_ctrl.sv`
+- `firmware/bootrom/secure_boot.c`, `trusted_manifest.h`, `secure_boot.hex`
+- `firmware/tests/app_payload.c`, `firmware/linker/app.ld`
+- `rtl/soc/boot_ctrl.sv`, `tb/unit/tb_boot_ctrl.sv`
 - `scripts/provision_image.py`
-- `results/board/boot_matrix/`
+- `tb/integration/tb_secure_boot.sv`
+- `results/board/boot_matrix/case_{1..9}.log`, `results/board/boot_matrix/boot_matrix_summary.md`
 
 ---
 

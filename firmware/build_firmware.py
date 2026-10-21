@@ -56,11 +56,55 @@ def build_firmware(src_c: str, out_name: str, ram_size_words: int = 4096):
     print(f"[SUCCESS] Generated {hex_path} with {len(words)} instructions/words.")
     return True
 
+def build_bootrom():
+    bootrom_dir = os.path.join(ROOT_DIR, "firmware", "bootrom")
+    linker_script = "firmware/linker/bringup.ld"
+    crt0_asm = "firmware/startup/crt0.S"
+    elf_path = os.path.join(bootrom_dir, "secure_boot.elf")
+    bin_path = os.path.join(bootrom_dir, "secure_boot.bin")
+    hex_path = os.path.join(bootrom_dir, "secure_boot.hex")
+
+    wsl_cmd = (
+        "cd /mnt/c/Users/Aayan/Desktop/RTL_Project/Ascon-AEAD-and-HASH && "
+        "riscv64-unknown-elf-gcc -march=rv32i -mabi=ilp32 -Os -nostdlib -Wl,-Bstatic "
+        "-I firmware/bootrom "
+        f"-T {linker_script} {crt0_asm} firmware/bootrom/secure_boot.c -o firmware/bootrom/secure_boot.elf && "
+        f"riscv64-unknown-elf-objcopy -O binary firmware/bootrom/secure_boot.elf firmware/bootrom/secure_boot.bin"
+    )
+
+    print("[BUILD] Compiling secure_boot.c via WSL riscv64-unknown-elf-gcc...")
+    res = subprocess.run(["wsl", "bash", "-c", wsl_cmd], capture_output=True, text=True)
+    if res.returncode != 0:
+        print(f"[FAIL] Compilation failed:\n{res.stderr}")
+        return False
+
+    with open(bin_path, "rb") as f:
+        bindata = f.read()
+
+    words = []
+    for i in range(0, len(bindata), 4):
+        chunk = bindata[i:i+4]
+        if len(chunk) < 4:
+            chunk = chunk + b"\x00" * (4 - len(chunk))
+        val = struct.unpack("<I", chunk)[0]
+        words.append(f"{val:08x}")
+
+    with open(hex_path, "w", encoding="utf-8") as f:
+        for w in words:
+            f.write(w + "\n")
+
+    print(f"[SUCCESS] Generated {hex_path} with {len(words)} instructions/words ({len(bindata)} bytes).")
+    return True
+
 if __name__ == "__main__":
-    src = "gpio_toggle.c"
-    out = "gpio_toggle"
-    if len(sys.argv) > 1:
-        src = sys.argv[1]
-    if len(sys.argv) > 2:
-        out = sys.argv[2]
-    build_firmware(src, out)
+    if len(sys.argv) > 1 and sys.argv[1] == "--bootrom":
+        build_bootrom()
+    else:
+        src = "gpio_toggle.c"
+        out = "gpio_toggle"
+        if len(sys.argv) > 1:
+            src = sys.argv[1]
+        if len(sys.argv) > 2:
+            out = sys.argv[2]
+        build_firmware(src, out)
+

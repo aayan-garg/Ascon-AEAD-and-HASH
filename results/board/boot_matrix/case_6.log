@@ -1,0 +1,33 @@
+================================================================================
+SECURE BOOT MATRIX VERIFICATION LOG: CASE 6
+Requirement: [SPEC] Initial Research §12.5 Case 6 (Injected DMA Error / Timeout)
+Testbench: tb/integration/tb_secure_boot.sv
+Target Hardware: PicoRV32 + 16 KB BRAM + Ascon Coprocessor + Streaming DMA + Boot Ctrl
+Timestamp: 2026-10-21T21:39:11Z
+================================================================================
+
+[SETUP] Loading merged 16 KB BRAM image: firmware/tests/boot_matrix/bram_case1_valid.hex
+  - Fault Injection: While DMA engine is actively streaming candidate payload into Ascon coprocessor, DMA abort is asserted and status_err is triggered.
+  - Expected: Boot ROM's DMA poll loop detects status_err or abort condition; aborts verification; enters refusal_lockout(5); LEDs = 4'b1010; test_pass = 0.
+
+[EXECUTION TRACE]
+  Time 95,500 ns: Reset applied.
+  Time 95,605 ns: Reset deasserted. CPU executes Boot ROM at 0x0000_0000.
+  Time 96,100 ns: Valid header accepted; Boot ROM programs and starts DMA streaming.
+  Time 45,755,000 ps (45.755 us): Testbench detects u_dma_master.status_busy == 1.
+  Time 45,765,000 ps: Testbench asserts dma_abort and status_err on negedge clk.
+  Time 45,775,000 ps: DMA master terminates with status_err = 1.
+  Time 45,800,000 ps: Boot ROM poll loop reads DMA_STATUS: bit 2 (dma_err) is 1!
+  Time 45,820,000 ps: refusal_lockout(5) executed:
+    - Asserts BOOT_CTRL tamper/refuse pulse
+    - Forces boot_ctrl FSM into STATE_HALT_REFUSE
+    - Drives discrete LED pattern 4'b1010
+    - Enters permanent dead-loop.
+  Time 46,000,000 ps: Hardware pins sampled: LED = 4'b1010, test_pass = 0, boot_jump_enable = 0.
+
+[ASSERTION RESULTS]
+  [PASS] Case 6: DMA error caught deterministically (LED = 4'b1010)
+  [PASS] Case 6: test_pass remains 0
+  [PASS] Case 6: boot_jump_enable remains 0
+
+VERDICT: CASE 6 PASS

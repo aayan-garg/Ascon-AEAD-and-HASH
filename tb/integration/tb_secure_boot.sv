@@ -1,0 +1,389 @@
+// ==============================================================================
+// Integration Testbench: tb_secure_boot.sv
+// Target: Phase 8 Secure Boot & Boot ROM Verification Exit Gate
+// Standard: NIST SP 800-232, Initial Research §12.5 (9-Case Boot Matrix)
+// ==============================================================================
+
+`timescale 1ns / 1ps
+`default_nettype wire
+
+module tb_secure_boot;
+
+    localparam time CLK_PERIOD = 10ns; // 100 MHz clock
+
+    reg        clk;
+    reg        rst_n;
+    reg        tamper_det;
+    wire [3:0] led;
+    wire [2:0] rgb_led;
+    wire       trap;
+    wire       test_pass;
+
+    // Instantiate SoC Top-Level
+    top_bringup #(
+        .FIRMWARE_HEX ("firmware/bootrom/secure_boot.hex"),
+        .RAM_WORDS    (4096)
+    ) dut (
+        .clk        (clk),
+        .rst_n      (rst_n),
+        .tamper_det (tamper_det),
+        .led        (led),
+        .rgb_led    (rgb_led),
+        .trap       (trap),
+        .test_pass  (test_pass)
+    );
+
+    // 100 MHz Clock Generator
+    always #(CLK_PERIOD / 2) clk = ~clk;
+
+    int total_pass = 0;
+    int total_fail = 0;
+
+    task check_case(input string name, input bit condition);
+        if (condition) begin
+            $display("  [PASS] %s", name);
+            total_pass++;
+        end else begin
+            $display("  [FAIL] %s", name);
+            total_fail++;
+        end
+    endtask
+
+    // Reset task
+    task reset_soc();
+        rst_n = 1'b0;
+        tamper_det = 1'b0;
+        #(CLK_PERIOD * 10);
+        @(negedge clk);
+        rst_n = 1'b1;
+        #(CLK_PERIOD * 5);
+    endtask
+
+    // Main Test Execution
+    initial begin
+        $display("================================================================================");
+        $display("STARTING COMPLETE 9-CASE SECURE BOOT MATRIX TESTBENCH (tb_secure_boot.sv)");
+        $display("Target: Initial Research §12.5 & Requirements R14, R17");
+        $display("Hardware: PicoRV32 + 16 KB BRAM + Ascon Coprocessor + Streaming DMA + Boot Ctrl");
+        $display("================================================================================");
+
+        clk        = 0;
+        rst_n      = 0;
+        tamper_det = 0;
+
+        // ---------------------------------------------------------------------
+        // Case 1: Valid Untampered Firmware Image (§12.5 Case 1)
+        // Expected: Boot ROM verifies digest, hardware authorizes jump,
+        //           CPU executes candidate payload, asserts test_pass (GPIO[31]=1),
+        //           LEDs = 4'b1111.
+        // ---------------------------------------------------------------------
+        $display("\n----------------------------------------------------------------");
+        $display("--- CASE 1: Valid Untampered Candidate Firmware Image ---");
+        $display("----------------------------------------------------------------");
+        $readmemh("firmware/tests/boot_matrix/bram_case1_valid.hex", dut.bram_mem);
+        reset_soc();
+
+        fork : timeout_case1
+            begin
+                #500000; // 500 us timeout (50,000 cycles)
+                $display("  [ERROR] Case 1 timed out waiting for boot pass!");
+                disable timeout_case1;
+            end
+            begin
+                wait (test_pass == 1'b1);
+                disable timeout_case1;
+            end
+        join
+
+        check_case("Case 1: test_pass asserted (CPU jumped to candidate payload)", test_pass == 1'b1);
+        check_case("Case 1: LEDs illuminate solid boot pattern 4'b1111", led == 4'b1111);
+        check_case("Case 1: Hardware boot_jump_enable is 1", dut.boot_jump_enable == 1'b1);
+        check_case("Case 1: Hardware boot_refuse is 0", dut.boot_refuse == 1'b0);
+
+        // ---------------------------------------------------------------------
+        // Case 2: Byte-Flipped Firmware Image (§12.5 Case 2)
+        // Expected: 1 bit modified in payload; Hash256 digest differs from reference;
+        //           Boot ROM detects mismatch, refuses jump, dead-loops in refusal;
+        //           LEDs = 4'b1010; test_pass remains 0; candidate NEVER executes.
+        // ---------------------------------------------------------------------
+        $display("\n----------------------------------------------------------------");
+        $display("--- CASE 2: Byte-Flipped Firmware (Payload Tampering) ---");
+        $display("----------------------------------------------------------------");
+        $readmemh("firmware/tests/boot_matrix/bram_case2_flipped.hex", dut.bram_mem);
+        reset_soc();
+
+        fork : timeout_case2
+            begin
+                #500000;
+                disable timeout_case2;
+            end
+            begin
+                wait (led == 4'b1010 || dut.boot_refuse == 1'b1);
+                #1000;
+                disable timeout_case2;
+            end
+        join
+
+        check_case("Case 2: Deterministic refusal LED pattern 4'b1010 detected", led == 4'b1010);
+        check_case("Case 2: Candidate payload never executed (test_pass is 0)", test_pass == 1'b0);
+        check_case("Case 2: Hardware boot_jump_enable remains 0", dut.boot_jump_enable == 1'b0);
+
+        // ---------------------------------------------------------------------
+        // Case 3: Wrong Reference Digest (§12.5 Case 3)
+        // Expected: Simulates provisioning error; digest comparison fails;
+        //           Boot ROM refuses; LEDs = 4'b1010; test_pass = 0.
+        // ---------------------------------------------------------------------
+        $display("\n----------------------------------------------------------------");
+        $display("--- CASE 3: Wrong Reference Digest (Provisioning Error) ---");
+        $display("----------------------------------------------------------------");
+        $readmemh("firmware/tests/boot_matrix/bram_case3_wrong_digest.hex", dut.bram_mem);
+        reset_soc();
+
+        fork : timeout_case3
+            begin
+                #500000;
+                disable timeout_case3;
+            end
+            begin
+                wait (led == 4'b1010 || dut.boot_refuse == 1'b1);
+                #1000;
+                disable timeout_case3;
+            end
+        join
+
+        check_case("Case 3: Refusal pattern 4'b1010 on wrong reference digest", led == 4'b1010);
+        check_case("Case 3: test_pass remains 0", test_pass == 1'b0);
+        check_case("Case 3: boot_jump_enable remains 0", dut.boot_jump_enable == 1'b0);
+
+        // ---------------------------------------------------------------------
+        // Case 4: Invalid Declared Length (§12.5 Case 4)
+        // Expected: Declared length is 0 (or out-of-bounds);
+        //           Boot ROM header validation catches length error;
+        //           Refuses immediately; LEDs = 4'b1010; test_pass = 0.
+        // ---------------------------------------------------------------------
+        $display("\n----------------------------------------------------------------");
+        $display("--- CASE 4: Invalid Declared Length (Header Violation) ---");
+        $display("----------------------------------------------------------------");
+        $readmemh("firmware/tests/boot_matrix/bram_case4_invalid_len.hex", dut.bram_mem);
+        reset_soc();
+
+        fork : timeout_case4
+            begin
+                #500000;
+                disable timeout_case4;
+            end
+            begin
+                wait (led == 4'b1010);
+                #1000;
+                disable timeout_case4;
+            end
+        join
+
+        check_case("Case 4: Immediate refusal on length violation (LED = 4'b1010)", led == 4'b1010);
+        check_case("Case 4: test_pass remains 0", test_pass == 1'b0);
+        check_case("Case 4: boot_jump_enable remains 0", dut.boot_jump_enable == 1'b0);
+
+        // ---------------------------------------------------------------------
+        // Case 5: Malformed Header Magic (§12.5 Case 5)
+        // Expected: Header magic is 0xDEADBEEF instead of "ASCN";
+        //           Boot ROM catches magic mismatch; refuses; LEDs = 4'b1010.
+        // ---------------------------------------------------------------------
+        $display("\n----------------------------------------------------------------");
+        $display("--- CASE 5: Malformed Header Magic (0xDEADBEEF) ---");
+        $display("----------------------------------------------------------------");
+        $readmemh("firmware/tests/boot_matrix/bram_case5_bad_magic.hex", dut.bram_mem);
+        reset_soc();
+
+        fork : timeout_case5
+            begin
+                #500000;
+                disable timeout_case5;
+            end
+            begin
+                wait (led == 4'b1010);
+                #1000;
+                disable timeout_case5;
+            end
+        join
+
+        check_case("Case 5: Immediate refusal on malformed magic (LED = 4'b1010)", led == 4'b1010);
+        check_case("Case 5: test_pass remains 0", test_pass == 1'b0);
+        check_case("Case 5: boot_jump_enable remains 0", dut.boot_jump_enable == 1'b0);
+
+        // ---------------------------------------------------------------------
+        // Case 6: Injected DMA Fault / Timeout (§12.5 Case 6)
+        // Expected: DMA engine encounters abort/error; Boot ROM detects failure;
+        //           Refuses deterministically; LEDs = 4'b1010; test_pass = 0.
+        // ---------------------------------------------------------------------
+        $display("\n----------------------------------------------------------------");
+        $display("--- CASE 6: Injected DMA Error / Timeout ---");
+        $display("----------------------------------------------------------------");
+        $readmemh("firmware/tests/boot_matrix/bram_case1_valid.hex", dut.bram_mem);
+        reset_soc();
+
+        // Wait until DMA starts streaming, then inject DMA abort
+        fork : dma_inject_fork
+            begin
+                wait (dut.u_dma_master.status_busy == 1'b1);
+                $display("  [EVENT] DMA busy detected at %0t, asserting abort!", $time);
+                @(negedge clk);
+                dut.u_dma_master.status_err <= 1'b1;
+                dut.u_ascon.r_dma_abort_pulse <= 1'b1;
+                @(negedge clk);
+                dut.u_ascon.r_dma_abort_pulse <= 1'b0;
+                disable dma_inject_fork;
+            end
+            begin
+                #200000;
+                $display("  [DEBUG Case 6] Waited 200us for DMA busy. status_busy=%b, dma_done=%b, mc_busy=%b, led=%b",
+                    dut.u_dma_master.status_busy, dut.u_dma_master.status_done, dut.u_ascon.mc_busy, led);
+                disable dma_inject_fork;
+            end
+        join
+
+        fork : timeout_case6
+            begin
+                #1000000;
+                $display("  [DEBUG Case 6 timeout] led=%b, boot_refuse=%b", led, dut.boot_refuse);
+                disable timeout_case6;
+            end
+            begin
+                wait (led == 4'b1010 || dut.boot_refuse == 1'b1);
+                #1000;
+                disable timeout_case6;
+            end
+        join
+
+        check_case("Case 6: DMA error caught deterministically (LED = 4'b1010)", led == 4'b1010);
+        check_case("Case 6: test_pass remains 0", test_pass == 1'b0);
+        check_case("Case 6: boot_jump_enable remains 0", dut.boot_jump_enable == 1'b0);
+
+        // ---------------------------------------------------------------------
+        // Case 7: Injected Accelerator Error (§12.5 Case 7)
+        // Expected: Coprocessor reports error during hash calculation;
+        //           Boot ROM catches error; refuses; LEDs = 4'b1010.
+        // ---------------------------------------------------------------------
+        $display("\n----------------------------------------------------------------");
+        $display("--- CASE 7: Injected Accelerator Error ---");
+        $display("----------------------------------------------------------------");
+        $readmemh("firmware/tests/boot_matrix/bram_case1_valid.hex", dut.bram_mem);
+        reset_soc();
+
+        // Wait until Ascon coprocessor starts absorbing, inject soft reset
+        fork : accel_inject_fork
+            begin
+                wait (dut.u_ascon.mc_busy == 1'b1);
+                $display("  [EVENT] Accelerator busy detected at %0t, injecting error!", $time);
+                @(negedge clk);
+                dut.u_ascon.r_soft_rst_pulse <= 1'b1;
+                dut.u_ascon.r_status_error <= 1'b1;
+                @(negedge clk);
+                dut.u_ascon.r_soft_rst_pulse <= 1'b0;
+                disable accel_inject_fork;
+            end
+            begin
+                #200000;
+                $display("  [DEBUG Case 7] Waited 200us for mc_busy. mc_busy=%b, led=%b", dut.u_ascon.mc_busy, led);
+                disable accel_inject_fork;
+            end
+        join
+
+        fork : timeout_case7
+            begin
+                #1000000;
+                $display("  [DEBUG Case 7 timeout] led=%b, boot_refuse=%b", led, dut.boot_refuse);
+                disable timeout_case7;
+            end
+            begin
+                wait (led == 4'b1010 || dut.boot_refuse == 1'b1);
+                #1000;
+                disable timeout_case7;
+            end
+        join
+
+        check_case("Case 7: Accelerator fault caught deterministically (LED = 4'b1010)", led == 4'b1010);
+        check_case("Case 7: test_pass remains 0", test_pass == 1'b0);
+        check_case("Case 7: boot_jump_enable remains 0", dut.boot_jump_enable == 1'b0);
+
+        // ---------------------------------------------------------------------
+        // Case 8: Reset Mid-Verification (§12.5 Case 8)
+        // Expected: Asynchronous reset pulsed during active DMA/Hash;
+        //           System cleanly returns to STATE_RESET; no jump occurred.
+        // ---------------------------------------------------------------------
+        $display("\n----------------------------------------------------------------");
+        $display("--- CASE 8: Asynchronous Reset Mid-Verification ---");
+        $display("----------------------------------------------------------------");
+        $readmemh("firmware/tests/boot_matrix/bram_case1_valid.hex", dut.bram_mem);
+        reset_soc();
+
+        // Wait until verification is actively in progress
+        wait (dut.u_ascon.u_boot_ctrl.busy == 1'b1);
+        @(negedge clk);
+        $display("  [EVENT] Asserting reset mid-verification at time %0t...", $time);
+        rst_n = 1'b0;
+        #(CLK_PERIOD * 5);
+        @(negedge clk);
+        check_case("Case 8: Controller safely in STATE_RESET (0)", dut.u_ascon.u_boot_ctrl.fsm_state == 4'd0);
+        check_case("Case 8: boot_jump_enable is 0 during reset", dut.boot_jump_enable == 1'b0);
+        check_case("Case 8: test_pass remained 0", test_pass == 1'b0);
+        rst_n = 1'b1;
+
+        // ---------------------------------------------------------------------
+        // Case 9: Repeated Boot Attempt After Refusal (§12.5 Case 9)
+        // Expected: After entering refusal (e.g. from tamper), re-triggering boot
+        //           without hardware reset must refuse again; never 'second time lucky'.
+        // ---------------------------------------------------------------------
+        $display("\n----------------------------------------------------------------");
+        $display("--- CASE 9: Repeated Boot Attempt After Refusal ---");
+        $display("----------------------------------------------------------------");
+        reset_soc();
+
+        // Inject physical tamper pulse
+        @(negedge clk);
+        tamper_det = 1'b1;
+        $display("  [DEBUG Case 9 pre-posedge] tamper_det=%b, dut.tamper_det=%b", tamper_det, dut.tamper_det);
+        @(negedge clk);
+        tamper_det = 1'b0;
+        @(negedge clk);
+        $display("  [DEBUG Case 9 post-posedge] tamper_latched=%b, fsm_state=%d, refuse=%b",
+            dut.u_ascon.u_boot_ctrl.tamper_latched, dut.u_ascon.u_boot_ctrl.fsm_state, dut.boot_refuse);
+
+        check_case("Case 9: Tamper latched in hardware", dut.u_ascon.u_boot_ctrl.tamper_latched == 1'b1);
+        check_case("Case 9: Controller in STATE_HALT_REFUSE", dut.u_ascon.u_boot_ctrl.fsm_state == 4'd7);
+        check_case("Case 9: boot_refuse asserted", dut.boot_refuse == 1'b1);
+
+        // Host attempts second boot trigger
+        @(negedge clk);
+        dut.u_ascon.r_boot_start_pulse = 1'b1;
+        dut.u_ascon.r_boot_req_jump_pulse = 1'b1;
+        @(negedge clk);
+        dut.u_ascon.r_boot_start_pulse = 1'b0;
+        dut.u_ascon.r_boot_req_jump_pulse = 1'b0;
+
+        repeat (10) @(negedge clk);
+        check_case("Case 9: Remains locked in STATE_HALT_REFUSE after repeated attempt", dut.u_ascon.u_boot_ctrl.fsm_state == 4'd7);
+        check_case("Case 9: boot_jump_enable remains 0", dut.boot_jump_enable == 1'b0);
+        check_case("Case 9: boot_refuse remains 1", dut.boot_refuse == 1'b1);
+
+        // ---------------------------------------------------------------------
+        // Final Summary
+        // ---------------------------------------------------------------------
+        $display("\n================================================================================");
+        $display("COMPLETE SECURE BOOT 9-CASE MATRIX SUMMARY");
+        $display("================================================================================");
+        $display("Total Assertions Tested: %0d", total_pass + total_fail);
+        $display("Passed:                  %0d", total_pass);
+        $display("Failed:                  %0d", total_fail);
+        $display("================================================================================");
+
+        if (total_fail == 0) begin
+            $display("[ALL 9 CASES PASSED] Secure Boot Implementation 100%% VERIFIED!");
+        end else begin
+            $display("[TEST FAILED] Boot matrix failures detected!");
+        end
+
+        #(CLK_PERIOD * 20);
+        $finish;
+    end
+
+endmodule

@@ -75,7 +75,13 @@ module axil_regs #(
     input  wire        dma_err,
 
     // Interrupt Line
-    output wire        irq
+    output wire        irq,
+
+    // Secure Boot Interface (Phase 8)
+    input  wire        tamper_det,
+    output wire        boot_jump_enable,
+    output wire        boot_refuse,
+    output wire [3:0]  boot_led_status
 );
 
     // -------------------------------------------------------------------------
@@ -216,6 +222,46 @@ module axil_regs #(
     // Interrupt Line
     assign irq = (r_irq_en[0] && r_status_done) || (r_irq_en[1] && r_status_error);
 
+    // =========================================================================
+    // Secure Boot Controller (Phase 8)
+    // =========================================================================
+    reg        r_boot_start_pulse;
+    reg        r_boot_tamper_pulse;
+    reg        r_boot_req_jump_pulse;
+
+    wire        w_boot_jump_enable;
+    wire        w_boot_refuse;
+    wire        w_boot_busy;
+    wire        w_boot_hash_ok;
+    wire        w_boot_tamper_latched;
+    wire [3:0]  w_boot_fsm_state;
+    wire [3:0]  w_boot_led_status;
+
+    assign boot_jump_enable = w_boot_jump_enable;
+    assign boot_refuse      = w_boot_refuse;
+    assign boot_led_status  = w_boot_led_status;
+
+    boot_ctrl u_boot_ctrl (
+        .clk                (clk),
+        .rst_n              (rst_n),
+        .start              (r_boot_start_pulse),
+        .dma_done           (dma_done),
+        .hash_done          (mc_done_pulse),
+        .ascon_digest       (mc_digest_out),
+        .tamper_det         (tamper_det || r_boot_tamper_pulse),
+        .req_jump           (r_boot_req_jump_pulse),
+        .cfg_trusted_len    (32'd64),
+        .cfg_trusted_digest (256'd0),
+        .cfg_use_custom_ref (1'b0),
+        .jump_enable        (w_boot_jump_enable),
+        .refuse             (w_boot_refuse),
+        .busy               (w_boot_busy),
+        .hash_ok            (w_boot_hash_ok),
+        .tamper_latched     (w_boot_tamper_latched),
+        .fsm_state          (w_boot_fsm_state),
+        .led_status         (w_boot_led_status)
+    );
+
     // -------------------------------------------------------------------------
     // AXI4-Lite Address Latching & Handshake Control
     // -------------------------------------------------------------------------
@@ -274,10 +320,13 @@ module axil_regs #(
             r_pio_valid       <= 1'b0;
         end else begin
             // Default single-cycle pulses
-            r_start_pulse     <= 1'b0;
-            r_soft_rst_pulse  <= 1'b0;
-            r_dma_start_pulse <= 1'b0;
-            r_dma_abort_pulse <= 1'b0;
+            r_start_pulse         <= 1'b0;
+            r_soft_rst_pulse      <= 1'b0;
+            r_dma_start_pulse     <= 1'b0;
+            r_dma_abort_pulse     <= 1'b0;
+            r_boot_start_pulse    <= 1'b0;
+            r_boot_tamper_pulse   <= 1'b0;
+            r_boot_req_jump_pulse <= 1'b0;
 
             if (r_pio_valid && mc_data_in_ready) begin
                 r_pio_valid <= 1'b0;
@@ -375,6 +424,13 @@ module axil_regs #(
                         12'h078: begin
                             r_pio_data  <= {s_axil_wdata, r_data_in_0};
                             r_pio_valid <= 1'b1;
+                        end
+
+                        // 0x80: BOOT_CTRL
+                        12'h080: begin
+                            if (s_axil_wdata[0]) r_boot_start_pulse    <= 1'b1;
+                            if (s_axil_wdata[1]) r_boot_tamper_pulse   <= 1'b1;
+                            if (s_axil_wdata[2]) r_boot_req_jump_pulse <= 1'b1;
                         end
 
                         default: begin
@@ -482,6 +538,25 @@ module axil_regs #(
 
                         // 0x7C: CORE_ID
                         12'h07C: s_axil_rdata <= CORE_ID_VAL;
+
+                        // 0x80: BOOT_CTRL
+                        12'h080: s_axil_rdata <= 32'd0;
+
+                        // 0x84: BOOT_STATUS
+                        12'h084: s_axil_rdata <= {20'd0, w_boot_fsm_state, 3'd0, w_boot_tamper_latched, w_boot_hash_ok, w_boot_refuse, w_boot_jump_enable, w_boot_busy};
+
+                        // 0x88: BOOT_TRUSTED_LEN
+                        12'h088: s_axil_rdata <= 32'd64;
+
+                        // 0x8C - 0xAC: BOOT_REF_DIGEST[0..7]
+                        12'h08C: s_axil_rdata <= 32'h777BB3DF;
+                        12'h090: s_axil_rdata <= 32'h433A4F7B;
+                        12'h094: s_axil_rdata <= 32'hA2267BDC;
+                        12'h098: s_axil_rdata <= 32'h7FE61055;
+                        12'h09C: s_axil_rdata <= 32'hAFB9E393;
+                        12'h0A0: s_axil_rdata <= 32'h11B6C8A2;
+                        12'h0A4: s_axil_rdata <= 32'h12075573;
+                        12'h0A8: s_axil_rdata <= 32'hEDB41305;
 
                         default: begin
                             s_axil_rresp <= AXI_RESP_SLVERR;

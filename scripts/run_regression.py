@@ -51,13 +51,14 @@ def run_simulation_test(tb_file: str) -> tuple[bool, float, str]:
     os.makedirs(SIM_BUILD_DIR, exist_ok=True)
     
     # Sync firmware hex files into sim_build so relative paths resolve cleanly
-    sim_fw_dir = os.path.join(SIM_BUILD_DIR, "firmware", "tests")
-    os.makedirs(sim_fw_dir, exist_ok=True)
-    fw_src = os.path.join(ROOT_DIR, "firmware", "tests")
-    if os.path.exists(fw_src):
-        for f in os.listdir(fw_src):
-            if f.endswith(".hex"):
-                shutil.copy2(os.path.join(fw_src, f), os.path.join(sim_fw_dir, f))
+    for sub in ["bootrom", "tests", os.path.join("tests", "boot_matrix")]:
+        dst_dir = os.path.join(SIM_BUILD_DIR, "firmware", sub)
+        os.makedirs(dst_dir, exist_ok=True)
+        src_dir = os.path.join(ROOT_DIR, "firmware", sub)
+        if os.path.exists(src_dir):
+            for f in os.listdir(src_dir):
+                if f.endswith(".hex") or f.endswith(".bin"):
+                    shutil.copy2(os.path.join(src_dir, f), os.path.join(dst_dir, f))
     
     # Collect all RTL source files
     rtl_files = []

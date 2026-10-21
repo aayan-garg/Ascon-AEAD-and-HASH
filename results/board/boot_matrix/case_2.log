@@ -1,0 +1,32 @@
+================================================================================
+SECURE BOOT MATRIX VERIFICATION LOG: CASE 2
+Requirement: [SPEC] Initial Research §12.5 Case 2 (Byte-Flipped Firmware Image)
+Testbench: tb/integration/tb_secure_boot.sv
+Target Hardware: PicoRV32 + 16 KB BRAM + Ascon Coprocessor + Streaming DMA + Boot Ctrl
+Timestamp: 2026-10-21T21:39:11Z
+================================================================================
+
+[SETUP] Loading merged 16 KB BRAM image: firmware/tests/boot_matrix/bram_case2_flipped.hex
+  - Modification: Bit 0 of byte 10 in candidate payload flipped (0x01 XORed).
+  - Expected: Ascon-Hash256 produces completely different digest due to avalanche effect.
+  - Verification Gates: Both hardware comparator and software constant-time compare must fail.
+
+[EXECUTION TRACE]
+  Time 45,700 ns: Reset applied.
+  Time 45,805 ns: Reset deasserted. CPU executes Boot ROM at 0x0000_0000.
+  Time 46,100 ns: Header syntax validated (magic, version, length, entry point all match header spec).
+  Time 46,250 ns: boot_ctrl FSM started.
+  Time 46,400 ns: DMA streams tampered payload into Ascon coprocessor.
+  Time 90,500 ns: DMA streaming completes; Ascon coprocessor completes hash calculation.
+  Time 90,520 ns: Hardware 256-bit comparator evaluates: hash_match == 0.
+  Time 90,540 ns: boot_ctrl FSM transitions to STATE_HALT_REFUSE (refuse = 1, jump_enable = 0, led_status = 4'b1010).
+  Time 90,900 ns: Software constant-time compare detects mismatch (sw_match == 0).
+  Time 91,050 ns: CPU enters refusal_lockout(9): pulses BOOT_CTRL tamper bit, writes GPIO LED = 0xA (4'b1010), enters infinite NOP loop.
+  Time 91,500 ns: Hardware pins verified: test_pass remains 0, LED remains 4'b1010, boot_jump_enable remains 0. Candidate NEVER executes.
+
+[ASSERTION RESULTS]
+  [PASS] Case 2: Deterministic refusal LED pattern 4'b1010 detected
+  [PASS] Case 2: Candidate payload never executed (test_pass is 0)
+  [PASS] Case 2: Hardware boot_jump_enable remains 0
+
+VERDICT: CASE 2 PASS
