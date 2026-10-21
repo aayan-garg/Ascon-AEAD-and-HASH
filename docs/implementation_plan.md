@@ -160,8 +160,8 @@ Phase 11 ──→ Phase 12 (Final Documentation & Handoff)
 - [x] Implement `rtl/ascon/permutation_half.sv` — ½ round/cycle (2 micro-steps)
 - [x] Implement `rtl/ascon/permutation_2r.sv` — 2 rounds/cycle (chained)
 - [x] Test: all 3 variants pass full KAT differential test
-- [ ] Implement `rtl/ascon/sbox5_espresso.sv` — ESPRESSO/BDD-derived variant
-- [ ] Test: same exhaustive truth-table check passes
+- [x] Implement `rtl/ascon/sbox5_espresso.sv` — ESPRESSO/BDD-derived variant
+- [x] Test: same exhaustive truth-table check passes (`tb/unit/tb_sbox_equiv.sv`)
 
 ### Exit Gate
 - [x] S-box exhaustive test: 0 mismatches → `results/kat/sbox_exhaustive.log`

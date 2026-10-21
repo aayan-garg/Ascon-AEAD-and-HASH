@@ -9,9 +9,9 @@
 | Field | Value |
 |---|---|
 | **Current Phase** | Phase 5 — AEAD and Hash Mode Controller |
-| **Last Action** | Phase 4 Datapath Architecture Exploration Complete: Designed, simulated, and 100% verified all three Ascon permutation datapath variants (1-round baseline `permutation_1r.sv`, 2-round unrolled `permutation_2r.sv` in 6 cycles for p^12, and 1/2-round pipelined `permutation_half.sv` in 24 cycles for p^12); all pass logs generated (perm_1r_pass.log, perm_2r_pass.log, perm_half_pass.log); 10/10 regression suites passing green |
+| **Last Action** | Phase 4 Datapath & Architectural Exploration 100% Complete: Designed, simulated, and verified all three Ascon permutation variants (1-round baseline `permutation_1r.sv`, 2-round unrolled `permutation_2r.sv`, and 1/2-round pipelined `permutation_half.sv`), along with ESPRESSO minimal SOP S-box (`sbox5_espresso.sv`) proven exhaustively equivalent (`tb_sbox_equiv.sv`); 11/11 regression suites passing green |
 | **Date** | 2026-10-21 |
-| **Overall Progress** | █████▌░░░░ ~55% (Phase 0, 1, 3, 4 complete; Phase 2 bitstream ready; 10/10 regression passing) |
+| **Overall Progress** | ██████░░░░ ~60% (Phase 0, 1, 3, 4 complete; Phase 2 bitstream ready; 11/11 regression passing) |
 
 ---
 
@@ -50,6 +50,7 @@
 
 | Date | Action | Files Changed |
 |---|---|---|
+| 2026-10-21 | Phase 4 Permutation Datapath & Architectural Exploration completed (1-round `permutation_1r.sv`, 2-round unrolled `permutation_2r.sv`, 1/2-round pipelined `permutation_half.sv`, Berkeley ESPRESSO minimal SOP S-box `sbox5_espresso.sv`, exhaustive equivalence verified in `tb_sbox_equiv.sv`, full regression 11/11 passing in 50.59s) | `rtl/ascon/*`, `tb/unit/*`, `docs/implementation_plan.md`, `docs/status.md` |
 | 2026-10-21 | Phase 2 Bitstream Synthesis & Waveform Tools completed (Vivado 2025.1 synthesis, opt, place, route; WNS = +3.098 ns; top_bringup.bit built; program_board.tcl created; view_waveform.py & open_wave_gui.bat created) | `rtl/soc/top_bringup_board.sv`, `firmware/tests/gpio_toggle_board.*`, `scripts/build_bitstream.tcl`, `scripts/program_board.tcl`, `scripts/view_waveform.py`, `scripts/open_wave_gui.bat`, `results/board/phase2_bringup.md`, `docs/implementation_plan.md` |
 | 2026-10-21 | Phase 2 Bring-Up Simulation completed (PicoRV32 AXI core, 16 KB BRAM, AXI4-Lite GPIO peripheral, gpio_toggle.c firmware, tb_picorv32_bringup.sv verified in XSim) | `rtl/soc/picorv32.v`, `rtl/soc/top_bringup.sv`, `firmware/linker/bringup.ld`, `firmware/startup/crt0.S`, `firmware/tests/gpio_toggle.c`, `firmware/build_firmware.py`, `tb/unit/tb_picorv32_bringup.sv`, `results/board/phase2_bringup.md`, `scripts/run_regression.py`, `docs/implementation_plan.md` |
 | 2026-10-21 | Phase 0 R-8 & Phase 1 completed (Golden model KAT verification, tb_hello.sv unit test, and automated regression runner) | `reference/kat/*`, `reference/pyascon/*`, `reference/run_kats.py`, `results/kat/*`, `tb/unit/tb_hello.sv`, `scripts/run_regression.*`, `docs/research_plan.md`, `docs/implementation_plan.md` |
@@ -64,8 +65,10 @@
 
 ## Next Steps (Immediate)
 
-1. Proceed with Phase 2: PicoRV32 bring-up with minimal BRAM and GPIO toggle simulation
-2. Or proceed with Phase 4: S-box and permutation datapath implementation (`rtl/ascon/sbox5.sv`, `diffusion.sv`, `round_core.sv`)
+1. **Proceed to Phase 5: AEAD & Hash Mode Controller**
+   - Implement `rtl/ascon/mode_ctrl.sv` (Master Sponge FSM per §8.4: IDLE → INIT → ABSORB_AD → ABSORB_PT_CT → FINALIZE → TAG_CHECK → DONE)
+   - Implement `rtl/ascon/plaintext_gate.sv` (Plaintext Release Security Gate: zeroization on tag mismatch per §10.3)
+   - Implement unit testbench `tb/unit/tb_mode_ctrl.sv` & `tb_security_gate.sv` against NIST SP 800-232 vectors
 
 ---
 
