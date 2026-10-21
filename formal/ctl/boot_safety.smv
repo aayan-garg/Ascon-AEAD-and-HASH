@@ -21,20 +21,22 @@ VAR
     };
 
     -- Internal registered security flags
-    hash_verified  : boolean; -- Authenticated tag match flag
-    tamper_latched : boolean; -- Sticky hardware tamper latch
+    hash_verified        : boolean; -- Authenticated tag match flag
+    tamper_latched       : boolean; -- Sticky hardware tamper latch
+    verified_before_jump : boolean; -- Refined monitor flag: latched prior to JUMP state
 
     -- Environmental and datapath inputs
-    start       : boolean; -- Host / Power-on boot trigger
+    start       : boolean; -- Host / Power-on boot trigger (verify_req)
     dma_done    : boolean; -- Streaming DMA completed transfer
     hash_done   : boolean; -- Ascon engine finished hash/AEAD calculation
-    hash_match  : boolean; -- 256-bit hash comparator matched golden digest
+    hash_match  : boolean; -- 256-bit hash comparator matched golden digest (digest_match)
     tamper_det  : boolean; -- Physical sensor / glitch tamper pulse
 
 ASSIGN
-    init(state)          := STATE_RESET;
-    init(hash_verified)  := FALSE;
-    init(tamper_latched) := FALSE;
+    init(state)                := STATE_RESET;
+    init(hash_verified)        := FALSE;
+    init(tamper_latched)       := FALSE;
+    init(verified_before_jump) := FALSE;
 
     -- Sticky tamper register latch
     next(tamper_latched) := tamper_latched | tamper_det;
@@ -45,6 +47,14 @@ ASSIGN
             tamper_latched | tamper_det : FALSE;
             state = STATE_CHECK_TAG     : (hash_verified | hash_match);
             TRUE                        : hash_verified;
+        esac;
+
+    -- Refined Monitor Register: latches high when hash_ok is valid, persists until reset
+    next(verified_before_jump) :=
+        case
+            tamper_latched | tamper_det                   : FALSE;
+            hash_verified & !tamper_latched & !tamper_det : TRUE;
+            TRUE                                          : verified_before_jump;
         esac;
 
     -- Next state logic
@@ -87,11 +97,15 @@ ASSIGN
         esac;
 
 DEFINE
-    -- Observable control outputs
-    jump    := (state = STATE_JUMP);
-    refuse  := (state = STATE_HALT_REFUSE);
-    hash_ok := hash_verified;
-    busy    := (state != STATE_RESET & state != STATE_JUMP & state != STATE_HALT_REFUSE);
+    -- Observable control outputs & standard aliases (§13.2)
+    jump               := (state = STATE_JUMP);
+    refuse             := (state = STATE_HALT_REFUSE);
+    hash_ok            := hash_verified;
+    busy               := (state != STATE_RESET & state != STATE_JUMP & state != STATE_HALT_REFUSE);
+    verify_in_progress := busy;
+    digest_match       := hash_match;
+    verify_req         := start;
+    reset              := (state = STATE_RESET);
 
 -- ==============================================================================
 -- CTL Formal Specifications
@@ -103,19 +117,26 @@ DEFINE
 CTLSPEC
     AG (jump -> hash_ok)
 
--- Safety Property 2 (Tamper Prevention):
+-- Safety Property 2 (Refined Monitor-Based Invariant):
+-- "Along all execution paths at all times, if the processor enters the JUMP state,
+-- full cryptographic hash verification strictly occurred beforehand."
+CTLSPEC
+    AG (jump -> verified_before_jump)
+
+-- Safety Property 3 (Tamper Prevention):
 -- "If physical tampering is detected and latched, it is globally impossible along any
 -- execution path to reach the JUMP state."
 CTLSPEC
     AG (tamper_latched -> !EF jump)
 
--- Safety Property 3 (Determinism of Failure):
+-- Safety Property 4 (Determinism of Failure):
 -- "If the hash fails to verify, entering the DECIDE state guarantees immediate
 -- lockout in HALT_REFUSE on the very next cycle along all paths."
 CTLSPEC
     AG (state = STATE_DECIDE & !hash_verified & !hash_match -> AX (state = STATE_HALT_REFUSE))
 
--- Invariance Property 4 (Terminal Lockout):
+-- Invariance Property 5 (Terminal Lockout):
 -- "Once the controller enters HALT_REFUSE, it cannot escape without system reset."
 CTLSPEC
     AG (refuse -> AG refuse)
+

@@ -1,0 +1,25 @@
+================================================================================
+FORMAL CTL VERIFICATION: CORRECT SPECIFICATION (boot_safety.smv)
+Requirement: [SPEC] R17, Initial Research Section 13.2, Phase 9 Exit Gate
+================================================================================
+Total State Configurations: 2048
+Total Reachable States:    320
+Total Transitions:         65536
+--------------------------------------------------------------------------------
+Property 1: AG (jump -> hash_ok)
+  Result: [PROVED TRUE]
+
+Property 2: AG (jump -> verified_before_jump)
+  Result: [PROVED TRUE]
+
+Property 3: AG (tamper_latched -> !EF jump)
+  Result: [PROVED TRUE]
+
+Property 4: AG (STATE_DECIDE & !hash_ok -> AX STATE_HALT_REFUSE)
+  Result: [PROVED TRUE]
+
+Property 5: AG (refuse -> AG refuse)
+  Result: [PROVED TRUE]
+--------------------------------------------------------------------------------
+MODEL VERDICT: ALL PROPERTIES PROVED TRUE
+================================================================================

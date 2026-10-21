@@ -8,10 +8,10 @@
 
 | Field | Value |
 |---|---|
-| **Current Phase** | Phase 9 — Formal CTL Verification |
-| **Last Action** | Phase 8 Secure Boot & Boot ROM Software 100% Complete: Implemented 64-byte authenticated firmware header specification (§12.4), automated image provisioning tool `scripts/provision_image.py`, hardware secure boot controller FSM `rtl/soc/boot_ctrl.sv` with 256-bit comparator and sticky tamper register, unit testbench `tb_boot_ctrl.sv` (31/31 PASS), immutable Boot ROM software `firmware/bootrom/secure_boot.c` (736 bytes), relocated candidate payload `firmware/tests/app_payload.c` (24 bytes @ 0x0000_1040), and end-to-end integration testbench `tb_secure_boot.sv` covering all 9 cases of §12.5 Boot Matrix (31/31 assertions PASS, deterministic refusal on all faults); generated artifacts in `results/board/boot_matrix/` |
+| **Current Phase** | Phase 10 — Synthesis & Performance Evaluation |
+| **Last Action** | Phase 9 Formal CTL Verification 100% Complete: Abstracted SMV model `boot_safety.smv` verified with 5/5 CTL properties proved true ($AG(\text{jump} \rightarrow \text{hash\_ok})$, $AG(\text{jump} \rightarrow \text{verified\_before\_jump})$, $AG(\text{tamper\_latched} \rightarrow \neg EF(\text{jump}))$, deterministic refusal, terminal lockout); flawed model `boot_safety_broken.smv` evaluated with counterexample synthesis confirming failure detection; generated `results/formal/proof_correct.log`, `results/formal/counterexample_broken.log`, and `results/formal/phase9_formal_summary.md` |
 | **Date** | 2026-10-21 |
-| **Overall Progress** | █████████░ ~90% (Phases 0, 1, 3, 4, 5, 6, 7, 8 complete; Phase 2 bitstream ready; 21/21 regression suites passing) |
+| **Overall Progress** | █████████▍ ~93% (Phases 0, 1, 3, 4, 5, 6, 7, 8, 9 complete; Phase 2 bitstream ready; 21/21 regression suites passing) |
 
 ---
 
@@ -28,9 +28,9 @@
 | 6 | Bus Integration | `✅ COMPLETED` | Register map per docs/register_map.md, AXI4-Lite slave, firmware driver, tb_axil_regs & tb_soc_ascon passing; unblocks Phase 7 |
 | 7 | DMA Integration | `✅ COMPLETED` | Custom DMA engine dma_master.sv, streaming data plane, boundary testing 40/40 PASS, tb_soc_dma passing; unblocks Phase 8 |
 | 8 | Secure Boot | `✅ COMPLETED` | Boot ROM firmware, boot_ctrl FSM, 64B header, provision_image.py, full 9-case matrix 31/31 PASS; unblocks Phase 9 |
-| 9 | Formal CTL | `🟡 READY / NEXT` | Prove AG (jump -> hash_ok) on RTL boot_ctrl.sv using NuSMV/nuXmv or SVA |
-| 10 | Synthesis/Performance | `⬜ NOT STARTED` | Blocked on Phase 4/5 |
-| 11 | Board Validation | `⬜ NOT STARTED` | Blocked on Phase 9 + 10 |
+| 9 | Formal CTL | `✅ COMPLETED` | Proved AG (jump -> hash_ok), AG (jump -> verified_before_jump), counterexample synthesized on broken model; unblocks Phase 10 |
+| 10 | Synthesis/Performance | `🟡 READY / NEXT` | Out-of-context synthesis of 1R, 2R, 1/2R variants on XC7Z010 @ 100 MHz; extract LUT/FF/BRAM/Fmax/WNS |
+| 11 | Board Validation | `⬜ NOT STARTED` | Blocked on Phase 10 |
 | 12 | Final Docs/Handoff | `⬜ NOT STARTED` | Blocked on Phase 11 |
 
 ---
@@ -49,7 +49,7 @@
 ## Recent Activity Log
 
 | Date | Action | Files Changed |
-|---|---|---|
+| 2026-10-21 | Phase 9 Formal CTL Verification completed (Abstracted SMV model `formal/ctl/boot_safety.smv` updated with `verified_before_jump` monitor register; verified `AG (jump -> hash_ok)`, `AG (jump -> verified_before_jump)`, `AG (tamper_latched -> !EF jump)`, `AG (DECIDE & !hash_ok -> AX REFUSE)`, `AG (refuse -> AG refuse)` across 320 reachable states and 65,536 transitions; built deliberately broken model `boot_safety_broken.smv` and proved failure with automated counterexample trace synthesis; generated `results/formal/proof_correct.log`, `results/formal/counterexample_broken.log`, and `results/formal/phase9_formal_summary.md`) | `formal/ctl/boot_safety.smv`, `formal/ctl/boot_safety_broken.smv`, `formal/ctl/verify_smv.py`, `results/formal/*`, `docs/*` |
 | 2026-10-21 | Phase 8 Secure Boot & Boot ROM Software completed (64-byte authenticated header format §12.4, automated provision script `scripts/provision_image.py`, hardware secure boot controller `boot_ctrl.sv` with 256-bit comparator and sticky tamper register, unit testbench `tb_boot_ctrl.sv` with 31/31 assertions PASS, immutable Boot ROM firmware `firmware/bootrom/secure_boot.c` compiled to `.hex`, candidate payload `app_payload.c` linked at `0x0000_1040`, integration testbench `tb_secure_boot.sv` verifying all 9 cases of §12.5 Boot Matrix with 31/31 assertions PASS and zero hung states, per-case logs and summary report in `results/board/boot_matrix/`) | `docs/threat_model.md`, `rtl/soc/boot_ctrl.sv`, `rtl/bus/axil_regs.sv`, `rtl/soc/top_bringup.sv`, `firmware/bootrom/*`, `firmware/linker/app.ld`, `firmware/tests/app_payload.c`, `scripts/provision_image.py`, `tb/unit/tb_boot_ctrl.sv`, `tb/integration/tb_secure_boot.sv`, `results/board/boot_matrix/*`, `docs/*` |
 | 2026-10-21 | Phase 7 Direct Memory Access (DMA) Integration completed (`dma_master.sv` custom burst-to-stream engine reading Port B of 16 KB BRAM, `top_bringup.sv` integration, `tb_dma.sv` with 40/40 boundary assertions PASS, `accel_dma_test.c` RISC-V firmware compiled to `.hex`, `tb_soc_dma.sv` full SoC simulation passing in 2,122 cycles with `GPIO[31]=1`, `results/board/dma_boundary.log`, `results/board/phase7_dma_summary.md`) | `rtl/dma/dma_master.sv`, `rtl/soc/top_bringup.sv`, `tb/integration/tb_dma.sv`, `tb/integration/tb_soc_dma.sv`, `firmware/tests/accel_dma_test.*`, `results/board/*`, `docs/*` |
 | 2026-10-21 | Phase 6 Accelerator Bus Integration completed (`axil_regs.sv` AXI4-Lite register file per `docs/register_map.md`, `tb_axil_regs.sv` BFM testbench 100% PASS, `accel_hash_test.c` RISC-V firmware, `tb_soc_ascon.sv` passing in 1,027 cycles with `GPIO[31]=1`, `results/board/axil_integration.log`, `results/board/phase6_axil_summary.md`) | `rtl/bus/axil_regs.sv`, `rtl/soc/top_bringup.sv`, `tb/integration/tb_axil_regs.sv`, `tb/integration/tb_soc_ascon.sv`, `firmware/tests/accel_hash_test.*`, `results/board/*`, `docs/*` |
@@ -69,11 +69,13 @@
 
 ## Next Steps (Immediate)
 
-1. **Proceed to Phase 9: Formal CTL Verification**
-   - Verify formal property `AG (jump -> hash_ok)` on `boot_ctrl.sv`
-   - Prove refusal invariance `AG (tamper -> AG !jump)`
-   - Verify reset safety `AG (rst_n == 0 -> state == STATE_RESET)`
-   - Formal verification report and proof artifact generation
+1. **Proceed to Phase 10: Synthesis & Performance Evaluation**
+   - Synthesize and implement all three datapath variants on XC7Z010 @ 100 MHz (`permutation_1r.sv`, `permutation_2r.sv`, `permutation_half.sv`)
+   - Run synthesis for the complete `top_bringup.sv` SoC
+   - Extract exact LUT, FF, BRAM, DSP, F_max, and WNS metrics from Vivado reports
+   - Compute throughput (Mbit/s) for AEAD128 and Hash256 across all variants
+   - Generate populated `results/performance/comparison_table.md` with zero fabricated numbers
+
 
 
 ---

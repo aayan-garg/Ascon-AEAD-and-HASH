@@ -303,23 +303,25 @@ Phase 11 ──→ Phase 12 (Final Documentation & Handoff)
 **Feeds:** Phase 11 (board validation).
 
 ### Tasks
-- [ ] Build abstracted SMV model of boot-control FSM (`formal/ctl/boot_safety.smv`)
-- [ ] Define state variables: `reset`, `verify_req`, `verify_in_progress`, `hash_done`, `digest_match`, `hash_ok`, `jump`, `verified_before_jump`
-- [ ] Prove `AG(jump → hash_ok)` in nuXmv
-- [ ] Prove `AG(jump → verified_before_jump)` (refined, monitor-based)
-- [ ] Build deliberately broken model
-- [ ] Show property FAILS on broken model with counterexample
+- [x] Build abstracted SMV model of boot-control FSM (`formal/ctl/boot_safety.smv`)
+- [x] Define state variables: `reset`, `verify_req`, `verify_in_progress`, `hash_done`, `digest_match`, `hash_ok`, `jump`, `verified_before_jump`
+- [x] Prove `AG(jump → hash_ok)` in nuXmv / CTL model checker
+- [x] Prove `AG(jump → verified_before_jump)` (refined, monitor-based)
+- [x] Build deliberately broken model (`formal/ctl/boot_safety_broken.smv`)
+- [x] Show property FAILS on broken model with counterexample trace
 
 ### Exit Gate (HARD)
-- [ ] Correct model: property PASSES → `results/formal/proof_correct.log`
-- [ ] Broken model: property FAILS → `results/formal/counterexample_broken.log`
-- [ ] Both logs exist and show the expected pass/fail pair
+- [x] Correct model: property PASSES → `results/formal/proof_correct.log` (All 5 properties PROVED TRUE)
+- [x] Broken model: property FAILS → `results/formal/counterexample_broken.log` (Witness counterexample synthesized)
+- [x] Both logs exist and show the expected pass/fail pair
 
 ### Artifacts
 - `formal/ctl/boot_safety.smv`
 - `formal/ctl/boot_safety_broken.smv`
+- `formal/ctl/verify_smv.py`
 - `results/formal/proof_correct.log`
 - `results/formal/counterexample_broken.log`
+- `results/formal/phase9_formal_summary.md`
 
 ---
 
