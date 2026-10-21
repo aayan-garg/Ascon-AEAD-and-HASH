@@ -8,10 +8,10 @@
 
 | Field | Value |
 |---|---|
-| **Current Phase** | Phase 7 — DMA Integration |
-| **Last Action** | Phase 6 Accelerator Bus Integration 100% Complete: Designed, simulated, and verified `axil_regs.sv` per `docs/register_map.md`; integrated into SoC top-level `top_bringup.sv`; wrote bare-metal C test `accel_hash_test.c` compiled with RISC-V GCC; verified end-to-end SoC execution `tb_soc_ascon.sv` in 1,027 cycles; 17/17 regression suites passing green in 80.64s |
+| **Current Phase** | Phase 8 — Secure Boot & Boot ROM Software |
+| **Last Action** | Phase 7 DMA Integration 100% Complete: Designed, simulated, and verified custom streaming DMA engine `rtl/dma/dma_master.sv` with contention-free Port B dual-port BRAM interface; verified all 10 boundary and functional scenarios (40/40 assertions PASS) in `tb_dma.sv`; created bare-metal C driver `accel_dma_test.c` compiled with RISC-V GCC; verified end-to-end SoC execution `tb_soc_dma.sv` in 2,122 cycles (21.315 µs @ 100 MHz); test pass marker `GPIO[31] = 1` detected |
 | **Date** | 2026-10-21 |
-| **Overall Progress** | ████████░░ ~78% (Phases 0, 1, 3, 4, 5, 6 complete; Phase 2 bitstream ready; 17/17 regression suites passing) |
+| **Overall Progress** | ████████▌░ ~85% (Phases 0, 1, 3, 4, 5, 6, 7 complete; Phase 2 bitstream ready; 19/19 regression suites passing) |
 
 ---
 
@@ -26,8 +26,8 @@
 | 4 | Permutation Datapath | `✅ COMPLETED` | All 3 variants (1R, 2R, 1/2R) bit-exact; unblocks Phase 5 |
 | 5 | AEAD/Hash Controller | `✅ COMPLETED` | Mode FSM, absorbing/squeezing, tag verification, security plaintext gate; unblocks Phase 6 |
 | 6 | Bus Integration | `✅ COMPLETED` | Register map per docs/register_map.md, AXI4-Lite slave, firmware driver, tb_axil_regs & tb_soc_ascon passing; unblocks Phase 7 |
-| 7 | DMA Integration | `🟡 READY / NEXT` | Custom DMA engine dma_master.sv, streaming data plane, boundary testing |
-| 8 | Secure Boot | `⬜ NOT STARTED` | Blocked on Phase 7 |
+| 7 | DMA Integration | `✅ COMPLETED` | Custom DMA engine dma_master.sv, streaming data plane, boundary testing 40/40 PASS, tb_soc_dma passing; unblocks Phase 8 |
+| 8 | Secure Boot | `🟡 READY / NEXT` | Boot ROM firmware, boot_ctrl FSM, header validation, verification-before-jump |
 | 9 | Formal CTL | `⬜ NOT STARTED` | Blocked on Phase 8 (Model verified in Phase 0 R-7) |
 | 10 | Synthesis/Performance | `⬜ NOT STARTED` | Blocked on Phase 4/5 |
 | 11 | Board Validation | `⬜ NOT STARTED` | Blocked on Phase 9 + 10 |
@@ -50,6 +50,8 @@
 
 | Date | Action | Files Changed |
 |---|---|---|
+| 2026-10-21 | Phase 7 Direct Memory Access (DMA) Integration completed (`dma_master.sv` custom burst-to-stream engine reading Port B of 16 KB BRAM, `top_bringup.sv` integration, `tb_dma.sv` with 40/40 boundary assertions PASS, `accel_dma_test.c` RISC-V firmware compiled to `.hex`, `tb_soc_dma.sv` full SoC simulation passing in 2,122 cycles with `GPIO[31]=1`, `results/board/dma_boundary.log`, `results/board/phase7_dma_summary.md`) | `rtl/dma/dma_master.sv`, `rtl/soc/top_bringup.sv`, `tb/integration/tb_dma.sv`, `tb/integration/tb_soc_dma.sv`, `firmware/tests/accel_dma_test.*`, `results/board/*`, `docs/*` |
+| 2026-10-21 | Phase 6 Accelerator Bus Integration completed (`axil_regs.sv` AXI4-Lite register file per `docs/register_map.md`, `tb_axil_regs.sv` BFM testbench 100% PASS, `accel_hash_test.c` RISC-V firmware, `tb_soc_ascon.sv` passing in 1,027 cycles with `GPIO[31]=1`, `results/board/axil_integration.log`, `results/board/phase6_axil_summary.md`) | `rtl/bus/axil_regs.sv`, `rtl/soc/top_bringup.sv`, `tb/integration/tb_axil_regs.sv`, `tb/integration/tb_soc_ascon.sv`, `firmware/tests/accel_hash_test.*`, `results/board/*`, `docs/*` |
 | 2026-10-21 | Phase 5 AEAD & Hash Mode Controller completed (`mode_ctrl.sv`, `aead_ctrl.sv`, `hash_ctrl.sv`, hardware security shadow buffer `plaintext_gate.sv`, full testbenches `tb_security_gate.sv`, `tb_mode_ctrl.sv`, `tb_hash.sv`, `tb_aead.sv` verified bit-exact against official NIST SP 800-232 KATs, 15/15 regression suites passing green in 68.88s) | `rtl/ascon/*`, `tb/unit/*`, `results/kat/*`, `docs/implementation_plan.md`, `docs/status.md` |
 | 2026-10-21 | Phase 4 Permutation Datapath & Architectural Exploration completed (1-round `permutation_1r.sv`, 2-round unrolled `permutation_2r.sv`, 1/2-round pipelined `permutation_half.sv`, Berkeley ESPRESSO minimal SOP S-box `sbox5_espresso.sv`, exhaustive equivalence verified in `tb_sbox_equiv.sv`, full regression 11/11 passing in 50.59s) | `rtl/ascon/*`, `tb/unit/*`, `docs/implementation_plan.md`, `docs/status.md` |
 | 2026-10-21 | Phase 2 Bitstream Synthesis & Waveform Tools completed (Vivado 2025.1 synthesis, opt, place, route; WNS = +3.098 ns; top_bringup.bit built; program_board.tcl created; view_waveform.py & open_wave_gui.bat created) | `rtl/soc/top_bringup_board.sv`, `firmware/tests/gpio_toggle_board.*`, `scripts/build_bitstream.tcl`, `scripts/program_board.tcl`, `scripts/view_waveform.py`, `scripts/open_wave_gui.bat`, `results/board/phase2_bringup.md`, `docs/implementation_plan.md` |
@@ -66,11 +68,12 @@
 
 ## Next Steps (Immediate)
 
-1. **Proceed to Phase 6: Accelerator Bus Integration (AXI4-Lite)**
-   - Implement `rtl/bus/axil_regs.sv` — register map per `docs/register_map.md` (`0x4000_0000` base)
-   - Connect `mode_ctrl.sv` controls, status, key, nonce, tag, digest, and data ports to memory-mapped registers
-   - Write integration testbench `tb/integration/tb_axil_regs.sv`
-   - Write firmware test `firmware/tests/accel_hash_test.c` for PicoRV32 execution
+1. **Proceed to Phase 8: Secure Boot & Boot ROM Software**
+   - Define firmware image format (64-byte authenticated header + payload per §12.4)
+   - Implement `firmware/bootrom/secure_boot.c` Boot ROM verification routine
+   - Implement `rtl/soc/boot_ctrl.sv` hardware reset→verify→jump sequencing FSM
+   - Implement `scripts/provision_image.py` for image signing & header embedding
+   - Test complete 9-case boot matrix in simulation (§12.5)
 
 ---
 

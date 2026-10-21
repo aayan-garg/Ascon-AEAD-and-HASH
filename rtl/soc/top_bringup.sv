@@ -226,7 +226,61 @@ module top_bringup #(
     end
 
     // =========================================================================
-    // 5b. Ascon AEAD and Hash Accelerator (Address 0x4000_0000)
+    // 5b. Dual-Port BRAM Port B Read Port (Dedicated to DMA Master)
+    // =========================================================================
+    wire [11:0] dma_bram_addr;
+    wire        dma_bram_en;
+    reg  [31:0] dma_bram_rdata;
+
+    always @(posedge clk) begin
+        if (dma_bram_en) begin
+            dma_bram_rdata <= bram_mem[dma_bram_addr];
+        end
+    end
+
+    // =========================================================================
+    // 5c. Custom Streaming DMA Master Engine (Data Plane)
+    // =========================================================================
+    wire [63:0] dma_stream_data;
+    wire        dma_stream_valid;
+    wire        dma_stream_ready;
+    wire        dma_stream_last;
+    wire [ 2:0] dma_stream_rem;
+
+    wire [31:0] dma_src_addr;
+    wire [31:0] dma_len;
+    wire        dma_start;
+    wire        dma_abort;
+    wire        dma_busy;
+    wire        dma_done;
+    wire        dma_err;
+
+    dma_master #(
+        .BRAM_DATA_WIDTH (32),
+        .BRAM_ADDR_WIDTH (12),
+        .MAX_BYTES       (16384)
+    ) u_dma_master (
+        .clk             (clk),
+        .rst_n           (rst_n),
+        .cfg_src_addr    (dma_src_addr),
+        .cfg_len         (dma_len),
+        .cfg_start       (dma_start),
+        .cfg_abort       (dma_abort),
+        .status_busy     (dma_busy),
+        .status_done     (dma_done),
+        .status_err      (dma_err),
+        .bram_addr       (dma_bram_addr),
+        .bram_en         (dma_bram_en),
+        .bram_rdata      (dma_bram_rdata),
+        .stream_data     (dma_stream_data),
+        .stream_valid    (dma_stream_valid),
+        .stream_ready    (dma_stream_ready),
+        .stream_last     (dma_stream_last),
+        .stream_rem      (dma_stream_rem)
+    );
+
+    // =========================================================================
+    // 5d. Ascon AEAD and Hash Accelerator (Address 0x4000_0000)
     // =========================================================================
     wire        ascon_awready;
     wire        ascon_wready;
@@ -260,19 +314,19 @@ module top_bringup #(
         .s_axil_rresp       (ascon_rresp),
         .s_axil_rvalid      (ascon_rvalid),
         .s_axil_rready      (axi_rready && sel_ascon_ar),
-        .dma_data_in        (64'd0),
-        .dma_data_in_valid  (1'b0),
-        .dma_data_in_ready  (),
+        .dma_data_in        (dma_stream_data),
+        .dma_data_in_valid  (dma_stream_valid),
+        .dma_data_in_ready  (dma_stream_ready),
         .dma_data_out       (),
         .dma_data_out_valid (),
         .dma_data_out_ready (1'b1),
-        .dma_src_addr       (),
-        .dma_len            (),
-        .dma_start          (),
-        .dma_abort          (),
-        .dma_busy           (1'b0),
-        .dma_done           (1'b0),
-        .dma_err            (1'b0),
+        .dma_src_addr       (dma_src_addr),
+        .dma_len            (dma_len),
+        .dma_start          (dma_start),
+        .dma_abort          (dma_abort),
+        .dma_busy           (dma_busy),
+        .dma_done           (dma_done),
+        .dma_err            (dma_err),
         .irq                (ascon_irq)
     );
 

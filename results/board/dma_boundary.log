@@ -1,0 +1,133 @@
+=== TB_DMA BOUNDARY SIMULATION LOG ===
+
+****** xsim v2025.1 (64-bit)
+  **** SW Build 6140274 on Thu May 22 00:12:29 MDT 2025
+  **** IP Build 6138677 on Thu May 22 03:10:11 MDT 2025
+  **** SharedData Build 6139179 on Tue May 20 17:58:58 MDT 2025
+  **** Start of session at: Wed Oct 21 20:36:30 2026
+    ** Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.
+    ** Copyright 2022-2025 Advanced Micro Devices, Inc. All Rights Reserved.
+
+source xsim.dir/tb_dma_sim/xsim_script.tcl
+# xsim {tb_dma_sim} -autoloadwcfg -runall
+Time resolution is 1 ps
+run -all
+================================================================================
+ASCON DMA INTEGRATION TESTBENCH (tb_dma.sv)
+Testing Custom Streaming DMA Engine, Boundary Cases, & Closed-Loop Hash
+================================================================================
+
+--- Test 1: 0-Byte Transfer (Boundary) ---
+  [PASS] 0-byte transfer immediately done
+  [PASS] 0-byte transfer not busy
+  [PASS] 0-byte transfer no error
+  [PASS] 0-byte transfer no valid stream
+
+--- Test 2: 1-Byte Transfer (Single Word Boundary) ---
+  [PASS] 1-byte transfer stream_data[7:0] == 0x12
+  [PASS] 1-byte transfer stream_last asserted
+  [PASS] 1-byte transfer stream_rem == 1
+  [PASS] 1-byte transfer done asserted
+  [PASS] 1-byte transfer busy cleared
+
+--- Test 3: 4-Byte Transfer (Full 32-bit Single Word) ---
+  [PASS] 4-byte transfer data matches word
+  [PASS] 4-byte transfer upper word is zero
+  [PASS] 4-byte transfer stream_rem == 4
+  [PASS] 4-byte transfer stream_last == 1
+  [PASS] 4-byte transfer done
+
+--- Test 4: Exactly-One-Block 8-Byte Transfer ---
+  [PASS] 8-byte block stream_data == {W1, W0}
+  [PASS] 8-byte block stream_rem == 0 (full)
+  [PASS] 8-byte block stream_last == 1
+  [PASS] 8-byte block transfer done
+
+--- Test 5: Exactly-One-Block 16-Byte Transfer (2 Beats) ---
+  [PASS] 16-byte Beat 0 data match
+  [PASS] 16-byte Beat 0 stream_last == 0
+  [PASS] 16-byte Beat 1 data match
+  [PASS] 16-byte Beat 1 stream_last == 1
+  [PASS] 16-byte Beat 1 stream_rem == 0
+  [PASS] 16-byte transfer done
+
+--- Test 6: Multi-Block 1 KB Transfer (128 Beats) with Backpressure ---
+  [PASS] All 128 beats (1 KB) streamed with bit integrity
+  [PASS] 1 KB transfer completed done
+  [PASS] 1 KB transfer busy cleared
+
+--- Test 7: Oversized & Out-of-Bounds Rejection ---
+  [PASS] Oversized transfer triggers status_err
+  [PASS] Oversized transfer not busy
+  [PASS] Oversized transfer no stream_valid
+
+--- Test 8: Address Misalignment Rejection ---
+  [PASS] Misaligned address triggers status_err
+  [PASS] Misaligned address not busy
+
+--- Test 9: Active Transfer Abort ---
+  [PASS] DMA is actively busy before abort
+  [PASS] Abort immediately clears busy
+  [PASS] Abort asserts status_err
+  [PASS] Abort clears stream_valid
+
+--- Test 10: Closed-Loop DMA-to-Ascon-Hash256 (64 Bytes) ---
+  [PASS] Ascon completed hash in < 200 cycles
+  [PASS] DMA_STATUS reports DMA_DONE
+  [PASS] DMA_STATUS reports no error
+  [PASS] 256-bit DMA-fed digest matches Python reference model exactly
+
+================================================================================
+DMA INTEGRATION TESTBENCH SUMMARY
+================================================================================
+Total Tests Executed: 40
+Passed:               40
+Failed:               0
+
+[ALL TESTS PASSED] Custom DMA Engine & Coprocessor Closed-Loop 100% VERIFIED.
+================================================================================
+
+$finish called at time : 8205 ns : File "C:/Users/Aayan/Desktop/RTL_Project/Ascon-AEAD-and-HASH/tb/integration/tb_dma.sv" Line 595
+exit
+INFO: [Common 17-206] Exiting xsim at Wed Oct 21 20:36:32 2026...
+
+
+=== TB_SOC_DMA HARDWARE INTEGRATION SIMULATION LOG ===
+
+****** xsim v2025.1 (64-bit)
+  **** SW Build 6140274 on Thu May 22 00:12:29 MDT 2025
+  **** IP Build 6138677 on Thu May 22 03:10:11 MDT 2025
+  **** SharedData Build 6139179 on Tue May 20 17:58:58 MDT 2025
+  **** Start of session at: Wed Oct 21 20:36:35 2026
+    ** Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.
+    ** Copyright 2022-2025 Advanced Micro Devices, Inc. All Rights Reserved.
+
+source xsim.dir/tb_soc_dma_sim/xsim_script.tcl
+# xsim {tb_soc_dma_sim} -autoloadwcfg -runall
+Time resolution is 1 ps
+run -all
+[BRAM] Initializing 16 KB BRAM from: firmware/tests/accel_dma_test.hex
+================================================================================
+STARTING PICORV32 + ASCON DMA INTEGRATION TESTBENCH: tb_soc_dma
+Target Core:  PicoRV32 RV32I AXI Core
+Data Plane:   Custom Streaming DMA Master (dma_master.sv)
+Coprocessor:  Ascon AEAD & Hash Engine (0x4000_0000)
+Firmware:     firmware/tests/accel_dma_test.hex
+Clock:        100 MHz (Period: 10 ns)
+================================================================================
+[TIME 100000] Reset de-asserted. CPU executing accel_dma_test from 0x00000000...
+[TIME 4615000 | Cycle 452] GPIO LED transition: 0x0 -> 0x1
+[TIME 21315000 | Cycle 2122] GPIO LED transition: 0x1 -> 0xf
+
+----------------------------------------------------------------
+[SUCCESS] Test Pass Marker detected (GPIO bit 31 asserted)!
+  Cycles Elapsed: 2122 cycles (21315000 ns)
+  Discrete LEDs:  4'b1111 (0xf)
+  Status: RISC-V Firmware successfully commanded DMA transfer
+          over AXI4-Lite, streamed 64 bytes from BRAM into Ascon,
+          and verified Hash256 digest against Golden Reference!
+----------------------------------------------------------------
+ALL PHASE 7 EXIT CRITERIA SATISFIED: DMA Integration 100  VERIFIED!
+$finish called at time : 21315 ns
+exit
+INFO: [Common 17-206] Exiting xsim at Wed Oct 21 20:36:37 2026...
