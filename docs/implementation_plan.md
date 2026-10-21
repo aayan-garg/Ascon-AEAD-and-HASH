@@ -219,21 +219,22 @@ Phase 11 ──→ Phase 12 (Final Documentation & Handoff)
 **Feeds:** Phase 7 (DMA).
 
 ### Tasks
-- [ ] Implement `rtl/bus/axil_regs.sv` — register map per `docs/register_map.md`
-- [ ] Implement address decode and bus glue
-- [ ] Test: AXI4-Lite bus-functional-model read/write tests
-- [ ] Test: illegal access tests (write while busy, invalid offset)
-- [ ] Integration test: RISC-V firmware writes key/nonce, starts hash, polls status, reads digest
-- [ ] Verify digest matches golden model
+- [x] Implement `rtl/bus/axil_regs.sv` — register map per `docs/register_map.md`
+- [x] Implement address decode and bus glue
+- [x] Test: AXI4-Lite bus-functional-model read/write tests
+- [x] Test: illegal access tests (write while busy, invalid offset)
+- [x] Integration test: RISC-V firmware writes key/nonce, starts hash, polls status, reads digest
+- [x] Verify digest matches golden model
 
 ### Exit Gate
-- [ ] RISC-V firmware can `start` a hash via AXI4-Lite and read back correct digest
-- [ ] Evidence: transaction logs + digest comparison
+- [x] RISC-V firmware can `start` a hash via AXI4-Lite and read back correct digest
+- [x] Evidence: transaction logs + digest comparison (`results/board/axil_integration.log`, `results/board/phase6_axil_summary.md`)
 
 ### Artifacts
 - `rtl/bus/axil_regs.sv`
-- `tb/integration/tb_axil_regs.sv`
-- `firmware/tests/accel_hash_test.c`
+- `tb/integration/tb_axil_regs.sv`, `tb/integration/tb_soc_ascon.sv`
+- `firmware/tests/accel_hash_test.c`, `firmware/tests/accel_hash_test.hex`
+- `results/board/axil_integration.log`, `results/board/phase6_axil_summary.md`
 
 ---
 

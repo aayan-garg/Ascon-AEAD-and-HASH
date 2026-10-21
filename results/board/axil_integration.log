@@ -1,0 +1,94 @@
+=== TB_AXIL_REGS LOG ===
+
+****** xsim v2025.1 (64-bit)
+  **** SW Build 6140274 on Thu May 22 00:12:29 MDT 2025
+  **** IP Build 6138677 on Thu May 22 03:10:11 MDT 2025
+  **** SharedData Build 6139179 on Tue May 20 17:58:58 MDT 2025
+  **** Start of session at: Wed Oct 21 20:00:46 2026
+    ** Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.
+    ** Copyright 2022-2025 Advanced Micro Devices, Inc. All Rights Reserved.
+
+source xsim.dir/tb_axil_regs_sim/xsim_script.tcl
+# xsim {tb_axil_regs_sim} -autoloadwcfg -runall
+Time resolution is 1 ps
+run -all
+================================================================================
+STARTING AXI4-LITE BUS INTEGRATION VERIFICATION: tb_axil_regs
+================================================================================
+
+[TEST 1] Reading CORE_ID (Offset 0x7C)...
+  CORE_ID: Read 0x41534331 (Expected: 0x41534331), Resp: 00
+  [PASS] CORE_ID returned 'ASC1' (0x41534331) with OKAY response.
+
+[TEST 2] Verifying Secret Key Registers are Write-Only...
+  KEY_0 Readback: 0x00000000 (Must be 0x00000000)
+  [PASS] Secret key write succeeded and read returned strictly 0x00.
+
+[TEST 3] Reading/Writing NONCE and Length Registers...
+  [PASS] Configuration registers correctly hold written values.
+
+[TEST 4] Testing Illegal Access Detection (SLVERR)...
+  Sub-word write response: 10 (Expected: 2'b10 SLVERR)
+  [PASS] Sub-word write correctly rejected with SLVERR.
+  Unaligned read response: 10 (Expected: 2'b10 SLVERR)
+  [PASS] Unaligned read correctly rejected with SLVERR.
+  Unmapped offset read response: 10 (Expected: 2'b10 SLVERR)
+  [PASS] Unmapped offset read correctly rejected with SLVERR.
+
+[TEST 5] Executing Ascon-Hash256 via AXI4-Lite (0-byte message)...
+  Hash finished: STATUS = 0x0000000a (BUSY=0, DONE=1, ERROR=0)
+  Computed Digest: H0={0x986b2f0f, 0x85e53b0b}, H1={0x649ba8de, 0x8f9ff2ca}
+                   H2={0x838f9b24, 0xaa70faa1}, H3={0xb2924d30, 0xaa3bd59b}
+  [PASS] AXI4-Lite Hash Digest matches official NIST SP 800-232 Count 1!
+  [PASS] STATUS.DONE successfully cleared via W1C.
+
+[TEST 6] Executing Ascon-AEAD128 Encryption via AXI4-Lite (Count 1)...
+  Computed Tag: T0={0x31c9be11, 0x82279c4f}, T1={0xc62e8bee, 0x468ff66b}
+  [PASS] AXI4-Lite AEAD Tag matches official NIST SP 800-232 Count 1!
+
+================================================================================
+AXI4-LITE BUS INTEGRATION RESULT: 100  PASS (ALL 6 TESTS PASSED)
+================================================================================
+$finish called at time : 2815 ns : File "C:/Users/Aayan/Desktop/RTL_Project/Ascon-AEAD-and-HASH/tb/integration/tb_axil_regs.sv" Line 387
+exit
+INFO: [Common 17-206] Exiting xsim at Wed Oct 21 20:00:48 2026...
+
+
+=== TB_SOC_ASCON LOG ===
+
+****** xsim v2025.1 (64-bit)
+  **** SW Build 6140274 on Thu May 22 00:12:29 MDT 2025
+  **** IP Build 6138677 on Thu May 22 03:10:11 MDT 2025
+  **** SharedData Build 6139179 on Tue May 20 17:58:58 MDT 2025
+  **** Start of session at: Wed Oct 21 20:00:52 2026
+    ** Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.
+    ** Copyright 2022-2025 Advanced Micro Devices, Inc. All Rights Reserved.
+
+source xsim.dir/tb_soc_ascon_sim/xsim_script.tcl
+# xsim {tb_soc_ascon_sim} -autoloadwcfg -runall
+Time resolution is 1 ps
+run -all
+[BRAM] Initializing 16 KB BRAM from: firmware/tests/accel_hash_test.hex
+================================================================================
+STARTING PICORV32 + ASCON HARDWARE INTEGRATION TESTBENCH: tb_soc_ascon
+Target Core:  PicoRV32 RV32I AXI Core
+Coprocessor:  Ascon AEAD & Hash Engine (0x4000_0000)
+Firmware:     firmware/tests/accel_hash_test.hex
+Clock:        100 MHz (Period: 10 ns)
+================================================================================
+[TIME 100000] Reset de-asserted. CPU executing accel_hash_test from 0x00000000...
+[TIME 1795000 | Cycle 170] GPIO LED transition: 0x0 -> 0x1
+[TIME 10365000 | Cycle 1027] GPIO LED transition: 0x1 -> 0xf
+
+----------------------------------------------------------------
+[SUCCESS] Test Pass Marker detected (GPIO bit 31 asserted)!
+  Cycles Elapsed: 1027 cycles (10365000 ns)
+  Discrete LEDs:  4'b1111 (0xf)
+  Status: RISC-V Firmware successfully commanded Ascon Coprocessor
+          over AXI4-Lite, verified Hash256 digest & AEAD128 tag
+          against official NIST SP 800-232 Known Answer Tests!
+----------------------------------------------------------------
+ALL PHASE 6 EXIT CRITERIA SATISFIED: AXI4-Lite SoC Integration VERIFIED!
+$finish called at time : 10365 ns
+exit
+INFO: [Common 17-206] Exiting xsim at Wed Oct 21 20:00:54 2026...

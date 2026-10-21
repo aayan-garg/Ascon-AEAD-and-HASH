@@ -8,10 +8,10 @@
 
 | Field | Value |
 |---|---|
-| **Current Phase** | Phase 6 — Accelerator Bus Integration (AXI4-Lite) |
-| **Last Action** | Phase 5 AEAD and Hash Mode Controller 100% Complete: Designed, simulated, and verified `mode_ctrl.sv`, `aead_ctrl.sv`, `hash_ctrl.sv`, and hardware security shadow buffer `plaintext_gate.sv` against official NIST SP 800-232 KATs; verified tamper rejection and zeroization; 15/15 regression suites passing green |
+| **Current Phase** | Phase 7 — DMA Integration |
+| **Last Action** | Phase 6 Accelerator Bus Integration 100% Complete: Designed, simulated, and verified `axil_regs.sv` per `docs/register_map.md`; integrated into SoC top-level `top_bringup.sv`; wrote bare-metal C test `accel_hash_test.c` compiled with RISC-V GCC; verified end-to-end SoC execution `tb_soc_ascon.sv` in 1,027 cycles; 17/17 regression suites passing green in 80.64s |
 | **Date** | 2026-10-21 |
-| **Overall Progress** | ███████░░░ ~70% (Phases 0, 1, 3, 4, 5 complete; Phase 2 bitstream ready; 15/15 regression suites passing) |
+| **Overall Progress** | ████████░░ ~78% (Phases 0, 1, 3, 4, 5, 6 complete; Phase 2 bitstream ready; 17/17 regression suites passing) |
 
 ---
 
@@ -25,8 +25,8 @@
 | 3 | Golden Model | `✅ COMPLETED` | 100% KAT pass in reference/run_kats.py (2,120 vectors); ready as RTL oracle |
 | 4 | Permutation Datapath | `✅ COMPLETED` | All 3 variants (1R, 2R, 1/2R) bit-exact; unblocks Phase 5 |
 | 5 | AEAD/Hash Controller | `✅ COMPLETED` | Mode FSM, absorbing/squeezing, tag verification, security plaintext gate; unblocks Phase 6 |
-| 6 | Bus Integration | `🟡 READY / NEXT` | Register map per docs/register_map.md, AXI4-Lite slave, firmware driver |
-| 7 | DMA Integration | `⬜ NOT STARTED` | Blocked on Phase 6 |
+| 6 | Bus Integration | `✅ COMPLETED` | Register map per docs/register_map.md, AXI4-Lite slave, firmware driver, tb_axil_regs & tb_soc_ascon passing; unblocks Phase 7 |
+| 7 | DMA Integration | `🟡 READY / NEXT` | Custom DMA engine dma_master.sv, streaming data plane, boundary testing |
 | 8 | Secure Boot | `⬜ NOT STARTED` | Blocked on Phase 7 |
 | 9 | Formal CTL | `⬜ NOT STARTED` | Blocked on Phase 8 (Model verified in Phase 0 R-7) |
 | 10 | Synthesis/Performance | `⬜ NOT STARTED` | Blocked on Phase 4/5 |

@@ -120,7 +120,7 @@ def main():
     else:
         print("\n[SKIPPED] Formal CTL Verification")
 
-    # 3. SystemVerilog Unit Tests
+    # 3. SystemVerilog Unit and Integration Tests
     if not args.skip_sim:
         tb_unit_dir = os.path.join(ROOT_DIR, "tb", "unit")
         unit_tests = [os.path.join(tb_unit_dir, f) for f in os.listdir(tb_unit_dir) if f.startswith("tb_") and f.endswith(".sv")]
@@ -128,6 +128,14 @@ def main():
             tb_name = os.path.basename(tb)
             p, dur, out = run_simulation_test(tb)
             results.append((f"Unit Sim: {tb_name}", p, dur, out))
+
+        tb_int_dir = os.path.join(ROOT_DIR, "tb", "integration")
+        if os.path.exists(tb_int_dir):
+            int_tests = [os.path.join(tb_int_dir, f) for f in os.listdir(tb_int_dir) if f.startswith("tb_") and f.endswith(".sv")]
+            for tb in sorted(int_tests):
+                tb_name = os.path.basename(tb)
+                p, dur, out = run_simulation_test(tb)
+                results.append((f"Integration Sim: {tb_name}", p, dur, out))
     else:
         print("\n[SKIPPED] SystemVerilog RTL Simulation")
 

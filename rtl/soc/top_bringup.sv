@@ -106,11 +106,14 @@ module top_bringup #(
     // Address Map:
     //   0x0000_0000 - 0x0000_3FFF: BRAM (16 KB Instruction & Data)
     //   0x1000_0000 - 0x1000_000F: GPIO Control Register
-    wire sel_bram_aw = (axi_awaddr[31:28] == 4'h0);
-    wire sel_gpio_aw = (axi_awaddr[31:28] == 4'h1);
+    //   0x4000_0000 - 0x4000_0FFF: Ascon AEAD & Hash Coprocessor
+    wire sel_bram_aw  = (axi_awaddr[31:28] == 4'h0);
+    wire sel_gpio_aw  = (axi_awaddr[31:28] == 4'h1);
+    wire sel_ascon_aw = (axi_awaddr[31:28] == 4'h4);
 
-    wire sel_bram_ar = (axi_araddr[31:28] == 4'h0);
-    wire sel_gpio_ar = (axi_araddr[31:28] == 4'h1);
+    wire sel_bram_ar  = (axi_araddr[31:28] == 4'h0);
+    wire sel_gpio_ar  = (axi_araddr[31:28] == 4'h1);
+    wire sel_ascon_ar = (axi_araddr[31:28] == 4'h4);
 
     // =========================================================================
     // 4. BRAM Controller (16 KB synchronous memory with byte strobes)
@@ -223,21 +226,86 @@ module top_bringup #(
     end
 
     // =========================================================================
+    // 5b. Ascon AEAD and Hash Accelerator (Address 0x4000_0000)
+    // =========================================================================
+    wire        ascon_awready;
+    wire        ascon_wready;
+    wire [ 1:0] ascon_bresp;
+    wire        ascon_bvalid;
+    wire        ascon_arready;
+    wire [31:0] ascon_rdata;
+    wire [ 1:0] ascon_rresp;
+    wire        ascon_rvalid;
+    wire        ascon_irq;
+
+    axil_regs #(.BUFFER_DEPTH(256)) u_ascon (
+        .clk                (clk),
+        .rst_n              (rst_n),
+        .s_axil_awaddr      (axi_awaddr),
+        .s_axil_awprot      (axi_awprot),
+        .s_axil_awvalid     (axi_awvalid && sel_ascon_aw),
+        .s_axil_awready     (ascon_awready),
+        .s_axil_wdata       (axi_wdata),
+        .s_axil_wstrb       (axi_wstrb),
+        .s_axil_wvalid      (axi_wvalid && sel_ascon_aw),
+        .s_axil_wready      (ascon_wready),
+        .s_axil_bresp       (ascon_bresp),
+        .s_axil_bvalid      (ascon_bvalid),
+        .s_axil_bready      (axi_bready && sel_ascon_aw),
+        .s_axil_araddr      (axi_araddr),
+        .s_axil_arprot      (axi_arprot),
+        .s_axil_arvalid     (axi_arvalid && sel_ascon_ar),
+        .s_axil_arready     (ascon_arready),
+        .s_axil_rdata       (ascon_rdata),
+        .s_axil_rresp       (ascon_rresp),
+        .s_axil_rvalid      (ascon_rvalid),
+        .s_axil_rready      (axi_rready && sel_ascon_ar),
+        .dma_data_in        (64'd0),
+        .dma_data_in_valid  (1'b0),
+        .dma_data_in_ready  (),
+        .dma_data_out       (),
+        .dma_data_out_valid (),
+        .dma_data_out_ready (1'b1),
+        .dma_src_addr       (),
+        .dma_len            (),
+        .dma_start          (),
+        .dma_abort          (),
+        .dma_busy           (1'b0),
+        .dma_done           (1'b0),
+        .dma_err            (1'b0),
+        .irq                (ascon_irq)
+    );
+
+    // =========================================================================
     // 6. Slave Response Multiplexing to CPU Master
     // =========================================================================
     // AW / W Ready
-    assign axi_awready = sel_bram_aw ? !bram_bvalid : (sel_gpio_aw ? !gpio_bvalid : 1'b0);
-    assign axi_wready  = sel_bram_aw ? !bram_bvalid : (sel_gpio_aw ? !gpio_bvalid : 1'b0);
+    assign axi_awready = sel_bram_aw  ? !bram_bvalid  :
+                         sel_gpio_aw  ? !gpio_bvalid  :
+                         sel_ascon_aw ? ascon_awready : 1'b0;
+
+    assign axi_wready  = sel_bram_aw  ? !bram_bvalid  :
+                         sel_gpio_aw  ? !gpio_bvalid  :
+                         sel_ascon_aw ? ascon_wready  : 1'b0;
 
     // Write Response (BVALID)
-    assign axi_bvalid = sel_bram_aw ? bram_bvalid : (sel_gpio_aw ? gpio_bvalid : 1'b0);
+    assign axi_bvalid  = sel_bram_aw  ? bram_bvalid   :
+                         sel_gpio_aw  ? gpio_bvalid   :
+                         sel_ascon_aw ? ascon_bvalid  : 1'b0;
 
     // AR Ready
-    assign axi_arready = sel_bram_ar ? !bram_rvalid : (sel_gpio_ar ? !gpio_rvalid : 1'b0);
+    assign axi_arready = sel_bram_ar  ? !bram_rvalid  :
+                         sel_gpio_ar  ? !gpio_rvalid  :
+                         sel_ascon_ar ? ascon_arready : 1'b0;
 
     // Read Response (RVALID & RDATA)
-    assign axi_rvalid = sel_bram_ar ? bram_rvalid : (sel_gpio_ar ? gpio_rvalid : 1'b0);
-    assign axi_rdata  = sel_bram_ar ? bram_rdata  : (sel_gpio_ar ? gpio_rdata  : 32'h0);
+    assign axi_rvalid  = sel_bram_ar  ? bram_rvalid   :
+                         sel_gpio_ar  ? gpio_rvalid   :
+                         sel_ascon_ar ? ascon_rvalid  : 1'b0;
+
+    assign axi_rdata   = sel_bram_ar  ? bram_rdata    :
+                         sel_gpio_ar  ? gpio_rdata    :
+                         sel_ascon_ar ? ascon_rdata   : 32'h0;
 
     // =========================================================================
     // 7. Output Port Assignments
