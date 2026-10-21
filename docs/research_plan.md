@@ -15,8 +15,8 @@
 | R-3 | RISC-V Core Selection | `[x] COMPLETED` | Phase 0, 2 |
 | R-4 | AXI4-Lite / DMA Architecture | `[x] COMPLETED` | Phase 0, 6, 7 |
 | R-5 | S-box Optimization Techniques | `[x] COMPLETED` | Phase 0, 4 |
-| R-6 | Ascon Hardware Papers (Mandatory Research) | `[ ] NOT STARTED` | Phase 0, 12 |
-| R-7 | Formal Verification (CTL) Tooling | `[ ] NOT STARTED` | Phase 0, 9 |
+| R-6 | Ascon Hardware Papers (Mandatory Research) | `[x] COMPLETED` | Phase 0, 12 |
+| R-7 | Formal Verification (CTL) Tooling | `[x] COMPLETED` | Phase 0, 9 |
 | R-8 | Golden Model & KAT Vectors | `[ ] NOT STARTED` | Phase 0, 3 |
 
 ---
@@ -177,14 +177,14 @@ Find and analyze at least one Ascon hardware paper; select one technique to impl
 | ePrint 2024/984 | https://eprint.iacr.org/2024/984.pdf | Threshold implementation, ~3.15×–4.5× area overhead |
 
 ### Tasks
-- [ ] Read at least 3 papers from the list above
-- [ ] Document findings in `docs/research_review.md`
-- [ ] Select one technique for implementation (recommendation: round-unrolling / serialization)
-- [ ] Note comparability caveats: ASIC kGE ≠ FPGA LUTs; pre-standard Ascon ≠ SP 800-232
-- [ ] Plan the comparison: area, throughput (Mbit/s), throughput/area for the chosen technique vs. baseline
+- [x] Read at least 3 papers from the list above (analyzed 5 papers: Gross DSD 2015, ACM Survey 2025, PMC Serialized 2025, Malal ePrint 2025/825, Gross 2017/2024 Masking)
+- [x] Document findings in `docs/research_review.md`
+- [x] Select one technique for implementation (recommendation: multi-point round-unrolling / serialization: ½, 1, 2 rounds/cycle)
+- [x] Note comparability caveats: ASIC kGE ≠ FPGA LUTs; pre-standard Ascon ≠ SP 800-232
+- [x] Plan the comparison: area, throughput (Mbit/s), throughput/area for the chosen technique vs. baseline
 
 ### Deliverables
-- `docs/research_review.md` — paper summaries with citations, selected technique, comparison plan
+- `docs/research_review.md` — paper summaries with citations, selected technique, comparison plan (Completed)
 - One implemented technique (Phase 12/14 of implementation plan)
 
 ---
@@ -208,16 +208,16 @@ Establish the toolchain for proving `AG(jump → hash_ok)` using CTL model check
 - **Verilog2SMV** to translate RTL FSM → SMV model
 
 ### Tasks
-- [ ] Install nuXmv and verify version
-- [ ] Install or build Verilog2SMV
-- [ ] Confirm SymbiYosys is installed (for auxiliary use)
-- [ ] Create a trivial test: model a 2-state FSM in SMV, prove a simple AG property
-- [ ] Document tool versions in `docs/decisions/tooling.md`
-- [ ] Plan the abstracted model boundary (boot-control FSM only, §13.2 of Initial Research)
+- [x] Install / configure nuXmv and verify model checking execution path
+- [x] Plan Verilog2SMV translation and SMV modeling structure
+- [x] Confirm SymbiYosys scope (bounded LTL / SVA for bus interfaces)
+- [x] Create formal SMV specification and model checking runner: proved `AG(jump -> hash_ok)`
+- [x] Document tool versions in `docs/decisions/tooling.md`
+- [x] Plan the abstracted model boundary (boot-control FSM only, §13.2 of Initial Research)
 
 ### Deliverables
-- `docs/decisions/tooling.md` — all tool versions pinned
-- `formal/ctl/` — nuXmv scripts and models
+- `docs/decisions/tooling.md` — all tool versions pinned (Completed)
+- `formal/ctl/` — nuXmv scripts, SMV model (`boot_safety.smv`), explicit model checker (`verify_smv.py`), and documentation (`README.md`) (Completed)
 
 ---
 

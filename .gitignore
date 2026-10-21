@@ -17,6 +17,7 @@
 *.dcp
 *.wdb
 *.wcfg
+*.pb
 vivado_*.backup.*
 
 # Simulation dumps

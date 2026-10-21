@@ -42,18 +42,18 @@ Phase 11 ──→ Phase 12 (Final Documentation & Handoff)
   - [x] R-3: Compare RISC-V candidates and document decision
   - [x] R-4: Study AXI4-Lite / DMA architecture patterns
   - [x] R-5: Research S-box optimization techniques
-  - [ ] R-6: Read ≥3 Ascon hardware papers; select one technique
-  - [ ] R-7: Install and test formal verification tools (nuXmv, Verilog2SMV)
+  - [x] R-6: Read ≥3 Ascon hardware papers; select one technique
+  - [x] R-7: Install and test formal verification tools (nuXmv, Verilog2SMV)
   - [ ] R-8: Identify and prepare golden model sources
-- [ ] Audit toolchain availability (Vivado, RISC-V GCC, Icarus/Verilator, SymbiYosys, nuXmv)
-- [ ] Record all tool versions in `docs/decisions/tooling.md`
-- [ ] Identify and document all instructor questions (§18 of Initial Research)
+- [x] Audit toolchain availability (Vivado, RISC-V GCC, Icarus/Verilator, SymbiYosys, nuXmv)
+- [x] Record all tool versions in `docs/decisions/tooling.md`
+- [x] Identify and document all instructor questions (§18 of Initial Research)
 
 ### Exit Gate
 - [ ] `docs/requirements_traceability.md` has all R1–R19 rows with phase/artifact assignments
-- [ ] All R-1 through R-8 research tasks have at least initial findings documented
-- [ ] `docs/decisions/tooling.md` lists all tool versions
-- [ ] Every ambiguity from §18 is recorded in `docs/decisions/`
+- [ ] All R-1 through R-8 research tasks have at least initial findings documented (R-1 to R-7 complete)
+- [x] `docs/decisions/tooling.md` lists all tool versions
+- [x] Every ambiguity from §18 is recorded in `docs/decisions/`
 
 ### Artifacts
 - `docs/requirements_traceability.md`
