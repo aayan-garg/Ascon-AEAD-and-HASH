@@ -92,8 +92,25 @@ module tb_aead_full;
     wire [ 3:0] fsm_state;
 
     // -------------------------------------------------------------------------
-    // DUT
+    // Byte-swap helpers (RTL uses little-endian byte order per 64-bit word)
     // -------------------------------------------------------------------------
+    function automatic [31:0] bswap32(input [31:0] v);
+        bswap32 = {v[7:0], v[15:8], v[23:16], v[31:24]};
+    endfunction
+
+    function automatic [63:0] bswap64_from_be32(input [31:0] hi32, input [31:0] lo32);
+        // Convert two big-endian 32-bit words to one little-endian 64-bit word.
+        // bswap64({hi32,lo32}) = {bswap32(lo32), bswap32(hi32)}
+        bswap64_from_be32 = {bswap32(lo32), bswap32(hi32)};
+    endfunction
+
+    // Build 128-bit RTL-native value from 4 consecutive big-endian mem words.
+    // RTL convention: [63:0] = bswap64(NIST_first_8B), [127:64] = bswap64(NIST_second_8B)
+    function automatic [127:0] be_words_to_rtl128(input integer base_word);
+        automatic reg [63:0] lo64 = bswap64_from_be32(kat_mem[base_word],   kat_mem[base_word+1]);
+        automatic reg [63:0] hi64 = bswap64_from_be32(kat_mem[base_word+2], kat_mem[base_word+3]);
+        be_words_to_rtl128 = {hi64, lo64};
+    endfunction
     aead_ctrl #(.BUFFER_DEPTH(256)) dut (
         .clk             (clk),
         .rst_n           (rst_n),
@@ -297,12 +314,9 @@ module tb_aead_full;
             automatic integer v_count    = kat_mem[base + 0];
             automatic integer v_ad_len   = kat_mem[base + 1];
             automatic integer v_pt_len   = kat_mem[base + 2];
-            automatic reg [127:0] v_key  = {kat_mem[base+4], kat_mem[base+5],
-                                             kat_mem[base+6], kat_mem[base+7]};
-            automatic reg [127:0] v_nonce= {kat_mem[base+8], kat_mem[base+9],
-                                             kat_mem[base+10],kat_mem[base+11]};
-            automatic reg [127:0] v_tag  = {kat_mem[base+12],kat_mem[base+13],
-                                             kat_mem[base+14],kat_mem[base+15]};
+            automatic reg [127:0] v_key   = be_words_to_rtl128(base + 4);
+            automatic reg [127:0] v_nonce = be_words_to_rtl128(base + 8);
+            automatic reg [127:0] v_tag   = be_words_to_rtl128(base + 12);
             automatic integer ad_base    = base + 16;
             automatic integer pt_base    = base + 24;
             automatic integer ct_base    = base + 32;
@@ -391,7 +405,7 @@ module tb_aead_full;
                     for (int pi = 0; pi < n_pt_words; pi++) begin
                         automatic reg [63:0] exp_pt = build_data_word(pt_base, pi * 8);
                         pt_rd_addr = pi;
-                        #5;
+                        #10;
                         if (pt_rd_valid !== 1'b1) begin
                             dec_ok = 0;
                         end else begin
@@ -400,7 +414,11 @@ module tb_aead_full;
                                                    (v_pt_len % 8) : 8;
                             automatic reg [63:0] mask_pt = (vb == 8) ? 64'hFFFFFFFFFFFFFFFF :
                                                            ((64'h1 << (vb*8)) - 64'h1);
-                            if ((pt_rd_data & mask_pt) !== (exp_pt & mask_pt)) dec_ok = 0;
+                            if ((pt_rd_data & mask_pt) !== (exp_pt & mask_pt)) begin
+                                dec_ok = 0;
+                                $display("  [DEBUG PT MISMATCH] pi=%0d got=%h exp=%h mask=%h",
+                                         pi, pt_rd_data, exp_pt, mask_pt);
+                            end
                         end
                     end
                 end

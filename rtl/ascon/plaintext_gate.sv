@@ -54,7 +54,13 @@ module plaintext_gate #(
             is_wiping <= 1'b0;
             wipe_idx  <= 9'd0;
         end else begin
-            if (auth_fail) begin
+            if (wr_clear) begin
+                for (i = 0; i < BUFFER_DEPTH; i = i + 1) begin
+                    mem[i] <= 64'h0;
+                end
+                is_wiping <= 1'b0;
+                wipe_idx  <= 9'd0;
+            end else if (auth_fail) begin
                 // Trigger active zeroization
                 is_wiping <= 1'b1;
                 wipe_idx  <= 9'd0;
@@ -67,10 +73,6 @@ module plaintext_gate #(
                     is_wiping <= 1'b0;
                 end else begin
                     wipe_idx <= wipe_idx + 1'b1;
-                end
-            end else if (wr_clear) begin
-                for (i = 0; i < BUFFER_DEPTH; i = i + 1) begin
-                    mem[i] <= 64'h0;
                 end
             end else if (wr_en && !tag_ok) begin
                 // Only allow writing while unauthenticated / during decryption

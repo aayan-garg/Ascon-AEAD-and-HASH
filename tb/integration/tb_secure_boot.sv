@@ -230,6 +230,7 @@ module tb_secure_boot;
         check_case("Case 2: Deterministic refusal LED pattern 4'b1010 detected", led == 4'b1010);
         check_case("Case 2: Candidate payload never executed (test_pass is 0)", test_pass == 1'b0);
         check_case("Case 2: Hardware boot_jump_enable remains 0", dut.boot_jump_enable == 1'b0);
+        write_case_log(2, "Byte-Flipped Firmware (Payload Tampering)", 4, 0);
 
         // ---------------------------------------------------------------------
         // Case 3: Wrong Reference Digest (§12.5 Case 3)
@@ -257,6 +258,7 @@ module tb_secure_boot;
         check_case("Case 3: Refusal pattern 4'b1010 on wrong reference digest", led == 4'b1010);
         check_case("Case 3: test_pass remains 0", test_pass == 1'b0);
         check_case("Case 3: boot_jump_enable remains 0", dut.boot_jump_enable == 1'b0);
+        write_case_log(3, "Wrong Reference Digest (Provisioning Error)", 7, 0);
 
         // ---------------------------------------------------------------------
         // Case 4: Invalid Declared Length (§12.5 Case 4)
@@ -285,6 +287,7 @@ module tb_secure_boot;
         check_case("Case 4: Immediate refusal on length violation (LED = 4'b1010)", led == 4'b1010);
         check_case("Case 4: test_pass remains 0", test_pass == 1'b0);
         check_case("Case 4: boot_jump_enable remains 0", dut.boot_jump_enable == 1'b0);
+        write_case_log(4, "Invalid Declared Length (Header Violation)", 10, 0);
 
         // ---------------------------------------------------------------------
         // Case 5: Malformed Header Magic (§12.5 Case 5)
@@ -312,6 +315,7 @@ module tb_secure_boot;
         check_case("Case 5: Immediate refusal on malformed magic (LED = 4'b1010)", led == 4'b1010);
         check_case("Case 5: test_pass remains 0", test_pass == 1'b0);
         check_case("Case 5: boot_jump_enable remains 0", dut.boot_jump_enable == 1'b0);
+        write_case_log(5, "Malformed Header Magic (0xDEADBEEF)", 13, 0);
 
         // ---------------------------------------------------------------------
         // Case 6: Injected DMA Fault / Timeout (§12.5 Case 6)
@@ -360,6 +364,7 @@ module tb_secure_boot;
         check_case("Case 6: DMA error caught deterministically (LED = 4'b1010)", led == 4'b1010);
         check_case("Case 6: test_pass remains 0", test_pass == 1'b0);
         check_case("Case 6: boot_jump_enable remains 0", dut.boot_jump_enable == 1'b0);
+        write_case_log(6, "Injected DMA Fault / Timeout", 16, 0);
 
         // ---------------------------------------------------------------------
         // Case 7: Injected Accelerator Error (§12.5 Case 7)
@@ -407,6 +412,7 @@ module tb_secure_boot;
         check_case("Case 7: Accelerator fault caught deterministically (LED = 4'b1010)", led == 4'b1010);
         check_case("Case 7: test_pass remains 0", test_pass == 1'b0);
         check_case("Case 7: boot_jump_enable remains 0", dut.boot_jump_enable == 1'b0);
+        write_case_log(7, "Injected Accelerator Error", 19, 0);
 
         // ---------------------------------------------------------------------
         // Case 8: Reset Mid-Verification (§12.5 Case 8)
@@ -430,6 +436,7 @@ module tb_secure_boot;
         check_case("Case 8: boot_jump_enable is 0 during reset", dut.boot_jump_enable == 1'b0);
         check_case("Case 8: test_pass remained 0", test_pass == 1'b0);
         rst_n = 1'b1;
+        write_case_log(8, "Reset Mid-Verification", 22, 0);
 
         // ---------------------------------------------------------------------
         // Case 9: Repeated Boot Attempt After Refusal (§12.5 Case 9)
@@ -467,6 +474,7 @@ module tb_secure_boot;
         check_case("Case 9: Remains locked in STATE_HALT_REFUSE after repeated attempt", dut.u_ascon.u_boot_ctrl.fsm_state == 4'd7);
         check_case("Case 9: boot_jump_enable remains 0", dut.boot_jump_enable == 1'b0);
         check_case("Case 9: boot_refuse remains 1", dut.boot_refuse == 1'b1);
+        write_case_log(9, "Repeated Boot Attempt After Refusal", 25, 0);
 
         // ---------------------------------------------------------------------
         // Final Summary

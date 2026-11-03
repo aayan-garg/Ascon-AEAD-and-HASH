@@ -24,6 +24,7 @@ set ALL_VARIANTS {
     "permutation_2r"
     "permutation_half"
     "permutation_1r_espresso"
+    "permutation_serial32"
 }
 
 # Determine if specific variant was requested via argv
@@ -57,6 +58,7 @@ foreach var $RUN_VARIANTS {
     read_verilog -sv "$ROOT_DIR/rtl/ascon/permutation_2r.sv"
     read_verilog -sv "$ROOT_DIR/rtl/ascon/permutation_half.sv"
     read_verilog -sv "$ROOT_DIR/rtl/ascon/permutation_1r_espresso.sv"
+    read_verilog -sv "$ROOT_DIR/rtl/ascon/permutation_serial32.sv"
 
     # Read OOC timing constraint
     read_xdc "$ROOT_DIR/board/timing_ooc.xdc"

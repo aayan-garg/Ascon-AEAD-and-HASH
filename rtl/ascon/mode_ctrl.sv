@@ -306,7 +306,7 @@ module mode_ctrl #(
             perm_running    <= 1'b0;
             gate_wr_clear   <= 1'b1;
             gate_wr_en      <= 1'b0;
-            gate_auth_fail  <= 1'b1;
+            gate_auth_fail  <= 1'b0;
         end else begin
             perm_start      <= 1'b0;
             gate_wr_clear   <= 1'b0;
@@ -443,6 +443,17 @@ module mode_ctrl #(
                             if (r_bytes_left > 8) begin
                                 r_bytes_left <= r_bytes_left - 8;
                                 r_beat       <= 1'b1;
+                            end else if (r_bytes_left == 8) begin
+                                data_in_ready <= 1'b0;
+                                perm_in_x0    <= s0 ^ data_in;
+                                perm_in_x1    <= s1 ^ 64'h00000000_00000001;
+                                perm_in_x2    <= s2;
+                                perm_in_x3    <= s3;
+                                perm_in_x4    <= s4;
+                                perm_rounds   <= 4'd8;
+                                perm_start    <= 1'b1;
+                                perm_running  <= 1'b1;
+                                r_bytes_left  <= 32'd0;
                             end else begin
                                 data_in_ready <= 1'b0;
                                 perm_in_x0    <= s0 ^ pad_word64(data_in, r_bytes_left[2:0]);
@@ -604,8 +615,23 @@ module mode_ctrl #(
                                         gate_wr_data  <= s0 ^ data_in;
                                         r_w0_buf      <= data_in;
                                     end
+                                end else if (r_bytes_left == 8) begin
+                                    data_in_ready <= 1'b0;
+                                    if (!r_decrypt) begin
+                                        data_out       <= s0 ^ data_in;
+                                        data_out_valid <= 1'b1;
+                                        s0             <= s0 ^ data_in;
+                                        s1             <= s1 ^ 64'h00000000_00000001;
+                                    end else begin
+                                        gate_wr_en     <= 1'b1;
+                                        gate_wr_data   <= s0 ^ data_in;
+                                        s0             <= data_in;
+                                        s1             <= s1 ^ 64'h00000000_00000001;
+                                    end
+                                    r_bytes_left <= 32'd0;
+                                    state_reg    <= ST_FINALIZE;
                                 end else begin
-                                    // Final partial beat
+                                    // Final partial beat (1..7 bytes)
                                     data_in_ready <= 1'b0;
                                     if (!r_decrypt) begin
                                         data_out       <= mask_word64(s0 ^ data_in, r_bytes_left[2:0]);

@@ -140,14 +140,22 @@ module tb_hash_full;
         end
     endtask
 
-    // -------------------------------------------------------------------------
-    // Build expected 256-bit digest from kat_mem big-endian words
-    // -------------------------------------------------------------------------
+    // Build expected 256-bit digest matching RTL's little-endian-per-64b convention.
+    // KAT stores H0..H3 as big-endian 32-bit words: [4]=H0_hi32, [5]=H0_lo32, ...
+    // RTL stores each 64-bit word byte-swapped: H0_stored = bswap64(NIST_H0).
+    // bswap64({W_hi,W_lo}) = {bswap32(W_lo), bswap32(W_hi)}.
+    // RTL digest_out = {H3_stored, H2_stored, H1_stored, H0_stored}.
+    function automatic [31:0] bswap32(input [31:0] v);
+        bswap32 = {v[7:0], v[15:8], v[23:16], v[31:24]};
+    endfunction
+
     function automatic [255:0] expected_digest(input integer base);
-        expected_digest = {kat_mem[base+4],  kat_mem[base+5],
-                           kat_mem[base+6],  kat_mem[base+7],
-                           kat_mem[base+8],  kat_mem[base+9],
-                           kat_mem[base+10], kat_mem[base+11]};
+        // H0_stored = bswap64({kat_mem[4],kat_mem[5]}) = {bswap32(kat_mem[5]), bswap32(kat_mem[4])}
+        automatic reg [63:0] h0s = {bswap32(kat_mem[base+5]),  bswap32(kat_mem[base+4])};
+        automatic reg [63:0] h1s = {bswap32(kat_mem[base+7]),  bswap32(kat_mem[base+6])};
+        automatic reg [63:0] h2s = {bswap32(kat_mem[base+9]),  bswap32(kat_mem[base+8])};
+        automatic reg [63:0] h3s = {bswap32(kat_mem[base+11]), bswap32(kat_mem[base+10])};
+        expected_digest = {h3s, h2s, h1s, h0s};  // RTL: [255:192]=H3, [63:0]=H0
     endfunction
 
     // -------------------------------------------------------------------------
