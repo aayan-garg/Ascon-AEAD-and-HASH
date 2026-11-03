@@ -1,0 +1,37 @@
+================================================================================
+NIST SP 800-232 OFFICIAL KAT VERIFICATION HARNESS
+Ascon Golden Model: reference/pyascon/ascon.py
+Execution Date: 2026-11-03 17:53:19 UTC
+================================================================================
+
+[1] Verifying Official KAT File Integrity (SHA-256):
+  AEAD KAT Path:   C:\Users\Aayan\Desktop\RTL_Project\Ascon-AEAD-and-HASH\reference\kat\LWC_AEAD_KAT_128_128.txt
+  Calculated SHA:  bbbc34692fe05e5fda0a3b025585622ab3e3747495e5e3655b29aae8c2a4bd33
+  Expected SHA:    bbbc34692fe05e5fda0a3b025585622ab3e3747495e5e3655b29aae8c2a4bd33
+  --> AEAD KAT Integrity: VERIFIED MATCH
+  Hash KAT Path:   C:\Users\Aayan\Desktop\RTL_Project\Ascon-AEAD-and-HASH\reference\kat\LWC_HASH_KAT_128_256.txt
+  Calculated SHA:  b7d6fbc51362f0d62bc7e57b21f3e83242983434a7c92320a4956d915749df17
+  Expected SHA:    b7d6fbc51362f0d62bc7e57b21f3e83242983434a7c92320a4956d915749df17
+  --> Hash KAT Integrity: VERIFIED MATCH
+
+[2] Executing Ascon-AEAD128 Known Answer Tests (1,089 vectors):
+  Parsed 1089 AEAD test vectors.
+  --> Ascon-AEAD128 Results: 1089/1089 PASSED (100.0%)
+
+[3] Executing Ascon-Hash256 Known Answer Tests (1,025 vectors):
+  Parsed 1025 Hash test vectors.
+  --> Ascon-Hash256 Results: 1025/1025 PASSED (100.0%)
+
+[4] Executing Security Edge Cases:
+  [PASS] Empty message and empty associated data
+  [PASS] Single-bit tag corruption rejected (defensive refusal)
+  [PASS] Single-bit ciphertext corruption rejected
+  [PASS] Tampered associated data rejected
+  [PASS] Empty input hash digest matches official NIST empty vector
+  [PASS] Multi-block hash (4,096 bytes firmware chunk): 6b3ac9e2136850c4...
+
+================================================================================
+SUMMARY: 100% PASS across all 2,114 official vectors + 6 security edge cases.
+Execution completed in 4.48 seconds.
+Hard Exit Gate Phase 0 / Phase 3: PASSED
+================================================================================

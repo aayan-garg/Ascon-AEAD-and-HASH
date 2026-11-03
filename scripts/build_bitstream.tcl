@@ -14,10 +14,28 @@ puts "==========================================================================
 # 1. Create In-Memory Project
 create_project -in_memory -part xc7z010clg400-1
 
-# 2. Add Source Files
-read_verilog -sv "$ROOT_DIR/rtl/soc/picorv32.v"
-read_verilog -sv "$ROOT_DIR/rtl/soc/top_bringup.sv"
-read_verilog -sv "$ROOT_DIR/rtl/soc/top_bringup_board.sv"
+# 2. Add ALL RTL Source Files (Complete SoC: PicoRV32 + Ascon Engine + DMA + Boot Ctrl)
+set rtl_files [list \
+    "$ROOT_DIR/rtl/ascon/aead_ctrl.sv" \
+    "$ROOT_DIR/rtl/ascon/diffusion.sv" \
+    "$ROOT_DIR/rtl/ascon/hash_ctrl.sv" \
+    "$ROOT_DIR/rtl/ascon/mode_ctrl.sv" \
+    "$ROOT_DIR/rtl/ascon/permutation_1r.sv" \
+    "$ROOT_DIR/rtl/ascon/permutation_1r_espresso.sv" \
+    "$ROOT_DIR/rtl/ascon/permutation_2r.sv" \
+    "$ROOT_DIR/rtl/ascon/permutation_half.sv" \
+    "$ROOT_DIR/rtl/ascon/plaintext_gate.sv" \
+    "$ROOT_DIR/rtl/ascon/round_core.sv" \
+    "$ROOT_DIR/rtl/ascon/sbox5.sv" \
+    "$ROOT_DIR/rtl/ascon/sbox5_espresso.sv" \
+    "$ROOT_DIR/rtl/bus/axil_regs.sv" \
+    "$ROOT_DIR/rtl/dma/dma_master.sv" \
+    "$ROOT_DIR/rtl/soc/boot_ctrl.sv" \
+    "$ROOT_DIR/rtl/soc/picorv32.v" \
+    "$ROOT_DIR/rtl/soc/top_bringup.sv" \
+    "$ROOT_DIR/rtl/soc/top_bringup_board.sv" \
+]
+read_verilog -sv $rtl_files
 
 # 3. Add Constraints
 read_xdc "$ROOT_DIR/board/zybo_z7_10.xdc"

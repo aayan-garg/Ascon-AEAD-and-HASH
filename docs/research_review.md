@@ -13,7 +13,7 @@ We surveyed five key peer-reviewed and pre-print works exploring hardware implem
 ---
 
 ### Paper 1: Foundational Round-Unrolling & Serialization
-- **Citation:** `[SOURCE]` H. Gross, E. Wenger, C. Dobraunig, F. Mendel, *"Suit up! — Made-to-Measure Hardware Implementations of ASCON"*, IEEE Euromicro Conference on Digital System Design (DSD), 2015 / IACR Cryptology ePrint Archive 2015/034 (https://eprint.iacr.org/2015/034.pdf).
+- **Citation:** `[SOURCE]` H. Gross, E. Wenger, C. Dobraunig, C. Ehrenhöfer, *"Suit up! — Made-to-Measure Hardware Implementations of ASCON"*, IEEE Euromicro Conference on Digital System Design (DSD), 2015 / IACR Cryptology ePrint Archive 2015/034 (https://eprint.iacr.org/2015/034.pdf).
 - **Architecture Explored:**
   - Designed the earliest ASIC round-based, unrolled (1, 2, 3, 4, 6, 12 rounds), and serialized implementations on TSMC 90nm.
   - Documented that a single combinational round transformation requires only $\approx 7\text{ kGE}$.
@@ -48,7 +48,7 @@ We surveyed five key peer-reviewed and pre-print works exploring hardware implem
 ---
 
 ### Paper 4: 7-Series FPGA Utilization Benchmarks
-- **Citation:** `[SOURCE]` M. Malal et al., *"High-Performance FPGA Implementations of Lightweight ASCON-128 and ASCON-128a on Xilinx 7-Series"*, IACR Cryptology ePrint Archive 2025/825 (https://eprint.iacr.org/2025/825).
+- **Citation:** `[SOURCE]` A. Malal, *"High-Performance FPGA Implementations of Lightweight ASCON-128 and ASCON-128a on Xilinx 7-Series"*, IACR Cryptology ePrint Archive 2025/825 (https://eprint.iacr.org/2025/825).
 - **Architecture Explored:**
   - Direct RTL implementations targeting Xilinx Artix-7 and Kintex-7.
   - Reported a 1-round baseline at 702 LUTs / 268 MHz (646 Mbps) on Kintex-7, and a 6-round unrolled variant at 3,728 LUTs / 100 MHz (1,354 Mbps).

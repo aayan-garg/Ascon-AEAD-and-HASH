@@ -1,16 +1,12 @@
 # Git ignores for Ascon RTL Project
 
-# Vivado project files
-*.runs/
-*.cache/
-*.hw/
-*.ip_user_files/
-*.sim/
-*.srcs/
-*.gen/
-*.xpr
+# Vivado journal and project-tool logs (auto-generated, not meaningful to track)
 *.jou
+# Vivado simulator logs (noisy, regenerated on every run)
+# Exception: results/**/*.log are committed as evidence [F9 fix]
 *.log
+!results/**/*.log
+!results/formal/**/*.log
 *.str
 *.bit
 *.ltx

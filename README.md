@@ -1,48 +1,159 @@
-# Ascon AEAD and Hash Engine for IoT Secure Boot
+# Ascon AEAD and Hash Engine — IoT Secure Boot on Zybo Z7-10
 
-[![Zybo Z7-10](https://img.shields.io/badge/Target-Zybo%20Z7--10-blue)]()
-[![NIST SP 800-232](https://img.shields.io/badge/Standard-SP%20800--232-green)]()
-[![License](https://img.shields.io/badge/License-TBD-lightgrey)]()
+[![NIST SP 800-232](https://img.shields.io/badge/Standard-SP%20800--232%20Final%20Aug%202025-green)]()
+[![Target](https://img.shields.io/badge/FPGA-Xilinx%20XC7Z010-blue)]()
+[![Vivado](https://img.shields.io/badge/Vivado-2025.1-orange)]()
 
-## Overview
+Hardware implementation of **Ascon-AEAD128** and **Ascon-Hash256** per NIST SP 800-232 (Final, August 2025), integrated with a PicoRV32 RV32I SoC on the Digilent Zybo Z7-10 FPGA for cryptographically-assured secure boot.
 
-A hardware implementation of **Ascon-AEAD128** and **Ascon-Hash256** (per NIST SP 800-232) integrated with an **RV32 RISC-V SoC** on the **Digilent Zybo Z7-10** FPGA for secure boot of IoT firmware.
+---
 
-## Key Features
+## Quick Start
 
-- Ascon-AEAD128 authenticated encryption/decryption with tag verification
-- Ascon-Hash256 cryptographic hashing
-- Three permutation design points: ½, 1, and 2 rounds per cycle
-- 5×5 S-box optimization via ESPRESSO/kernel-extraction/BDD
-- AXI4-Lite control + custom DMA bulk transfer
-- Secure boot: firmware integrity verification before execution
-- Formal CTL proof: `AG(jump → hash_ok)`
-- Physical demo: LED-indicated boot pass/fail with switch-based byte tampering
+### Prerequisites
+- Python 3.9+
+- Vivado 2025.1 (for RTL simulation and synthesis)
+- Icarus Verilog (optional, for lightweight unit tests)
 
-## Project Structure
+### 1 — Reproduce Golden-Model KATs (Python only)
+```bash
+python reference/run_kats.py
+# Expected: PASS  AEAD 1089 + HASH 1025 vectors (2114 total) + 6 edge cases
+```
 
-See [`docs/directory_structure.md`](docs/directory_structure.md) for the complete layout.
+### 2 — Generate RTL KAT Vector Files
+```bash
+python scripts/kat_to_vectors.py
+# Outputs: tb/vectors/aead_kat.mem (1089 × 64 words)
+#          tb/vectors/hash_kat.mem  (1025 × 272 words, up to 1024-byte messages)
+```
 
-## Getting Started
+### 3 — Run Full Regression (Vivado XSim)
+```bash
+# Set Vivado on PATH first, then:
+python scripts/run_regression.py
+# Or set env var: VIVADO_PATH=C:\Xilinx\2025.1\Vivado\bin python scripts/run_regression.py
+```
 
-*Documentation and setup instructions will be added as implementation progresses.*
+### 4 — Run Individual Simulation
+```bash
+# Example: exhaustive AEAD KAT testbench
+python scripts/run_regression.py --test tb_aead_full
+```
 
-## Status
+### 5 — Synthesize All Variants (OOC)
+```bash
+# In Vivado Tcl console or batch:
+vivado -mode batch -source scripts/synth_variants.tcl
+python scripts/parse_synth_reports.py   # regenerates results/performance/comparison_table.md
+```
 
-See [`docs/status.md`](docs/status.md) for current project state.
+---
 
-## Documentation
+## Repository Map
 
-| Document | Purpose |
-|---|---|
-| [`docs/implementation_plan.md`](docs/implementation_plan.md) | Phase-by-phase execution plan |
-| [`docs/research_plan.md`](docs/research_plan.md) | Research tasks and sources |
-| [`docs/requirements_traceability.md`](docs/requirements_traceability.md) | Requirements → artifacts mapping |
-| [`AGENTS.md`](AGENTS.md) | Agent operating instructions |
+```
+rtl/
+  ascon/          Cryptographic core: permutation, S-box, diffusion, AEAD/hash controllers
+  soc/            PicoRV32 SoC, boot_ctrl FSM, fetch_guard, top-level wrappers
+  bus/            AXI4-Lite register file
+  dma/            Custom DMA streaming engine
+tb/
+  unit/           Unit testbenches (permutation, S-box, mode_ctrl, security gate, full KATs)
+  integration/    SoC-level testbenches (AXI, DMA, secure boot)
+  vectors/        Binary KAT memory files ($readmemh)
+formal/
+  ctl/            NuSMV SMV model + corrected model + broken-model counterexample
+  sva/            SVA property files (placeholder for SymbiYosys flow)
+firmware/
+  bootrom/        Secure boot C firmware + linker scripts
+  tests/          Peripheral test programs + boot matrix BRAM images
+reference/
+  pyascon/        Python golden model (Ascon reference implementation)
+  kat/            NIST SP 800-232 official KAT text files
+  run_kats.py     Golden model KAT verification script
+scripts/
+  kat_to_vectors.py      Convert KAT files → $readmemh vector files
+  run_regression.py      Automated regression runner (Vivado XSim)
+  parse_synth_reports.py Read Vivado reports → comparison_table.md
+  synth_variants.tcl     OOC synthesis for all permutation variants
+  gen_perm_vectors.py    Generate random permutation test vectors (Python oracle)
+  provision_image.py     Create test BRAM images for boot matrix
+board/
+  zybo_z7_10.xdc         Physical constraints (pins, clock, I/O)
+  timing_ooc.xdc         OOC timing constraints
+docs/
+  architecture.md         System architecture
+  research_review.md      Literature survey + technique selection
+  decisions/              Architecture decision records
+  ps_reevaluation.md      Independent audit against problem statement
+  threat_model.md         Security threat model
+  validation_report.md    Verification evidence + corrections log
+results/
+  kat/            KAT pass logs
+  formal/nuxmv/   Real NuSMV 2.6.0 transcripts
+  performance/    Synthesis comparison table
+  board/          Board-level logs, boot matrix, runbook
+```
+
+---
+
+## Results Summary
+
+### Cryptographic Correctness
+| Test | Vectors | Status |
+|------|---------|--------|
+| Python golden model (AEAD) | 1,089 | ✅ PASS |
+| Python golden model (Hash) | 1,025 | ✅ PASS |
+| RTL exhaustive AEAD KAT (`tb_aead_full.sv`) | 1,089 | Requires Vivado sim |
+| RTL exhaustive Hash KAT (`tb_hash_full.sv`) | 1,025 | Requires Vivado sim |
+
+### Permutation Variants (XC7Z010 OOC @ 100 MHz)
+See [`results/performance/comparison_table.md`](results/performance/comparison_table.md) for full table.
+
+| Variant | Fmax (MHz) | AEAD Throughput |
+|---------|-----------|-----------------|
+| permutation_1r (baseline) | ~200 | 1600 Mbit/s |
+| permutation_2r (unrolled) | ~165 | ~2640 Mbit/s |
+| permutation_half (serialized) | ~264 | ~800 Mbit/s |
+| permutation_serial32 (paper) | TBD | ~800 Mbit/s |
+
+### Formal Verification
+- **NuSMV 2.6.0** proved `AG(jump → hash_ok)` and 4 other safety properties on `formal/ctl/boot_safety_corrected.smv`
+- Transcript: [`results/formal/nuxmv/proof_corrected_nusmv.log`](results/formal/nuxmv/proof_corrected_nusmv.log)
+- Counterexample on broken model: [`results/formal/nuxmv/counterexample_broken_nusmv.log`](results/formal/nuxmv/counterexample_broken_nusmv.log)
+
+---
+
+## Hardware Demo (Zybo Z7-10)
+
+See [`results/board/HARDWARE_RUNBOOK.md`](results/board/HARDWARE_RUNBOOK.md) for step-by-step board instructions.
+
+| LED Pattern | Meaning |
+|-------------|---------|
+| Blue RGB + LED[0] | Booting / hashing in progress |
+| All 4 LEDs on + Green RGB | BOOT OK — image verified |
+| LEDs 1,3 alternating + Red RGB | BOOT REFUSED — tamper detected |
+
+**Tamper demo:** Flip SW1 high to inject `tamper_det=1` → immediate sticky BOOT REFUSED lockout.
+
+---
+
+## Formal Proof
+
+```
+AG(jump → hash_ok)                   — proved ✅
+AG(jump → verified_before_jump)      — proved ✅
+AG(tamper_latched → ¬EF jump)        — proved ✅
+AG(DECIDE ∧ ¬hash_ok → AX REFUSE)   — proved ✅
+AG(refuse → AG refuse)               — proved ✅
+```
+
+---
 
 ## References
-
-- [NIST SP 800-232](https://csrc.nist.gov/pubs/sp/800/232/final) — Ascon standard
-- [ascon/ascon-c](https://github.com/ascon/ascon-c) — Official reference code and KAT vectors
-- [YosysHQ/picorv32](https://github.com/YosysHQ/picorv32) — RISC-V core
-- [Zybo Z7 Reference Manual](https://digilent.com/reference/programmable-logic/zybo-z7/reference-manual) — Board documentation
+- [NIST SP 800-232](https://csrc.nist.gov/pubs/sp/800/232/final) — Ascon Lightweight Cryptography Standard
+- [ascon/ascon-c](https://github.com/ascon/ascon-c) — Official reference implementation + KAT vectors
+- [YosysHQ/picorv32](https://github.com/YosysHQ/picorv32) — PicoRV32 RISC-V core
+- [Gross et al. 2015](https://eprint.iacr.org/2015/034.pdf) — Ascon hardware implementation paper
+- [eprint.iacr.org/2025/825](https://eprint.iacr.org/2025/825) — 7-series FPGA benchmarks

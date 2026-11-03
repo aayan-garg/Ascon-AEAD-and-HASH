@@ -17,7 +17,14 @@
 `default_nettype wire
 
 module mode_ctrl #(
-    parameter int BUFFER_DEPTH = 256
+    parameter int BUFFER_DEPTH = 256,
+    // [F5 FIX] PERM_VARIANT selects which permutation core is instantiated [SPEC]:
+    //   0 = permutation_half  (0.5 round/cycle, 2 cycles/round — lowest area)
+    //   1 = permutation_1r   (1 round/cycle — baseline, DEFAULT)
+    //   2 = permutation_2r   (2 rounds/cycle — highest throughput)
+    //   3 = permutation_serial32 (32-bit datapath, 2 cycles/round — paper design point)
+    parameter int PERM_VARIANT = 1,
+    parameter string SBOX_TYPE = "BASELINE"  // Passed to permutation_1r only
 ) (
     input  wire         clk,
     input  wire         rst_n,
@@ -164,24 +171,63 @@ module mode_ctrl #(
     reg  [63:0] perm_in_x0, perm_in_x1, perm_in_x2, perm_in_x3, perm_in_x4;
     wire [63:0] perm_out_x0, perm_out_x1, perm_out_x2, perm_out_x3, perm_out_x4;
 
-    permutation_1r u_perm (
-        .clk     (clk),
-        .rst_n   (rst_n),
-        .start   (perm_start),
-        .rounds  (perm_rounds),
-        .ready   (perm_ready),
-        .done    (perm_done),
-        .in_x0   (perm_in_x0),
-        .in_x1   (perm_in_x1),
-        .in_x2   (perm_in_x2),
-        .in_x3   (perm_in_x3),
-        .in_x4   (perm_in_x4),
-        .out_x0  (perm_out_x0),
-        .out_x1  (perm_out_x1),
-        .out_x2  (perm_out_x2),
-        .out_x3  (perm_out_x3),
-        .out_x4  (perm_out_x4)
-    );
+    // [F5 FIX] Generate-based permutation core selection [SPEC]
+    // Default (PERM_VARIANT=1) preserves existing 1r behaviour; no functional change to mode FSM.
+    generate
+        if (PERM_VARIANT == 0) begin : gen_perm_half
+            permutation_half u_perm (
+                .clk    (clk),
+                .rst_n  (rst_n),
+                .start  (perm_start),
+                .rounds (perm_rounds),
+                .ready  (perm_ready),
+                .done   (perm_done),
+                .in_x0  (perm_in_x0), .in_x1 (perm_in_x1), .in_x2 (perm_in_x2),
+                .in_x3  (perm_in_x3), .in_x4 (perm_in_x4),
+                .out_x0 (perm_out_x0), .out_x1 (perm_out_x1), .out_x2 (perm_out_x2),
+                .out_x3 (perm_out_x3), .out_x4 (perm_out_x4)
+            );
+        end else if (PERM_VARIANT == 2) begin : gen_perm_2r
+            permutation_2r u_perm (
+                .clk    (clk),
+                .rst_n  (rst_n),
+                .start  (perm_start),
+                .rounds (perm_rounds),
+                .ready  (perm_ready),
+                .done   (perm_done),
+                .in_x0  (perm_in_x0), .in_x1 (perm_in_x1), .in_x2 (perm_in_x2),
+                .in_x3  (perm_in_x3), .in_x4 (perm_in_x4),
+                .out_x0 (perm_out_x0), .out_x1 (perm_out_x1), .out_x2 (perm_out_x2),
+                .out_x3 (perm_out_x3), .out_x4 (perm_out_x4)
+            );
+        end else if (PERM_VARIANT == 3) begin : gen_perm_serial32
+            permutation_serial32 u_perm (
+                .clk    (clk),
+                .rst_n  (rst_n),
+                .start  (perm_start),
+                .rounds (perm_rounds),
+                .ready  (perm_ready),
+                .done   (perm_done),
+                .in_x0  (perm_in_x0), .in_x1 (perm_in_x1), .in_x2 (perm_in_x2),
+                .in_x3  (perm_in_x3), .in_x4 (perm_in_x4),
+                .out_x0 (perm_out_x0), .out_x1 (perm_out_x1), .out_x2 (perm_out_x2),
+                .out_x3 (perm_out_x3), .out_x4 (perm_out_x4)
+            );
+        end else begin : gen_perm_1r  // PERM_VARIANT == 1 (default)
+            permutation_1r #(.SBOX_TYPE(SBOX_TYPE)) u_perm (
+                .clk    (clk),
+                .rst_n  (rst_n),
+                .start  (perm_start),
+                .rounds (perm_rounds),
+                .ready  (perm_ready),
+                .done   (perm_done),
+                .in_x0  (perm_in_x0), .in_x1 (perm_in_x1), .in_x2 (perm_in_x2),
+                .in_x3  (perm_in_x3), .in_x4 (perm_in_x4),
+                .out_x0 (perm_out_x0), .out_x1 (perm_out_x1), .out_x2 (perm_out_x2),
+                .out_x3 (perm_out_x3), .out_x4 (perm_out_x4)
+            );
+        end
+    endgenerate
 
     plaintext_gate #(.BUFFER_DEPTH(BUFFER_DEPTH)) u_pt_gate (
         .clk       (clk),

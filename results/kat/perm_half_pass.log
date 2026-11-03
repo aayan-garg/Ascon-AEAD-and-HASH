@@ -1,0 +1,45 @@
+================================================================
+ASCON 1/2-ROUND/CYCLE PIPELINED PERMUTATION VERIFICATION LOG
+Standard: NIST SP 800-232 Section 3.2
+Hardware Implementation: rtl/ascon/permutation_half.sv
+Testbench: tb/unit/tb_permutation_half.sv
+Date: 2026-10-21
+================================================================
+Test 1: 12-Round Permutation (p^12) - Pipelined 1/2-Round
+Input State:
+  x0 = 0x80400c0600000000
+  x1 = 0x0001020304050607
+  x2 = 0x08090a0b0c0d0e0f
+  x3 = 0x1011121314151617
+  x4 = 0x18191a1b1c1d1e1f
+Output State:
+  x0 = 0xcba43b0a331b0ae5 [MATCH]
+  x1 = 0xd0b1251e0aae45b2 [MATCH]
+  x2 = 0x38a513833140c3d8 [MATCH]
+  x3 = 0x9a7f51ebf8fe3e35 [MATCH]
+  x4 = 0x59d69785c0fa7540 [MATCH]
+Computation Cycles: 24 computation cycles (25 clock edges total)
+Characteristics:    Critical path cut in half (p_C+p_S in cycle 0, p_L in cycle 1)
+Status:             PASS (Bit-Exact)
+
+----------------------------------------------------------------
+Test 2: 6-Round Permutation (p^6) - Pipelined 1/2-Round
+Input State:
+  x0 = 0x80400c0600000000
+  x1 = 0x0001020304050607
+  x2 = 0x08090a0b0c0d0e0f
+  x3 = 0x1011121314151617
+  x4 = 0x18191a1b1c1d1e1f
+Output State:
+  x0 = 0xa43b13dc0b9a309d [MATCH]
+  x1 = 0xba81690fc1f3cbe2 [MATCH]
+  x2 = 0x9abb863d41ef1406 [MATCH]
+  x3 = 0x0056ecf95f5785cb [MATCH]
+  x4 = 0xbe9f15ede55c7e7f [MATCH]
+Computation Cycles: 12 computation cycles (13 clock edges total)
+Status:             PASS (Bit-Exact)
+================================================================
+TOTAL TESTS: 2
+MISMATCHES:  0
+STATUS:      SUCCESS (100% BIT-EXACT WITH NIST SP 800-232)
+================================================================

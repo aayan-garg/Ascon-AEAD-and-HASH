@@ -16,38 +16,54 @@ SYNTH_DIR = ROOT_DIR / "results" / "synthesis"
 TIMING_DIR = ROOT_DIR / "results" / "timing"
 PERF_DIR = ROOT_DIR / "results" / "performance"
 
+# [F4 FIX] Corrected cycles per block and added serial32 variant.
+# SP 800-232 Ascon-AEAD128: rate = 128 bits, b = 8 rounds/data-block, a = 12 init/final.
+# SP 800-232 Ascon-Hash256:  rate =  64 bits, a = 12 rounds/message-block.
+# Reference: NIST SP 800-232 Final Standard (August 2025) [SPEC]
+# Old incorrect values used b=6 and rate=64 bits (old Ascon-128 parameters).
 VARIANTS = [
     {
         "id": "permutation_1r",
         "name": "1-Round Iterative (Baseline)",
         "sbox": "Canonical Bit-sliced (Lut-5)",
-        "cycles_aead": 6,   # b = 6 rounds
-        "cycles_hash": 12,  # a = 12 rounds
+        "cycles_aead": 8,   # [SPEC] b=8 rounds x 1 cycle/round = 8 cycles per 128-bit AEAD block
+        "cycles_hash": 12,  # [SPEC] a=12 rounds x 1 cycle/round = 12 cycles per 64-bit Hash block
         "desc": "Baseline 1-round/cycle datapath with NIST SP 800-232 bit-sliced S-box."
     },
     {
         "id": "permutation_2r",
         "name": "2-Rounds Unrolled (High Throughput)",
         "sbox": "Dual Cascaded Bit-sliced",
-        "cycles_aead": 3,   # 6 rounds in 3 cycles
-        "cycles_hash": 6,   # 12 rounds in 6 cycles
+        "cycles_aead": 4,   # [SPEC] b=8 rounds / 2 rounds/cycle = 4 cycles per AEAD block
+        "cycles_hash": 6,   # [SPEC] a=12 rounds / 2 rounds/cycle = 6 cycles per Hash block
         "desc": "Chained dual combinational round cores retiring 2 rounds per clock edge."
     },
     {
         "id": "permutation_half",
         "name": "1/2-Round Folded (Low Area / Pipelined)",
         "sbox": "Time-Multiplexed Bit-sliced",
-        "cycles_aead": 12,  # 6 rounds in 12 cycles
-        "cycles_hash": 24,  # 12 rounds in 24 cycles
+        "cycles_aead": 16,  # [SPEC] b=8 rounds x 2 cycles/round = 16 cycles per AEAD block
+        "cycles_hash": 24,  # [SPEC] a=12 rounds x 2 cycles/round = 24 cycles per Hash block
         "desc": "2-phase folded micro-step datapath (p_C + p_S in cycle 0, p_L in cycle 1)."
     },
     {
         "id": "permutation_1r_espresso",
-        "name": "1-Round Espresso (Paper Variant)",
+        "name": "1-Round Espresso (ESPRESSO S-box)",
         "sbox": "Berkeley ESPRESSO Minimized SOP",
-        "cycles_aead": 6,   # b = 6 rounds
-        "cycles_hash": 12,  # a = 12 rounds
-        "desc": "Paper-derived variant using 2-level SOP logic minimization for S-box layer."
+        "cycles_aead": 8,   # [SPEC] b=8 rounds x 1 cycle/round = 8 cycles per AEAD block
+        "cycles_hash": 12,  # [SPEC] same as 1r baseline
+        "desc": "ESPRESSO SOP-minimized S-box layer; same round count as 1r baseline."
+    },
+    {
+        "id": "permutation_serial32",
+        "name": "32-bit Serialised (Paper Design Point)",
+        "sbox": "Bit-sliced, 32-bit datapath",
+        "cycles_aead": 16,  # [REC] b=8 rounds x 2 cycles/round (32-bit slice per cycle)
+        "cycles_hash": 24,  # [REC] a=12 rounds x 2 cycles/round
+        "desc": "Serialised 32-bit datapath: processes 32 columns of the 5x64-bit state per cycle, "
+                "requiring 2 clock cycles per Ascon round. Reduces area vs 1r at cost of 2x cycle count. "
+                "Based on serial architecture from Graz University ascon-hardware repository. [SOURCE]",
+        "paper_ref": "github.com/ascon/ascon-hardware (Graz University of Technology)"
     }
 ]
 
@@ -153,13 +169,16 @@ def parse_timing(timing_path):
 def compute_throughputs(variant, f_mhz):
     """
     Computes cryptographic throughputs in Mbit/s.
-    SP 800-232 Rates:
-      AEAD-128: Rate = 64 bits/block
-      Hash-256: Rate = 64 bits/block
-    Throughput = (Rate * F) / Cycles_per_block
+    [F4 FIX] Corrected per NIST SP 800-232 Final Standard (August 2025) [SPEC]:
+      AEAD-128: Rate = 128 bits per data block (b=8 data rounds, r=128-bit rate)
+      Hash-256: Rate =  64 bits per message block (a=12 rounds, r=64-bit rate)
+    Throughput (Mbit/s) = Rate_bits * F_MHz / cycles_per_block
+    Note [REC]: Area figures are for the permutation core synthesised OOC only.
+      Engine-level area (mode_ctrl + permutation) is [MEASURE - not from OOC runs].
+    OLD (WRONG): used 64-bit rate for AEAD (correct only for old Ascon-128, not SP 800-232).
     """
-    tp_aead = (64.0 * f_mhz) / variant["cycles_aead"]
-    tp_hash = (64.0 * f_mhz) / variant["cycles_hash"]
+    tp_aead = (128.0 * f_mhz) / variant["cycles_aead"]  # 128-bit rate [SPEC]
+    tp_hash = ( 64.0 * f_mhz) / variant["cycles_hash"]  #  64-bit rate [SPEC]
     return tp_aead, tp_hash
 
 def main():

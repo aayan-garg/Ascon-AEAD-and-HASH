@@ -1,6 +1,6 @@
 # Golden Model Verification Summary (NIST SP 800-232)
 
-- **Date:** 2026-10-21 19:16:07 UTC
+- **Date:** 2026-11-03 17:53:23 UTC
 - **Status:** `[x] 100% VERIFIED PASS`
 - **Model:** `reference/pyascon/ascon.py`
 - **Standard:** NIST SP 800-232 (Little-Endian)
@@ -9,8 +9,8 @@
 
 | File | Vectors | SHA-256 Checksum | Integrity Status |
 |---|---|---|---|
-| `reference/kat/LWC_AEAD_KAT_128_128.txt` | 1,089 | `37cdac1a75c35ba0fe234098027ab43bd396c147e26a4a0c41123e2db25b31bb` | `MATCH` |
-| `reference/kat/LWC_HASH_KAT_128_256.txt` | 1,025 | `106f09738b1bd8fac6275665835314f589b919661f1c35a86f4c3bc146a8ce0a` | `MATCH` |
+| `reference/kat/LWC_AEAD_KAT_128_128.txt` | 1,089 | `bbbc34692fe05e5fda0a3b025585622ab3e3747495e5e3655b29aae8c2a4bd33` | `MATCH` |
+| `reference/kat/LWC_HASH_KAT_128_256.txt` | 1,025 | `b7d6fbc51362f0d62bc7e57b21f3e83242983434a7c92320a4956d915749df17` | `MATCH` |
 
 ## 2. Test Execution Results
 

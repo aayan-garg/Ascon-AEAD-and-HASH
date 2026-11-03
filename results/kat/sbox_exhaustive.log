@@ -1,0 +1,44 @@
+================================================================
+ASCON S-BOX EXHAUSTIVE VERIFICATION LOG
+Standard: NIST SP 800-232 Table 6 (Section 3.2.1)
+Hardware Implementation: rtl/ascon/sbox5.sv
+Testbench: tb/unit/tb_sbox5.sv
+Date: 2026-10-21
+================================================================
+Vector  0: in=0x00 (00000) -> out=0x04 (00100) [MATCH]
+Vector  1: in=0x01 (00001) -> out=0x0b (01011) [MATCH]
+Vector  2: in=0x02 (00010) -> out=0x1f (11111) [MATCH]
+Vector  3: in=0x03 (00011) -> out=0x14 (10100) [MATCH]
+Vector  4: in=0x04 (00100) -> out=0x1a (11010) [MATCH]
+Vector  5: in=0x05 (00101) -> out=0x15 (10101) [MATCH]
+Vector  6: in=0x06 (00110) -> out=0x09 (01001) [MATCH]
+Vector  7: in=0x07 (00111) -> out=0x02 (00010) [MATCH]
+Vector  8: in=0x08 (01000) -> out=0x1b (11011) [MATCH]
+Vector  9: in=0x09 (01001) -> out=0x05 (00101) [MATCH]
+Vector 10: in=0x0a (01010) -> out=0x08 (01000) [MATCH]
+Vector 11: in=0x0b (01011) -> out=0x12 (10010) [MATCH]
+Vector 12: in=0x0c (01100) -> out=0x1d (11101) [MATCH]
+Vector 13: in=0x0d (01101) -> out=0x03 (00011) [MATCH]
+Vector 14: in=0x0e (01110) -> out=0x06 (00110) [MATCH]
+Vector 15: in=0x0f (01111) -> out=0x1c (11100) [MATCH]
+Vector 16: in=0x10 (10000) -> out=0x1e (11110) [MATCH]
+Vector 17: in=0x11 (10001) -> out=0x13 (10011) [MATCH]
+Vector 18: in=0x12 (10010) -> out=0x07 (00111) [MATCH]
+Vector 19: in=0x13 (10011) -> out=0x0e (01110) [MATCH]
+Vector 20: in=0x14 (10100) -> out=0x00 (00000) [MATCH]
+Vector 21: in=0x15 (10101) -> out=0x0d (01101) [MATCH]
+Vector 22: in=0x16 (10110) -> out=0x11 (10001) [MATCH]
+Vector 23: in=0x17 (10111) -> out=0x18 (11000) [MATCH]
+Vector 24: in=0x18 (11000) -> out=0x10 (10000) [MATCH]
+Vector 25: in=0x19 (11001) -> out=0x0c (01100) [MATCH]
+Vector 26: in=0x1a (11010) -> out=0x01 (00001) [MATCH]
+Vector 27: in=0x1b (11011) -> out=0x19 (11001) [MATCH]
+Vector 28: in=0x1c (11100) -> out=0x16 (10110) [MATCH]
+Vector 29: in=0x1d (11101) -> out=0x0a (01010) [MATCH]
+Vector 30: in=0x1e (11110) -> out=0x0f (01111) [MATCH]
+Vector 31: in=0x1f (11111) -> out=0x17 (10111) [MATCH]
+================================================================
+TOTAL VECTORS CHECKED: 32
+MISMATCHES:            0
+STATUS:                PASS (100% Equivalence)
+================================================================

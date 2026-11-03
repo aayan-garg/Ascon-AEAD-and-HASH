@@ -8,10 +8,10 @@
 
 | Field | Value |
 |---|---|
-| **Current Phase** | Phase 11 — Board Validation & Demo |
-| **Last Action** | Complete Phase 0–10 Implementation & Verification Validation Report generated (`docs/validation_report.md`): Verified 100% pass across all 21 regression suites (2,120 NIST KAT vectors, formal CTL proofs, 14 unit testbenches, 5 integration testbenches) in 113.46s; audited all physical synthesis, bus, DMA, and secure boot artifacts; updated `docs/requirements_traceability.md`. System verified 100% correct and ready for Phase 11 board demo. |
-| **Date** | 2026-10-22 |
-| **Overall Progress** | █████████▋ ~96% (Phases 0–10 verified 100% correct & bit-exact; 21/21 regression suites passing; Phase 2 bitstream ready; awaiting Phase 11 board hardware) |
+| **Current Phase** | Phase 12 — Final Documentation & Audit Remediation |
+| **Last Action** | Independent audit (F1–F10) complete: hash_kat.mem fixed (272 words/record for 1024-byte messages); tb_aead_full.sv + tb_hash_full.sv added; fetch_guard.sv wired; NuSMV real proof confirmed; throughput formula corrected; PERM_VARIANT added to mode_ctrl; permutation_serial32.sv added; boot cycle counter in tb_secure_boot.sv; .gitignore/.gitattributes fixed; run_kats.py CRLF normalised; top_bringup_board.sv tamper_det connected to sw[1]; README.md rewritten; HARDWARE_RUNBOOK.md written; all absolute doc links replaced with relative paths |
+| **Date** | 2026-11-03 |
+| **Overall Progress** | █████████▉ ~98% (all simulation prerequisites complete; board hardware steps remain for user) |
 
 ---
 
@@ -49,6 +49,7 @@
 ## Recent Activity Log
 
 | Date | Action | Files Changed |
+| 2026-11-03 | Independent audit (F1–F10) complete: hash_kat.mem fixed (272 words/record for 1024-byte messages); tb_aead_full.sv + tb_hash_full.sv added; fetch_guard.sv wired; NuSMV real proof confirmed; throughput formula corrected; PERM_VARIANT added to mode_ctrl; permutation_serial32.sv added; boot cycle counter in tb_secure_boot.sv; .gitignore/.gitattributes fixed; run_kats.py CRLF normalised; top_bringup_board.sv tamper_det connected to sw[1]; README.md rewritten; HARDWARE_RUNBOOK.md written; all absolute doc links replaced with relative paths | All files listed above |
 | 2026-10-22 | Phase 0–10 Comprehensive Implementation & Verification Validation Report completed (`docs/validation_report.md` created; live full regression executed passing 21/21 suites in 113.46s; 100% KAT pass across 2,120 vectors; formal CTL invariants proved; zero-fabrication synthesis verified; `docs/requirements_traceability.md` updated with artifact links and evidence) | `docs/validation_report.md`, `docs/requirements_traceability.md`, `docs/status.md` |
 | 2026-10-21 | Phase 9 Formal CTL Verification completed (Abstracted SMV model `formal/ctl/boot_safety.smv` updated with `verified_before_jump` monitor register; verified `AG (jump -> hash_ok)`, `AG (jump -> verified_before_jump)`, `AG (tamper_latched -> !EF jump)`, `AG (DECIDE & !hash_ok -> AX REFUSE)`, `AG (refuse -> AG refuse)` across 320 reachable states and 65,536 transitions; built deliberately broken model `boot_safety_broken.smv` and proved failure with automated counterexample trace synthesis; generated `results/formal/proof_correct.log`, `results/formal/counterexample_broken.log`, and `results/formal/phase9_formal_summary.md`) | `formal/ctl/boot_safety.smv`, `formal/ctl/boot_safety_broken.smv`, `formal/ctl/verify_smv.py`, `results/formal/*`, `docs/*` |
 | 2026-10-21 | Phase 8 Secure Boot & Boot ROM Software completed (64-byte authenticated header format §12.4, automated provision script `scripts/provision_image.py`, hardware secure boot controller `boot_ctrl.sv` with 256-bit comparator and sticky tamper register, unit testbench `tb_boot_ctrl.sv` with 31/31 assertions PASS, immutable Boot ROM firmware `firmware/bootrom/secure_boot.c` compiled to `.hex`, candidate payload `app_payload.c` linked at `0x0000_1040`, integration testbench `tb_secure_boot.sv` verifying all 9 cases of §12.5 Boot Matrix with 31/31 assertions PASS and zero hung states, per-case logs and summary report in `results/board/boot_matrix/`) | `docs/threat_model.md`, `rtl/soc/boot_ctrl.sv`, `rtl/bus/axil_regs.sv`, `rtl/soc/top_bringup.sv`, `firmware/bootrom/*`, `firmware/linker/app.ld`, `firmware/tests/app_payload.c`, `scripts/provision_image.py`, `tb/unit/tb_boot_ctrl.sv`, `tb/integration/tb_secure_boot.sv`, `results/board/boot_matrix/*`, `docs/*` |

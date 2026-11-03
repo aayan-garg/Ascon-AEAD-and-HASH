@@ -19,14 +19,18 @@ KAT_HASH_FILE = os.path.join(os.path.dirname(__file__), "kat", "LWC_HASH_KAT_128
 LOG_FILE = os.path.join(os.path.dirname(__file__), "..", "results", "kat", "golden_model_pass.log")
 SUMMARY_FILE = os.path.join(os.path.dirname(__file__), "..", "results", "kat", "golden_model_summary.md")
 
-EXPECTED_AEAD_SHA256 = "37cdac1a75c35ba0fe234098027ab43bd396c147e26a4a0c41123e2db25b31bb"
-EXPECTED_HASH_SHA256 = "106f09738b1bd8fac6275665835314f589b919661f1c35a86f4c3bc146a8ce0a"
+EXPECTED_AEAD_SHA256 = "bbbc34692fe05e5fda0a3b025585622ab3e3747495e5e3655b29aae8c2a4bd33"
+EXPECTED_HASH_SHA256 = "b7d6fbc51362f0d62bc7e57b21f3e83242983434a7c92320a4956d915749df17"
 
 def sha256_file(filepath: str) -> str:
+    # [F9 fix] Normalise CRLF -> LF before hashing for cross-platform consistency.
+    # Windows git clones may have CRLF; Linux clones have LF (with .gitattributes eol=lf).
+    # Normalising ensures the expected hash matches on both platforms.
     h = hashlib.sha256()
     with open(filepath, "rb") as f:
-        while chunk := f.read(65536):
-            h.update(chunk)
+        content = f.read()
+    content = content.replace(b'\r\n', b'\n')  # CRLF -> LF normalisation
+    h.update(content)
     return h.hexdigest().lower()
 
 def parse_kat_aead(filepath: str):

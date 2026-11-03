@@ -1,0 +1,173 @@
+-- ==============================================================================
+-- Formal Specification: Ascon Secure Boot Controller Safety & CTL Model
+-- CORRECTED VERSION — 2026-11-03 re-audit
+--
+-- Fix applied (F2): DECIDE state now uses ONLY the latched hash_verified register,
+-- matching boot_ctrl.sv line 145: hash_verified_q && !tamper_latched_q
+-- The previous version (boot_safety.smv commit as of 2026-10-21) used
+-- (hash_verified | hash_match) which is NOT what the RTL does and violated
+-- AG(jump -> hash_ok) in 6 steps via a free hash_match input.
+--
+-- Model Checker Target: NuSMV 2.6.0 / nuXmv 2.2.0
+-- Command: NuSMV.exe formal/ctl/boot_safety_corrected.smv
+-- Property: SPEC AG (jump -> hash_ok)
+-- ==============================================================================
+
+MODULE main
+
+VAR
+    -- FSM State enumeration (matches boot_ctrl.sv STATE_* localparam)
+    state : {
+        STATE_RESET,
+        STATE_READ_HEADER,
+        STATE_DMA_STREAM,
+        STATE_WAIT_HASH,
+        STATE_CHECK_TAG,
+        STATE_DECIDE,
+        STATE_JUMP,
+        STATE_HALT_REFUSE
+    };
+
+    -- Internal REGISTERED security flags (registers, not combinational)
+    -- These model the _q flip-flop outputs in boot_ctrl.sv
+    hash_verified        : boolean; -- Models hash_verified_q: set in CHECK_TAG if hash_match, cleared by tamper
+    tamper_latched       : boolean; -- Models tamper_latched_q: sticky, set by tamper_det, never cleared in run
+    verified_before_jump : boolean; -- Monitor register: set when hash_verified_q goes high without tamper
+
+    -- Environmental inputs (free, non-deterministic each cycle)
+    start       : boolean; -- boot initiation trigger (verify_req from CPU)
+    dma_done    : boolean; -- DMA engine completed transfer
+    hash_done   : boolean; -- Ascon coprocessor completed hash
+    hash_match  : boolean; -- Hardware 256-bit comparator result: ascon_digest == trusted_digest
+    tamper_det  : boolean; -- Physical tamper sensor / glitch detector pulse
+
+ASSIGN
+    -- =========================================================================
+    -- Initial Values (all registers cleared at reset)
+    -- =========================================================================
+    init(state)                := STATE_RESET;
+    init(hash_verified)        := FALSE;
+    init(tamper_latched)       := FALSE;
+    init(verified_before_jump) := FALSE;
+
+    -- =========================================================================
+    -- Sticky tamper register (models tamper_latched_q)
+    -- Once set, cannot be cleared without hardware reset
+    -- Matches boot_ctrl.sv lines 80-88
+    -- =========================================================================
+    next(tamper_latched) := tamper_latched | tamper_det;
+
+    -- =========================================================================
+    -- hash_verified register (models hash_verified_q)
+    -- Set ONLY in STATE_CHECK_TAG when hash_match AND NOT tamper
+    -- Cleared immediately if tamper detected
+    -- Matches boot_ctrl.sv lines 138-141: hash_verified_d = hash_match && !tamper
+    -- CORRECTED: no longer uses (hash_verified | hash_match) in DECIDE
+    -- =========================================================================
+    next(hash_verified) :=
+        case
+            tamper_latched | tamper_det        : FALSE;
+            state = STATE_CHECK_TAG            : (hash_match & !(tamper_latched | tamper_det));
+            TRUE                               : hash_verified;
+        esac;
+
+    -- =========================================================================
+    -- Monitor register: verified_before_jump (models verified_before_jump_q)
+    -- Latches TRUE when hash_verified goes TRUE and tamper is not active
+    -- Matches boot_ctrl.sv lines 91-98
+    -- =========================================================================
+    next(verified_before_jump) :=
+        case
+            tamper_latched | tamper_det                   : FALSE;
+            hash_verified & !tamper_latched & !tamper_det : TRUE;
+            TRUE                                          : verified_before_jump;
+        esac;
+
+    -- =========================================================================
+    -- Next-State Logic (models boot_ctrl.sv always@(*) block, lines 104-167)
+    -- KEY CORRECTION: DECIDE uses ONLY hash_verified (the latched _q register),
+    -- NOT (hash_verified | hash_match). This matches RTL line 145.
+    -- =========================================================================
+    next(state) :=
+        case
+            -- High-priority tamper: immediately force lockout from any state
+            tamper_latched | tamper_det : STATE_HALT_REFUSE;
+
+            state = STATE_RESET :
+                case
+                    start : STATE_READ_HEADER;
+                    TRUE  : STATE_RESET;
+                esac;
+
+            -- Header advances unconditionally (header is read combinationally)
+            state = STATE_READ_HEADER : STATE_DMA_STREAM;
+
+            state = STATE_DMA_STREAM :
+                case
+                    dma_done : STATE_WAIT_HASH;
+                    TRUE     : STATE_DMA_STREAM;
+                esac;
+
+            state = STATE_WAIT_HASH :
+                case
+                    hash_done : STATE_CHECK_TAG;
+                    TRUE      : STATE_WAIT_HASH;
+                esac;
+
+            -- CHECK_TAG: samples the hardware comparator; result goes into hash_verified_d
+            -- On the NEXT cycle, hash_verified_q reflects the result
+            state = STATE_CHECK_TAG : STATE_DECIDE;
+
+            -- DECIDE: uses ONLY hash_verified (the _q flip-flop from CHECK_TAG)
+            -- This is the critical fix vs. the original model
+            state = STATE_DECIDE :
+                case
+                    hash_verified & !(tamper_latched | tamper_det) : STATE_JUMP;
+                    TRUE : STATE_HALT_REFUSE;
+                esac;
+
+            -- Sink states
+            state = STATE_JUMP        : STATE_JUMP;
+            state = STATE_HALT_REFUSE : STATE_HALT_REFUSE;
+        esac;
+
+DEFINE
+    -- Observable output aliases
+    jump               := (state = STATE_JUMP);
+    refuse             := (state = STATE_HALT_REFUSE);
+    hash_ok            := hash_verified;
+    busy               := (state != STATE_RESET & state != STATE_JUMP & state != STATE_HALT_REFUSE);
+
+-- ==============================================================================
+-- CTL Safety Specifications (Properties to Prove)
+-- ==============================================================================
+
+-- Property 1 (Mandatory PS Requirement R17):
+-- "Along all paths, at all times, if the boot controller is in STATE_JUMP,
+-- the hardware hash_verified register is TRUE."
+-- Covers: boot_ctrl.sv guarantee that hash_verified_q is set before STATE_JUMP.
+CTLSPEC
+    AG (jump -> hash_ok)
+
+-- Property 2 (Monitor Invariant):
+-- "If in STATE_JUMP, the verified_before_jump monitor register is TRUE,
+-- meaning hash verification strictly preceded the jump."
+CTLSPEC
+    AG (jump -> verified_before_jump)
+
+-- Property 3 (Tamper Prevention):
+-- "If tamper_latched is TRUE, it is globally impossible on any future path to
+-- reach STATE_JUMP."
+CTLSPEC
+    AG (tamper_latched -> !EF jump)
+
+-- Property 4 (Determinism of Failure):
+-- "If in STATE_DECIDE with hash_verified=FALSE, the next state is always HALT_REFUSE."
+CTLSPEC
+    AG (state = STATE_DECIDE & !hash_verified -> AX (state = STATE_HALT_REFUSE))
+
+-- Property 5 (Terminal Lockout):
+-- "Once in STATE_HALT_REFUSE, no execution path can ever leave it."
+CTLSPEC
+    AG (refuse -> AG refuse)
+

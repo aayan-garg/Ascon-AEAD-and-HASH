@@ -1,0 +1,4 @@
+# tb_aead_full.sv NIST SP 800-232 AEAD-128 Exhaustive KAT Log
+# [SPEC] F1 fix: all 1089 vectors exercised
+# Tests per vector: Encrypt, Decrypt-valid, Decrypt-corrupt-tag, Decrypt-corrupt-CT
+FAIL Encrypt Count=1

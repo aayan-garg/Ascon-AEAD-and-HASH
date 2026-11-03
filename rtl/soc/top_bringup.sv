@@ -14,6 +14,7 @@ module top_bringup #(
     input  wire        clk,        // 100 MHz clock
     input  wire        rst_n,      // Active-low asynchronous reset
     input  wire        tamper_det, // Physical sensor / glitch tamper pulse
+    input  wire [3:0]  sw,         // User slide switches (SW0=tamper/flip byte, SW1=tamper_det)
     output wire [3:0]  led,        // 4 discrete LEDs on Zybo Z7-10 (LD0..LD3)
     output wire [2:0]  rgb_led,    // RGB LED on Zybo Z7-10 (LD6: R, G, B)
     output wire        trap,       // CPU trap indicator
@@ -119,8 +120,10 @@ module top_bringup #(
     // =========================================================================
     // 4. BRAM Controller (16 KB synchronous memory with byte strobes)
     // =========================================================================
+    (* ram_style = "block" *)
     reg [31:0] bram_mem [0:RAM_WORDS-1];
-    reg [31:0] bram_rdata;
+    reg [31:0] bram_rdata_raw;    // Raw BRAM output (before fetch guard)
+    wire [31:0] bram_rdata;       // Gated read data (after fetch guard) [F3 fix]
     reg        bram_rvalid;
     reg        bram_bvalid;
 
@@ -175,14 +178,48 @@ module top_bringup #(
         end
     end
 
-    // BRAM read port
+    // BRAM read port (Standard Block RAM inference template)
+    always @(posedge clk) begin
+        if (axi_arvalid && sel_bram_ar) begin
+            bram_rdata_raw <= bram_mem[bram_raddr];
+        end
+    end
+
+    // =========================================================================
+    // 4b. Fetch Guard: hardware gate blocking CPU instruction fetch from the
+    //     application region (>= 0x1040) until boot_jump_enable=1.
+    //     [SPEC] R14, F3 fix — replaces the previous "physically impossible"
+    //     claim that was FALSE (jump was a plain C function call).
+    //
+    //     Implementation: when a fetch targets [APP_BASE, BRAM_TOP) and
+    //     boot_jump_enable=0, the read data mux returns RISC-V NOP (0x0000_0013)
+    //     instead of the real instruction. The CPU executes an infinite NOP slide
+    //     until the boot controller asserts jump_enable=1.
+    // =========================================================================
+    localparam [31:0] APP_BASE  = 32'h0000_1040; // App entry point
+    localparam [31:0] BRAM_END  = 32'h0000_4000; // BRAM top (16 KB)
+    localparam [31:0] RISCV_NOP = 32'h0000_0013; // ADDI x0,x0,0
+
+    wire        boot_jump_enable;
+
+    // Address latched at the cycle ARVALID was accepted (for the response mux)
+    reg [31:0] bram_araddr_q;
+    always @(posedge clk) begin
+        if (axi_arvalid && sel_bram_ar)
+            bram_araddr_q <= axi_araddr;
+    end
+
+    wire in_app_region = (bram_araddr_q >= APP_BASE) && (bram_araddr_q < BRAM_END);
+    wire fetch_blocked = in_app_region && !boot_jump_enable;
+
+    // Gated read data: return NOP when fetch is blocked
+    assign bram_rdata = fetch_blocked ? RISCV_NOP : bram_rdata_raw;
+
     always @(posedge clk) begin
         if (!rst_n) begin
             bram_rvalid <= 1'b0;
-            bram_rdata  <= 32'b0;
         end else begin
             if (axi_arvalid && sel_bram_ar && !bram_rvalid) begin
-                bram_rdata  <= bram_mem[bram_raddr];
                 bram_rvalid <= 1'b1;
             end else if (axi_rready) begin
                 bram_rvalid <= 1'b0;
@@ -231,13 +268,20 @@ module top_bringup #(
     // =========================================================================
     wire [11:0] dma_bram_addr;
     wire        dma_bram_en;
-    reg  [31:0] dma_bram_rdata;
+    reg  [31:0] dma_bram_raw;
+    reg  [11:0] dma_bram_addr_q;
 
+    // Strict Block RAM read template: NO combinational logic in the memory assignment
     always @(posedge clk) begin
         if (dma_bram_en) begin
-            dma_bram_rdata <= bram_mem[dma_bram_addr];
+            dma_bram_raw <= bram_mem[dma_bram_addr];
         end
+        dma_bram_addr_q <= dma_bram_addr;
     end
+
+    // Deliverable Demo: If SW[0] is ON, corrupt 1 bit of candidate payload (word 0x410 = byte 0x1040)
+    wire [31:0] dma_bram_rdata = (sw[0] && (dma_bram_addr_q == 12'h410)) ?
+                                 (dma_bram_raw ^ 32'h00000001) : dma_bram_raw;
 
     // =========================================================================
     // 5c. Custom Streaming DMA Master Engine (Data Plane)
@@ -293,7 +337,6 @@ module top_bringup #(
     wire        ascon_rvalid;
     wire        ascon_irq;
 
-    wire        boot_jump_enable;
     wire        boot_refuse;
     wire [3:0]  boot_led_status;
 
@@ -333,7 +376,7 @@ module top_bringup #(
         .dma_done           (dma_done),
         .dma_err            (dma_err),
         .irq                (ascon_irq),
-        .tamper_det         (tamper_det),
+        .tamper_det         (tamper_det | sw[1]),
         .boot_jump_enable   (boot_jump_enable),
         .boot_refuse        (boot_refuse),
         .boot_led_status    (boot_led_status)
@@ -373,8 +416,15 @@ module top_bringup #(
     // =========================================================================
     // 7. Output Port Assignments
     // =========================================================================
+    // Discrete LEDs: Refuse -> 4'b1010, Boot Pass -> gpio_reg[3:0] (0xF) | boot_led_status
     assign led       = boot_refuse ? 4'b1010 : (gpio_reg[3:0] | boot_led_status);
-    assign rgb_led   = gpio_reg[6:4];
+    // RGB LED LD6 ([0]=Red, [1]=Green, [2]=Blue):
+    // Refusal Lockout -> Solid RED (3'b001)
+    // Successful Boot -> Solid GREEN (3'b010)
+    // Verifying / Init -> Solid BLUE (3'b100)
+    assign rgb_led   = boot_refuse ? 3'b001 :
+                       boot_jump_enable ? 3'b010 :
+                       (gpio_reg[6:4] != 3'b0 ? gpio_reg[6:4] : 3'b100);
     assign test_pass = gpio_reg[31];
 
 endmodule

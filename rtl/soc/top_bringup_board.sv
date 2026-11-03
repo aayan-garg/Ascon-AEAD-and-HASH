@@ -9,10 +9,11 @@
 `default_nettype wire
 
 module top_bringup_board #(
-    parameter string FIRMWARE_HEX = "firmware/tests/gpio_toggle_board.hex"
+    parameter string FIRMWARE_HEX = "firmware/tests/boot_matrix/bram_case1_valid.hex"
 ) (
     input  wire        clk_125mhz, // 125 MHz from Ethernet PHY on pin K17
     input  wire        rst_btn,    // BTN0 on pin K18 (Active-high)
+    input  wire [3:0]  sw,         // SW0..SW3 on pins G15, P15, W13, T16
     output wire [3:0]  led,        // LD0..LD3 on pins M14, M15, G14, D18
     output wire        led6_r,     // RGB LD6 Red on pin V16
     output wire        led6_g,     // RGB LD6 Green on pin F17
@@ -87,12 +88,19 @@ module top_bringup_board #(
         .FIRMWARE_HEX (FIRMWARE_HEX),
         .RAM_WORDS    (4096)
     ) u_soc (
-        .clk       (clk_100mhz),
-        .rst_n     (rst_n),
-        .led       (led),
-        .rgb_led   (rgb_led),
-        .trap      (),
-        .test_pass ()
+        .clk        (clk_100mhz),
+        .rst_n      (rst_n),
+        // sw[1] acts as deterministic hardware tamper injection:
+        //   SW1=0 → normal operation
+        //   SW1=1 → assert tamper_det (one byte of DMA stream flipped upstream or
+        //           the tamper signal toggles the hash comparison path in boot_ctrl).
+        //   This gives a real, switch-controlled tamper that the user can demo live.
+        .tamper_det (sw[1]),
+        .sw         (sw),
+        .led        (led),
+        .rgb_led    (rgb_led),
+        .trap       (),
+        .test_pass  ()
     );
 
     assign led6_r = rgb_led[0];

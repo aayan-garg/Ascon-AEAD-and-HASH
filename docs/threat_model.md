@@ -55,6 +55,26 @@ To maintain rigorous engineering honesty (§12.3), the following threat vectors 
 
 ---
 
+## 6. Fetch Guard Hardware Implementation (F3 Fix)
+
+**Threat addressed:** CPU jumping into unverified application code before `boot_ctrl` asserts `jump_enable`.
+
+**Implementation (`rtl/soc/fetch_guard.sv` + `rtl/soc/top_bringup.sv`):**
+- A combinational gate intercepts `bram_rdata` on the instruction bus.
+- Application region is defined as addresses ≥ `APP_BASE` (default `0x1040`).
+- While `boot_jump_enable = 0`, any fetch from the application region returns `32'h0000_0013` (RISC-V NOP / ADDI x0, x0, 0), preventing execution of unverified code.
+- Once `boot_ctrl.sv` sets `jump_enable = 1` (only after `hash_ok` is asserted), the gate opens and real instructions are fetched.
+
+**Limitations [ASSUME]:**
+- Protection is address-based (instruction address decode), not bus-protocol enforcement. A speculative or mis-predicted fetch cannot cause harm since the NOP is benign.
+- The TOCTOU risk (image modified between hash completion and fetch) is LOW: the DMA engine uses a read-only port (Port B) and the boot ROM does not write to the application region after hashing.
+- This does not prevent an attacker who can modify the bitstream or BRAM init data from bypassing the gate entirely (see §4 limitations).
+
+**Updated threat claim:** The claim "physically impossible to jump without authorization" is revised to: "A CPU executing Boot ROM firmware cannot fetch executable instructions from the application region until `boot_ctrl` asserts `jump_enable`, which is conditioned on `hash_ok`. An attacker with bitstream or JTAG access remains out of scope."
+
+
+---
+
 ## 5. Digest Provenance & Provisioning Flow
 
 ```

@@ -1,0 +1,44 @@
+# Git Attributes — line ending and encoding policy
+# [F9 fix] Normalise KAT file line endings for cross-platform SHA-256 consistency.
+# The expected SHA-256 hashes in reference/run_kats.py were recomputed after
+# CRLF normalisation (LF canonical form). See run_kats.py sha256_file().
+
+# Force KAT reference files to LF on checkout (cross-platform consistency)
+reference/kat/*.txt  text eol=lf
+
+# SystemVerilog / Verilog: keep LF
+*.sv    text eol=lf
+*.v     text eol=lf
+*.svh   text eol=lf
+
+# Python: LF
+*.py    text eol=lf
+
+# TCL scripts: LF
+*.tcl   text eol=lf
+
+# Markdown: LF
+*.md    text eol=lf
+
+# C firmware: LF
+*.c     text eol=lf
+*.h     text eol=lf
+
+# Hex memory init files: LF
+*.hex   text eol=lf
+*.mem   text eol=lf
+
+# Constraint files: LF
+*.xdc   text eol=lf
+
+# Windows batch files: CRLF
+*.bat   text eol=crlf
+*.ps1   text eol=crlf
+
+# Binary files: no line ending conversion
+*.bit   binary
+*.elf   binary
+*.bin   binary
+*.wdb   binary
+*.dcp   binary
+

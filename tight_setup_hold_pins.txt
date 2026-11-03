@@ -1,0 +1,29 @@
++====================+===================+========================================+
+| Launch Setup Clock | Launch Hold Clock | Pin                                    |
++====================+===================+========================================+
+| clk_100mhz_unbuf   | clk_100mhz_unbuf  | u_soc/u_ascon/u_mode_ctrl/s0_reg[56]/D |
+| clk_100mhz_unbuf   | clk_100mhz_unbuf  | u_soc/u_ascon/u_mode_ctrl/s0_reg[58]/D |
+| clk_100mhz_unbuf   | clk_100mhz_unbuf  | u_soc/u_ascon/u_mode_ctrl/s0_reg[63]/D |
+| clk_100mhz_unbuf   | clk_100mhz_unbuf  | u_soc/u_ascon/u_mode_ctrl/s0_reg[57]/D |
+| clk_100mhz_unbuf   | clk_100mhz_unbuf  | u_soc/u_ascon/u_mode_ctrl/s0_reg[59]/D |
+| clk_100mhz_unbuf   | clk_100mhz_unbuf  | u_soc/u_ascon/u_mode_ctrl/s0_reg[62]/D |
+| clk_100mhz_unbuf   | clk_100mhz_unbuf  | u_soc/u_ascon/u_mode_ctrl/s0_reg[60]/D |
+| clk_100mhz_unbuf   | clk_100mhz_unbuf  | u_soc/u_ascon/u_mode_ctrl/s1_reg[60]/D |
+| clk_100mhz_unbuf   | clk_100mhz_unbuf  | u_soc/u_ascon/u_mode_ctrl/s1_reg[63]/D |
+| clk_100mhz_unbuf   | clk_100mhz_unbuf  | u_soc/u_ascon/u_mode_ctrl/s1_reg[56]/D |
+| clk_100mhz_unbuf   | clk_100mhz_unbuf  | u_soc/u_ascon/u_mode_ctrl/s1_reg[61]/D |
+| clk_100mhz_unbuf   | clk_100mhz_unbuf  | u_soc/u_ascon/u_mode_ctrl/s1_reg[62]/D |
+| clk_100mhz_unbuf   | clk_100mhz_unbuf  | u_soc/u_ascon/u_mode_ctrl/s0_reg[50]/D |
+| clk_100mhz_unbuf   | clk_100mhz_unbuf  | u_soc/u_ascon/u_mode_ctrl/s0_reg[49]/D |
+| clk_100mhz_unbuf   | clk_100mhz_unbuf  | u_soc/u_ascon/u_mode_ctrl/s0_reg[48]/D |
+| clk_100mhz_unbuf   | clk_100mhz_unbuf  | u_soc/u_ascon/u_mode_ctrl/s0_reg[53]/D |
+| clk_100mhz_unbuf   | clk_100mhz_unbuf  | u_soc/u_ascon/u_mode_ctrl/s0_reg[55]/D |
+| clk_100mhz_unbuf   | clk_100mhz_unbuf  | u_soc/u_ascon/u_mode_ctrl/s0_reg[51]/D |
+| clk_100mhz_unbuf   | clk_100mhz_unbuf  | u_soc/u_ascon/u_mode_ctrl/s0_reg[52]/D |
+| clk_100mhz_unbuf   | clk_100mhz_unbuf  | u_soc/u_ascon/u_mode_ctrl/s1_reg[53]/D |
+| clk_100mhz_unbuf   | clk_100mhz_unbuf  | u_soc/u_ascon/u_mode_ctrl/s1_reg[54]/D |
+| clk_100mhz_unbuf   | clk_100mhz_unbuf  | u_soc/u_ascon/u_mode_ctrl/s1_reg[52]/D |
+| clk_100mhz_unbuf   | clk_100mhz_unbuf  | u_soc/u_ascon/u_mode_ctrl/s1_reg[49]/D |
+| clk_100mhz_unbuf   | clk_100mhz_unbuf  | u_soc/u_ascon/u_mode_ctrl/s1_reg[51]/D |
+| clk_100mhz_unbuf   | clk_100mhz_unbuf  | u_soc/u_ascon/u_mode_ctrl/s1_reg[50]/D |
++--------------------+-------------------+----------------------------------------+

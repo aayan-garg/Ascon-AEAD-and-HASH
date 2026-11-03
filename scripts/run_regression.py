@@ -18,14 +18,71 @@ import subprocess
 import time
 import shutil
 import argparse
+import platform
 
 ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 SIM_BUILD_DIR = os.path.join(ROOT_DIR, "sim_build")
 
-VIVADO_BIN_DIR = r"C:\Xilinx\2025.1\Vivado\bin"
-XVLOG = os.path.join(VIVADO_BIN_DIR, "xvlog.bat")
-XELAB = os.path.join(VIVADO_BIN_DIR, "xelab.bat")
-XSIM  = os.path.join(VIVADO_BIN_DIR, "xsim.bat")
+# ──────────────────────────────────────────────────────────────────────────────
+# [F9 fix] Cross-platform Vivado detection
+# Set VIVADO_PATH env var to override automatic detection, e.g.:
+#   Windows: set VIVADO_PATH=C:\Xilinx\Vivado\2025.1\bin
+#   Linux:   export VIVADO_PATH=/opt/Xilinx/Vivado/2025.1/bin
+# ──────────────────────────────────────────────────────────────────────────────
+IS_WINDOWS = platform.system() == "Windows"
+EXE_SUFFIX = ".bat" if IS_WINDOWS else ""
+
+def _find_vivado() -> str:
+    """Return Vivado bin directory or None if not found."""
+    # 1. VIVADO_PATH environment variable
+    env_path = os.environ.get("VIVADO_PATH", "")
+    if env_path:
+        xvlog_name = f"xvlog{EXE_SUFFIX}"
+        if os.path.exists(os.path.join(env_path, xvlog_name)):
+            return env_path
+
+    # 2. Common installation paths
+    if IS_WINDOWS:
+        candidates = [
+            r"C:\Xilinx\Vivado\2025.1\bin",
+            r"C:\Xilinx\2025.1\Vivado\bin",
+            r"C:\Xilinx\Vivado\2024.2\bin",
+            r"C:\Xilinx\Vivado\2024.1\bin",
+            r"C:\Xilinx\Vivado\2023.2\bin",
+        ]
+    else:
+        candidates = [
+            "/opt/Xilinx/Vivado/2025.1/bin",
+            "/opt/Xilinx/Vivado/2024.2/bin",
+            "/tools/Xilinx/Vivado/2025.1/bin",
+            "/opt/AMD/Vivado/2025.1/bin",
+        ]
+    for p in candidates:
+        if os.path.exists(os.path.join(p, f"xvlog{EXE_SUFFIX}")):
+            return p
+
+    # 3. PATH search (xvlog without .bat suffix works on Linux)
+    for name in [f"xvlog{EXE_SUFFIX}", "xvlog"]:
+        found = shutil.which(name)
+        if found:
+            return os.path.dirname(found)
+
+    return None
+
+_VIVADO_BIN = _find_vivado()
+if _VIVADO_BIN is None:
+    print("[WARNING] Vivado not found. Set VIVADO_PATH env var to Vivado bin directory.")
+    print(f"          Example (Windows): set VIVADO_PATH=C:\\Xilinx\\Vivado\\2025.1\\bin")
+    print(f"          Example (Linux):   export VIVADO_PATH=/opt/Xilinx/Vivado/2025.1/bin")
+    # Fall back to bare names; will fail if not in PATH
+    XVLOG = f"xvlog{EXE_SUFFIX}"
+    XELAB = f"xelab{EXE_SUFFIX}"
+    XSIM  = f"xsim{EXE_SUFFIX}"
+else:
+    print(f"[INFO] Vivado found at: {_VIVADO_BIN}")
+    XVLOG = os.path.join(_VIVADO_BIN, f"xvlog{EXE_SUFFIX}")
+    XELAB = os.path.join(_VIVADO_BIN, f"xelab{EXE_SUFFIX}")
+    XSIM  = os.path.join(_VIVADO_BIN, f"xsim{EXE_SUFFIX}")
 
 def run_step(name: str, cmd: list, cwd: str = ROOT_DIR) -> tuple[bool, float, str]:
     print(f"\n[RUNNING] {name}...")
@@ -68,7 +125,7 @@ def run_simulation_test(tb_file: str) -> tuple[bool, float, str]:
                 rtl_files.append(os.path.join(root, f))
 
     # 1. xvlog
-    xvlog_cmd = [XVLOG, "-sv"] + rtl_files + [os.path.abspath(tb_file)]
+    xvlog_cmd = [XVLOG, "-sv", "-i", ROOT_DIR] + rtl_files + [os.path.abspath(tb_file)]
     pass_vlog, dur_vlog, out_vlog = run_step(f"Compile {tb_name} (xvlog)", xvlog_cmd, cwd=SIM_BUILD_DIR)
     if not pass_vlog:
         return False, dur_vlog, f"Compilation failed:\n{out_vlog}"
