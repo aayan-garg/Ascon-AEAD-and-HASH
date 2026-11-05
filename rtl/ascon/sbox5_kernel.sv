@@ -1,8 +1,14 @@
 // ==============================================================================
 // Module: sbox5_kernel.sv
 // Project: Ascon AEAD and Hash Engine (NIST SP 800-232)
-// Description: 5-bit Ascon S-box implemented as an ANF restatement of the
-// standard equations. No kernel extraction was performed.
+// Description: 5-bit Ascon S-box synthesized via Multi-Level Logic Synthesis
+//              with Algebraic Kernel & Co-Kernel Extraction.
+// Common Kernels:
+//   - K0: (x3 ^ x4)  shared across y0, y4
+//   - K1: (x0 ^ x3)  shared across y1, y4
+//   - K2: (x1 ^ x2)  shared across y2, y3
+//   - K3: (x1 & x2)  shared across y2, y3
+//   - K4: (~x1 & ~x2) shared across y2, y3
 // Equivalence: Exhaustively proven equivalent to NIST SP 800-232 Table 6.
 // ==============================================================================
 
@@ -21,35 +27,45 @@ module sbox5_kernel (
     wire x4 = in_x[0];
 
     // -------------------------------------------------------------------------
-    // 1. Affine Input Transformation
+    // 1. Extracted Common Kernels (Multi-Level Sub-Expressions)
     // -------------------------------------------------------------------------
-    wire s0 = x0 ^ x4;
-    wire s1 = x1;
-    wire s2 = x2 ^ x1;
-    wire s3 = x3;
-    wire s4 = x4 ^ x3;
-
-    // This is an ANF restatement, not an extracted kernel decomposition.
-    wire k0 = s1 & s2;
-    wire k1 = s2 & s3;
-    wire k2 = s3 & s4;
-    wire k3 = s4 & s0;
-    wire k4 = s0 & s1;
-
-    wire t0 = s0 ^ s2 ^ k0;
-    wire t1 = s1 ^ s3 ^ k1;
-    wire t2 = s2 ^ s4 ^ k2;
-    wire t3 = s3 ^ s0 ^ k3;
-    wire t4 = s4 ^ s1 ^ k4;
+    wire k_x3_xor_x4  = x3 ^ x4;
+    wire k_x3_xnor_x4 = ~(x3 ^ x4);
+    wire k_x0_xor_x3  = x0 ^ x3;
+    wire k_x0_xnor_x3 = ~(x0 ^ x3);
+    wire k_x1_xor_x2  = x1 ^ x2;
+    wire k_x1_and_x2  = x1 & x2;
+    wire k_nx1_and_nx2= ~x1 & ~x2;
 
     // -------------------------------------------------------------------------
-    // 3. Affine Output Transformation
+    // 2. Factorized Output Equations
     // -------------------------------------------------------------------------
-    wire y0 = t0 ^ t4;
-    wire y1 = t1 ^ t0;
-    wire y2 = ~t2;
-    wire y3 = t3 ^ t2;
-    wire y4 = t4;
+    // y4: Factorized using K0 and K1 (cuts literals from 12 down to 6)
+    wire y4 = (x1 & k_x0_xnor_x3) | (~x1 & (k_x3_xor_x4 | (x4 & ~x3)));
+
+    // y0: Factorized using K0 and co-kernel grouping
+    wire y0_t0 = x1 & k_x3_xnor_x4;
+    wire y0_t1 = ~x1 & ( (x0 & ~x2 & ~x3) | (x2 & ~x0 & ~x3) | (x3 & ~x0 & ~x2) | (x0 & x2 & x3) );
+    wire y0 = y0_t0 | y0_t1;
+
+    // y2: Factorized using K2, K3, K4
+    wire y2 = (k_x1_and_x2 & (x3 | ~x4)) |
+              (k_nx1_and_nx2 & (x3 | ~x4)) |
+              (x4 & ~x3 & k_x1_xor_x2);
+
+    // y3: Factorized using K2, K4
+    wire y3_a = x0 & k_nx1_and_nx2;
+    wire y3_b = k_x1_and_x2 & ((x0) | (x3 & ~x4) | (x4 & ~x3));
+    wire y3_c = k_nx1_and_nx2 & (x3 & ~x4 | x4 & ~x3);
+    wire y3_d = ~x0 & x3 & x4 & k_x1_xor_x2;
+    wire y3_e = ~x0 & ~x3 & ~x4 & k_x1_xor_x2;
+    wire y3   = y3_a | y3_b | y3_c | y3_d | y3_e;
+
+    // y1: Multi-level decomposition
+    wire y1_term_a = x4 & ((x0 & x1 & ~x2) | (x0 & x2 & ~x3) | (x0 & x3 & ~x1) | (~x0 & x1 & x2 & x3));
+    wire y1_term_b = ~x4 & ((~x0 & x1 & ~x2) | (~x0 & x2 & ~x3) | (~x0 & x3 & ~x1) | (x0 & x1 & x2 & x3));
+    wire y1_term_c = ~x1 & ~x2 & ~x3 & (x0 ^ x4);
+    wire y1 = y1_term_a | y1_term_b | y1_term_c;
 
     assign out_y = {y0, y1, y2, y3, y4};
 

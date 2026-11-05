@@ -10,23 +10,23 @@ Property 1: AG (jump -> hash_ok)
   Result: [FAILED / VIOLATED]
   Counterexample Trace Found (Witness of Authentication Bypass):
   Step  0: state=STATE_RESET       | start=1 dma_done=1 hash_done=1 hash_match=0 tamper_det=0 | hash_ok=0 vbj=0 tamper=0 jump=0
-  Step  1: state=STATE_READ_HEADER | start=0 dma_done=0 hash_done=0 hash_match=1 tamper_det=0 | hash_ok=0 vbj=0 tamper=0 jump=0
-  Step  2: state=STATE_DMA_STREAM  | start=0 dma_done=1 hash_done=1 hash_match=1 tamper_det=0 | hash_ok=0 vbj=0 tamper=0 jump=0
-  Step  3: state=STATE_WAIT_HASH   | start=0 dma_done=1 hash_done=1 hash_match=1 tamper_det=0 | hash_ok=0 vbj=0 tamper=0 jump=0
-  Step  4: state=STATE_CHECK_TAG   | start=1 dma_done=1 hash_done=1 hash_match=0 tamper_det=0 | hash_ok=0 vbj=0 tamper=0 jump=0
-  Step  5: state=STATE_DECIDE      | start=1 dma_done=1 hash_done=1 hash_match=0 tamper_det=0 | hash_ok=0 vbj=0 tamper=0 jump=0
-  Step  6: state=STATE_JUMP        | start=1 dma_done=1 hash_done=1 hash_match=0 tamper_det=1 | hash_ok=0 vbj=0 tamper=0 jump=1
+  Step  1: state=STATE_READ_HEADER | start=1 dma_done=0 hash_done=1 hash_match=0 tamper_det=0 | hash_ok=0 vbj=0 tamper=0 jump=0
+  Step  2: state=STATE_DMA_STREAM  | start=1 dma_done=1 hash_done=1 hash_match=0 tamper_det=0 | hash_ok=0 vbj=0 tamper=0 jump=0
+  Step  3: state=STATE_WAIT_HASH   | start=1 dma_done=1 hash_done=1 hash_match=0 tamper_det=0 | hash_ok=0 vbj=0 tamper=0 jump=0
+  Step  4: state=STATE_CHECK_TAG   | start=0 dma_done=1 hash_done=1 hash_match=0 tamper_det=0 | hash_ok=0 vbj=0 tamper=0 jump=0
+  Step  5: state=STATE_DECIDE      | start=0 dma_done=1 hash_done=0 hash_match=1 tamper_det=0 | hash_ok=0 vbj=0 tamper=0 jump=0
+  Step  6: state=STATE_JUMP        | start=1 dma_done=1 hash_done=0 hash_match=1 tamper_det=0 | hash_ok=0 vbj=0 tamper=0 jump=1
 
 Property 2: AG (jump -> verified_before_jump)
   Result: [FAILED / VIOLATED]
   Counterexample Trace Found:
   Step  0: state=STATE_RESET       | start=1 dma_done=1 hash_done=1 hash_match=0 tamper_det=0 | hash_ok=0 vbj=0 tamper=0 jump=0
-  Step  1: state=STATE_READ_HEADER | start=0 dma_done=0 hash_done=0 hash_match=1 tamper_det=0 | hash_ok=0 vbj=0 tamper=0 jump=0
-  Step  2: state=STATE_DMA_STREAM  | start=0 dma_done=1 hash_done=1 hash_match=1 tamper_det=0 | hash_ok=0 vbj=0 tamper=0 jump=0
-  Step  3: state=STATE_WAIT_HASH   | start=0 dma_done=1 hash_done=1 hash_match=1 tamper_det=0 | hash_ok=0 vbj=0 tamper=0 jump=0
-  Step  4: state=STATE_CHECK_TAG   | start=1 dma_done=1 hash_done=1 hash_match=0 tamper_det=0 | hash_ok=0 vbj=0 tamper=0 jump=0
-  Step  5: state=STATE_DECIDE      | start=1 dma_done=1 hash_done=1 hash_match=0 tamper_det=0 | hash_ok=0 vbj=0 tamper=0 jump=0
-  Step  6: state=STATE_JUMP        | start=1 dma_done=1 hash_done=1 hash_match=0 tamper_det=1 | hash_ok=0 vbj=0 tamper=0 jump=1
+  Step  1: state=STATE_READ_HEADER | start=1 dma_done=0 hash_done=1 hash_match=0 tamper_det=0 | hash_ok=0 vbj=0 tamper=0 jump=0
+  Step  2: state=STATE_DMA_STREAM  | start=1 dma_done=1 hash_done=1 hash_match=0 tamper_det=0 | hash_ok=0 vbj=0 tamper=0 jump=0
+  Step  3: state=STATE_WAIT_HASH   | start=1 dma_done=1 hash_done=1 hash_match=0 tamper_det=0 | hash_ok=0 vbj=0 tamper=0 jump=0
+  Step  4: state=STATE_CHECK_TAG   | start=0 dma_done=1 hash_done=1 hash_match=0 tamper_det=0 | hash_ok=0 vbj=0 tamper=0 jump=0
+  Step  5: state=STATE_DECIDE      | start=0 dma_done=1 hash_done=0 hash_match=1 tamper_det=0 | hash_ok=0 vbj=0 tamper=0 jump=0
+  Step  6: state=STATE_JUMP        | start=1 dma_done=1 hash_done=0 hash_match=1 tamper_det=0 | hash_ok=0 vbj=0 tamper=0 jump=1
 
 Property 3: AG (tamper_latched -> !EF jump)
   Result: [PROVED TRUE]
@@ -35,11 +35,11 @@ Property 4: AG (STATE_DECIDE & !hash_ok -> AX STATE_HALT_REFUSE)
   Result: [FAILED / VIOLATED]
   Counterexample Trace Found (Bypassed Lockout):
   Step  0: state=STATE_RESET       | start=1 dma_done=1 hash_done=1 hash_match=0 tamper_det=0 | hash_ok=0 vbj=0 tamper=0 jump=0
-  Step  1: state=STATE_READ_HEADER | start=0 dma_done=0 hash_done=0 hash_match=1 tamper_det=0 | hash_ok=0 vbj=0 tamper=0 jump=0
-  Step  2: state=STATE_DMA_STREAM  | start=0 dma_done=1 hash_done=1 hash_match=1 tamper_det=0 | hash_ok=0 vbj=0 tamper=0 jump=0
-  Step  3: state=STATE_WAIT_HASH   | start=0 dma_done=1 hash_done=1 hash_match=1 tamper_det=0 | hash_ok=0 vbj=0 tamper=0 jump=0
-  Step  4: state=STATE_CHECK_TAG   | start=1 dma_done=1 hash_done=1 hash_match=0 tamper_det=0 | hash_ok=0 vbj=0 tamper=0 jump=0
-  Step  5: state=STATE_DECIDE      | start=1 dma_done=1 hash_done=1 hash_match=0 tamper_det=0 | hash_ok=0 vbj=0 tamper=0 jump=0
+  Step  1: state=STATE_READ_HEADER | start=1 dma_done=0 hash_done=1 hash_match=0 tamper_det=0 | hash_ok=0 vbj=0 tamper=0 jump=0
+  Step  2: state=STATE_DMA_STREAM  | start=1 dma_done=1 hash_done=1 hash_match=0 tamper_det=0 | hash_ok=0 vbj=0 tamper=0 jump=0
+  Step  3: state=STATE_WAIT_HASH   | start=1 dma_done=1 hash_done=1 hash_match=0 tamper_det=0 | hash_ok=0 vbj=0 tamper=0 jump=0
+  Step  4: state=STATE_CHECK_TAG   | start=0 dma_done=1 hash_done=1 hash_match=0 tamper_det=0 | hash_ok=0 vbj=0 tamper=0 jump=0
+  Step  5: state=STATE_DECIDE      | start=0 dma_done=1 hash_done=0 hash_match=1 tamper_det=0 | hash_ok=0 vbj=0 tamper=0 jump=0
 
 Property 5: AG (refuse -> AG refuse)
   Result: [PROVED TRUE]

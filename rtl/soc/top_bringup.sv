@@ -134,34 +134,11 @@ module top_bringup #(
     reg        bram_rvalid;
     reg        bram_bvalid;
 
-    // Load initial binary hex image
+    // Load initial binary hex image (synthesizable and simulation compatible)
     initial begin
-        int fd;
         if (FIRMWARE_HEX != "") begin
-            fd = $fopen(FIRMWARE_HEX, "r");
-            if (fd != 0) begin
-                $fclose(fd);
-                $display("[BRAM] Initializing 16 KB BRAM from: %s", FIRMWARE_HEX);
-                $readmemh(FIRMWARE_HEX, bram_mem);
-            end else begin
-                // Fallback 1: Vivado GUI simulation working directory (ascon_soc.sim/sim_1/behav/xsim/)
-                fd = $fopen("../../../../firmware/tests/gpio_toggle.hex", "r");
-                if (fd != 0) begin
-                    $fclose(fd);
-                    $display("[BRAM] Initializing 16 KB BRAM from: ../../../../firmware/tests/gpio_toggle.hex");
-                    $readmemh("../../../../firmware/tests/gpio_toggle.hex", bram_mem);
-                end else begin
-                    // Fallback 2: Local simulation directory
-                    fd = $fopen("gpio_toggle.hex", "r");
-                    if (fd != 0) begin
-                        $fclose(fd);
-                        $display("[BRAM] Initializing 16 KB BRAM from: gpio_toggle.hex");
-                        $readmemh("gpio_toggle.hex", bram_mem);
-                    end else begin
-                        $display("[BRAM ERROR] Could not find firmware hex file in any path!");
-                    end
-                end
-            end
+            $display("[BRAM] Initializing 16 KB BRAM from: %s", FIRMWARE_HEX);
+            $readmemh(FIRMWARE_HEX, bram_mem);
         end
     end
 

@@ -5,10 +5,12 @@
 
 set SCRIPT_DIR [file dirname [info script]]
 set ROOT_DIR   [file normalize "$SCRIPT_DIR/.."]
+cd $ROOT_DIR
 
 puts "================================================================================"
 puts "STARTING VIVADO BATCH BITSTREAM BUILD FOR ZYBO Z7-10"
 puts "Root Directory: $ROOT_DIR"
+puts "Working Directory: [pwd]"
 puts "================================================================================"
 
 # 1. Create In-Memory Project
@@ -44,7 +46,7 @@ read_xdc "$ROOT_DIR/board/zybo_z7_10.xdc"
 
 # 4. Synthesize Design
 puts "\n--- STEP 1/5: Synthesizing top_bringup_board for xc7z010clg400-1 ---"
-synth_design -top top_bringup_board -part xc7z010clg400-1 -flatten_hierarchy rebuilt
+synth_design -top top_bringup_board -part xc7z010clg400-1 -flatten_hierarchy rebuilt -generic [list FIRMWARE_HEX="$ROOT_DIR/firmware/tests/boot_matrix/bram_case1_valid.hex"]
 
 # 5. Logic Optimization
 puts "\n--- STEP 2/5: Running logic optimization (opt_design) ---"

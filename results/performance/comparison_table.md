@@ -20,7 +20,7 @@ level only in [`engine_comparison_table.md`](engine_comparison_table.md).
 They were not separately synthesized as permutation-level wrappers in the
 same measurement session. S-box variants were evaluated with the 1-round
 permutation only.
-| **Full SoC System (PicoRV32 + Ascon Engine)** | `top_bringup_board` | **5088** | **5486** | **4** | **0** | **+1.570** | **MET** | **118.62** | **8.430** |
+| **Full SoC System (PicoRV32 + Ascon Engine)** | `top_bringup_board` | **5088** | **5486** | **4** | **0** | **+1.510** | **MET** | **117.79** | **8.490** |
 
 ## 2. Cryptographic Throughput & Hardware Efficiency
 

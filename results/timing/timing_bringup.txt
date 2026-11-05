@@ -1,7 +1,7 @@
 Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2025 Advanced Micro Devices, Inc. All Rights Reserved.
 ----------------------------------------------------------------------------------------------------------------------------------------------------
 | Tool Version : Vivado v.2025.1 (win64) Build 6140274 Thu May 22 00:12:29 MDT 2025
-| Date         : Thu Nov  5 03:08:18 2026
+| Date         : Thu Nov  5 23:00:15 2026
 | Host         : LAPTOP-9H0QSNOD running 64-bit major release  (build 9200)
 | Command      : report_timing_summary -file C:/Users/Aayan/Desktop/RTL_Project/Ascon-AEAD-and-HASH/results/timing/timing_bringup.txt -max_paths 10
 | Design       : top_bringup_board
@@ -138,7 +138,7 @@ Table of Contents
 
     WNS(ns)      TNS(ns)  TNS Failing Endpoints  TNS Total Endpoints      WHS(ns)      THS(ns)  THS Failing Endpoints  THS Total Endpoints     WPWS(ns)     TPWS(ns)  TPWS Failing Endpoints  TPWS Total Endpoints  
     -------      -------  ---------------------  -------------------      -------      -------  ---------------------  -------------------     --------     --------  ----------------------  --------------------  
-      1.570        0.000                      0                16623        0.027        0.000                      0                16623        2.000        0.000                       0                  5588  
+      1.510        0.000                      0                16623        0.027        0.000                      0                16623        2.000        0.000                       0                  5588  
 
 
 All user specified timing constraints are met.
@@ -164,7 +164,7 @@ sys_clk_pin         {0.000 4.000}        8.000           125.000
 Clock                   WNS(ns)      TNS(ns)  TNS Failing Endpoints  TNS Total Endpoints      WHS(ns)      THS(ns)  THS Failing Endpoints  THS Total Endpoints     WPWS(ns)     TPWS(ns)  TPWS Failing Endpoints  TPWS Total Endpoints  
 -----                   -------      -------  ---------------------  -------------------      -------      -------  ---------------------  -------------------     --------     --------  ----------------------  --------------------  
 sys_clk_pin                                                                                                                                                           2.000        0.000                       0                     1  
-  clk_100mhz_unbuf        1.570        0.000                      0                11786        0.027        0.000                      0                11786        3.750        0.000                       0                  5584  
+  clk_100mhz_unbuf        1.510        0.000                      0                11786        0.027        0.000                      0                11786        3.750        0.000                       0                  5584  
   clkfb_out                                                                                                                                                           5.845        0.000                       0                     3  
 
 
@@ -224,7 +224,7 @@ High Pulse Width  Fast    MMCME2_ADV/CLKIN1  n/a            2.000         4.000 
 From Clock:  clk_100mhz_unbuf
   To Clock:  clk_100mhz_unbuf
 
-Setup :            0  Failing Endpoints,  Worst Slack        1.570ns,  Total Violation        0.000ns
+Setup :            0  Failing Endpoints,  Worst Slack        1.510ns,  Total Violation        0.000ns
 Hold  :            0  Failing Endpoints,  Worst Slack        0.027ns,  Total Violation        0.000ns
 PW    :            0  Failing Endpoints,  Worst Slack        3.750ns,  Total Violation        0.000ns
 ---------------------------------------------------------------------------------------------------
@@ -232,7 +232,7 @@ PW    :            0  Failing Endpoints,  Worst Slack        3.750ns,  Total Vio
 
 Max Delay Paths
 --------------------------------------------------------------------------------------
-Slack (MET) :             1.570ns  (required time - arrival time)
+Slack (MET) :             1.510ns  (required time - arrival time)
   Source:                 u_soc/u_ascon/u_boot_ctrl/FSM_sequential_state_q_reg[2]/C
                             (rising edge-triggered cell FDCE clocked by clk_100mhz_unbuf  {rise@0.000ns fall@5.000ns period=10.000ns})
   Destination:            u_soc/u_cpu/picorv32_core/decoded_rs1_reg_rep[1]/D
@@ -240,7 +240,7 @@ Slack (MET) :             1.570ns  (required time - arrival time)
   Path Group:             clk_100mhz_unbuf
   Path Type:              Setup (Max at Slow Process Corner)
   Requirement:            10.000ns  (clk_100mhz_unbuf rise@10.000ns - clk_100mhz_unbuf rise@0.000ns)
-  Data Path Delay:        7.957ns  (logic 1.531ns (19.241%)  route 6.426ns (80.759%))
+  Data Path Delay:        8.017ns  (logic 1.531ns (19.098%)  route 6.486ns (80.902%))
   Logic Levels:           5  (LUT3=1 LUT5=2 LUT6=2)
   Clock Path Skew:        -0.133ns (DCD - SCD + CPR)
     Destination Clock Delay (DCD):    -1.338ns = ( 8.662 - 10.000 ) 
@@ -267,17 +267,17 @@ Slack (MET) :             1.570ns  (required time - arrival time)
     SLICE_X38Y21         FDCE                                         r  u_soc/u_ascon/u_boot_ctrl/FSM_sequential_state_q_reg[2]/C
   -------------------------------------------------------------------    -------------------
     SLICE_X38Y21         FDCE (Prop_fdce_C_Q)         0.478    -0.139 r  u_soc/u_ascon/u_boot_ctrl/FSM_sequential_state_q_reg[2]/Q
-                         net (fo=17, routed)          1.920     1.780    u_soc/u_ascon/u_boot_ctrl/p_7_in[10]
-    SLICE_X22Y33         LUT6 (Prop_lut6_I1_O)        0.301     2.081 r  u_soc/u_ascon/u_boot_ctrl/mem_rdata_q[5]_i_9/O
-                         net (fo=2, routed)           0.672     2.753    u_soc/u_ascon/u_boot_ctrl/mem_rdata_q[5]_i_9_n_0
-    SLICE_X22Y33         LUT5 (Prop_lut5_I4_O)        0.150     2.903 r  u_soc/u_ascon/u_boot_ctrl/mem_rdata_q[5]_i_5/O
-                         net (fo=2, routed)           1.039     3.942    u_soc/u_cpu/picorv32_core/mem_rdata_q_reg[31]_2
-    SLICE_X32Y24         LUT6 (Prop_lut6_I1_O)        0.326     4.268 f  u_soc/u_cpu/picorv32_core/mem_rdata_q[5]_i_2/O
-                         net (fo=35, routed)          1.066     5.334    u_soc/u_cpu/picorv32_core/mem_rdata_q[5]_i_2_n_0
-    SLICE_X25Y26         LUT5 (Prop_lut5_I0_O)        0.124     5.458 r  u_soc/u_cpu/picorv32_core/mem_rdata_q[16]_i_1/O
-                         net (fo=5, routed)           1.047     6.506    u_soc/u_cpu/picorv32_core/axi_rdata[16]
-    SLICE_X24Y31         LUT3 (Prop_lut3_I2_O)        0.152     6.658 r  u_soc/u_cpu/picorv32_core/decoded_rs1_rep_rep[1]_i_1/O
-                         net (fo=2, routed)           0.682     7.340    u_soc/u_cpu/picorv32_core/decoded_rs1_rep_rep[1]_i_1_n_0
+                         net (fo=17, routed)          1.979     1.840    u_soc/u_ascon/u_boot_ctrl/p_7_in[10]
+    SLICE_X22Y33         LUT6 (Prop_lut6_I1_O)        0.301     2.141 r  u_soc/u_ascon/u_boot_ctrl/mem_rdata_q[5]_i_9/O
+                         net (fo=2, routed)           0.672     2.813    u_soc/u_ascon/u_boot_ctrl/mem_rdata_q[5]_i_9_n_0
+    SLICE_X22Y33         LUT5 (Prop_lut5_I4_O)        0.150     2.963 r  u_soc/u_ascon/u_boot_ctrl/mem_rdata_q[5]_i_5/O
+                         net (fo=2, routed)           1.039     4.001    u_soc/u_cpu/picorv32_core/mem_rdata_q_reg[31]_2
+    SLICE_X32Y24         LUT6 (Prop_lut6_I1_O)        0.326     4.327 f  u_soc/u_cpu/picorv32_core/mem_rdata_q[5]_i_2/O
+                         net (fo=35, routed)          1.066     5.394    u_soc/u_cpu/picorv32_core/mem_rdata_q[5]_i_2_n_0
+    SLICE_X25Y26         LUT5 (Prop_lut5_I0_O)        0.124     5.518 r  u_soc/u_cpu/picorv32_core/mem_rdata_q[16]_i_1/O
+                         net (fo=5, routed)           1.047     6.565    u_soc/u_cpu/picorv32_core/axi_rdata[16]
+    SLICE_X24Y31         LUT3 (Prop_lut3_I2_O)        0.152     6.717 r  u_soc/u_cpu/picorv32_core/decoded_rs1_rep_rep[1]_i_1/O
+                         net (fo=2, routed)           0.682     7.399    u_soc/u_cpu/picorv32_core/decoded_rs1_rep_rep[1]_i_1_n_0
     SLICE_X24Y35         FDRE                                         r  u_soc/u_cpu/picorv32_core/decoded_rs1_reg_rep[1]/D
   -------------------------------------------------------------------    -------------------
 
@@ -298,11 +298,139 @@ Slack (MET) :             1.570ns  (required time - arrival time)
     SLICE_X24Y35         FDRE (Setup_fdre_C_D)       -0.269     8.910    u_soc/u_cpu/picorv32_core/decoded_rs1_reg_rep[1]
   -------------------------------------------------------------------
                          required time                          8.910    
-                         arrival time                          -7.340    
+                         arrival time                          -7.399    
   -------------------------------------------------------------------
-                         slack                                  1.570    
+                         slack                                  1.510    
 
-Slack (MET) :             1.635ns  (required time - arrival time)
+Slack (MET) :             1.515ns  (required time - arrival time)
+  Source:                 u_soc/u_ascon/u_mode_ctrl/state_reg_reg[1]_rep/C
+                            (rising edge-triggered cell FDCE clocked by clk_100mhz_unbuf  {rise@0.000ns fall@5.000ns period=10.000ns})
+  Destination:            u_soc/u_ascon/u_mode_ctrl/perm_in_x2_reg[50]/D
+                            (rising edge-triggered cell FDCE clocked by clk_100mhz_unbuf  {rise@0.000ns fall@5.000ns period=10.000ns})
+  Path Group:             clk_100mhz_unbuf
+  Path Type:              Setup (Max at Slow Process Corner)
+  Requirement:            10.000ns  (clk_100mhz_unbuf rise@10.000ns - clk_100mhz_unbuf rise@0.000ns)
+  Data Path Delay:        8.297ns  (logic 0.704ns (8.485%)  route 7.593ns (91.515%))
+  Logic Levels:           2  (LUT5=1 LUT6=1)
+  Clock Path Skew:        -0.199ns (DCD - SCD + CPR)
+    Destination Clock Delay (DCD):    -1.289ns = ( 8.711 - 10.000 ) 
+    Source Clock Delay      (SCD):    -0.603ns
+    Clock Pessimism Removal (CPR):    0.487ns
+  Clock Uncertainty:      0.071ns  ((TSJ^2 + DJ^2)^1/2) / 2 + PE
+    Total System Jitter     (TSJ):    0.071ns
+    Discrete Jitter          (DJ):    0.123ns
+    Phase Error              (PE):    0.000ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock clk_100mhz_unbuf rise edge)
+                                                      0.000     0.000 r  
+    K17                                               0.000     0.000 r  clk_125mhz (IN)
+                         net (fo=0)                   0.000     0.000    clk_125mhz
+    K17                  IBUF (Prop_ibuf_I_O)         1.492     1.492 r  clk_125mhz_IBUF_inst/O
+                         net (fo=1, routed)           1.285     2.777    clk_125mhz_IBUF
+    MMCME2_ADV_X0Y1      MMCME2_ADV (Prop_mmcme2_adv_CLKIN1_CLKOUT0)
+                                                     -6.996    -4.219 r  u_mmcm/CLKOUT0
+                         net (fo=1, routed)           1.760    -2.459    clk_100mhz_unbuf
+    BUFGCTRL_X0Y16       BUFG (Prop_bufg_I_O)         0.101    -2.358 r  u_bufg_clkout/O
+                         net (fo=5582, routed)        1.755    -0.603    u_soc/u_ascon/u_mode_ctrl/clk_100mhz
+    SLICE_X37Y6          FDCE                                         r  u_soc/u_ascon/u_mode_ctrl/state_reg_reg[1]_rep/C
+  -------------------------------------------------------------------    -------------------
+    SLICE_X37Y6          FDCE (Prop_fdce_C_Q)         0.456    -0.147 f  u_soc/u_ascon/u_mode_ctrl/state_reg_reg[1]_rep/Q
+                         net (fo=108, routed)         6.577     6.430    u_soc/u_ascon/u_mode_ctrl/state_reg_reg[1]_rep_n_0
+    SLICE_X3Y22          LUT5 (Prop_lut5_I2_O)        0.124     6.554 r  u_soc/u_ascon/u_mode_ctrl/perm_in_x2[50]_i_2/O
+                         net (fo=1, routed)           1.016     7.569    u_soc/u_ascon/u_mode_ctrl/perm_in_x2[50]_i_2_n_0
+    SLICE_X4Y21          LUT6 (Prop_lut6_I3_O)        0.124     7.693 r  u_soc/u_ascon/u_mode_ctrl/perm_in_x2[50]_i_1/O
+                         net (fo=1, routed)           0.000     7.693    u_soc/u_ascon/u_mode_ctrl/perm_in_x2[50]
+    SLICE_X4Y21          FDCE                                         r  u_soc/u_ascon/u_mode_ctrl/perm_in_x2_reg[50]/D
+  -------------------------------------------------------------------    -------------------
+
+                         (clock clk_100mhz_unbuf rise edge)
+                                                     10.000    10.000 r  
+    K17                                               0.000    10.000 r  clk_125mhz (IN)
+                         net (fo=0)                   0.000    10.000    clk_125mhz
+    K17                  IBUF (Prop_ibuf_I_O)         1.421    11.421 r  clk_125mhz_IBUF_inst/O
+                         net (fo=1, routed)           1.162    12.583    clk_125mhz_IBUF
+    MMCME2_ADV_X0Y1      MMCME2_ADV (Prop_mmcme2_adv_CLKIN1_CLKOUT0)
+                                                     -7.105     5.478 r  u_mmcm/CLKOUT0
+                         net (fo=1, routed)           1.599     7.077    clk_100mhz_unbuf
+    BUFGCTRL_X0Y16       BUFG (Prop_bufg_I_O)         0.091     7.168 r  u_bufg_clkout/O
+                         net (fo=5582, routed)        1.542     8.711    u_soc/u_ascon/u_mode_ctrl/clk_100mhz
+    SLICE_X4Y21          FDCE                                         r  u_soc/u_ascon/u_mode_ctrl/perm_in_x2_reg[50]/C
+                         clock pessimism              0.487     9.198    
+                         clock uncertainty           -0.071     9.127    
+    SLICE_X4Y21          FDCE (Setup_fdce_C_D)        0.081     9.208    u_soc/u_ascon/u_mode_ctrl/perm_in_x2_reg[50]
+  -------------------------------------------------------------------
+                         required time                          9.208    
+                         arrival time                          -7.693    
+  -------------------------------------------------------------------
+                         slack                                  1.515    
+
+Slack (MET) :             1.530ns  (required time - arrival time)
+  Source:                 u_soc/u_ascon/u_mode_ctrl/state_reg_reg[1]_rep/C
+                            (rising edge-triggered cell FDCE clocked by clk_100mhz_unbuf  {rise@0.000ns fall@5.000ns period=10.000ns})
+  Destination:            u_soc/u_ascon/u_mode_ctrl/perm_in_x2_reg[48]/D
+                            (rising edge-triggered cell FDCE clocked by clk_100mhz_unbuf  {rise@0.000ns fall@5.000ns period=10.000ns})
+  Path Group:             clk_100mhz_unbuf
+  Path Type:              Setup (Max at Slow Process Corner)
+  Requirement:            10.000ns  (clk_100mhz_unbuf rise@10.000ns - clk_100mhz_unbuf rise@0.000ns)
+  Data Path Delay:        8.226ns  (logic 0.704ns (8.558%)  route 7.522ns (91.442%))
+  Logic Levels:           2  (LUT5=1 LUT6=1)
+  Clock Path Skew:        -0.202ns (DCD - SCD + CPR)
+    Destination Clock Delay (DCD):    -1.292ns = ( 8.708 - 10.000 ) 
+    Source Clock Delay      (SCD):    -0.603ns
+    Clock Pessimism Removal (CPR):    0.487ns
+  Clock Uncertainty:      0.071ns  ((TSJ^2 + DJ^2)^1/2) / 2 + PE
+    Total System Jitter     (TSJ):    0.071ns
+    Discrete Jitter          (DJ):    0.123ns
+    Phase Error              (PE):    0.000ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock clk_100mhz_unbuf rise edge)
+                                                      0.000     0.000 r  
+    K17                                               0.000     0.000 r  clk_125mhz (IN)
+                         net (fo=0)                   0.000     0.000    clk_125mhz
+    K17                  IBUF (Prop_ibuf_I_O)         1.492     1.492 r  clk_125mhz_IBUF_inst/O
+                         net (fo=1, routed)           1.285     2.777    clk_125mhz_IBUF
+    MMCME2_ADV_X0Y1      MMCME2_ADV (Prop_mmcme2_adv_CLKIN1_CLKOUT0)
+                                                     -6.996    -4.219 r  u_mmcm/CLKOUT0
+                         net (fo=1, routed)           1.760    -2.459    clk_100mhz_unbuf
+    BUFGCTRL_X0Y16       BUFG (Prop_bufg_I_O)         0.101    -2.358 r  u_bufg_clkout/O
+                         net (fo=5582, routed)        1.755    -0.603    u_soc/u_ascon/u_mode_ctrl/clk_100mhz
+    SLICE_X37Y6          FDCE                                         r  u_soc/u_ascon/u_mode_ctrl/state_reg_reg[1]_rep/C
+  -------------------------------------------------------------------    -------------------
+    SLICE_X37Y6          FDCE (Prop_fdce_C_Q)         0.456    -0.147 f  u_soc/u_ascon/u_mode_ctrl/state_reg_reg[1]_rep/Q
+                         net (fo=108, routed)         6.401     6.253    u_soc/u_ascon/u_mode_ctrl/state_reg_reg[1]_rep_n_0
+    SLICE_X4Y27          LUT5 (Prop_lut5_I2_O)        0.124     6.377 r  u_soc/u_ascon/u_mode_ctrl/perm_in_x2[48]_i_2/O
+                         net (fo=1, routed)           1.121     7.499    u_soc/u_ascon/u_mode_ctrl/perm_in_x2[48]_i_2_n_0
+    SLICE_X2Y23          LUT6 (Prop_lut6_I3_O)        0.124     7.623 r  u_soc/u_ascon/u_mode_ctrl/perm_in_x2[48]_i_1/O
+                         net (fo=1, routed)           0.000     7.623    u_soc/u_ascon/u_mode_ctrl/perm_in_x2[48]
+    SLICE_X2Y23          FDCE                                         r  u_soc/u_ascon/u_mode_ctrl/perm_in_x2_reg[48]/D
+  -------------------------------------------------------------------    -------------------
+
+                         (clock clk_100mhz_unbuf rise edge)
+                                                     10.000    10.000 r  
+    K17                                               0.000    10.000 r  clk_125mhz (IN)
+                         net (fo=0)                   0.000    10.000    clk_125mhz
+    K17                  IBUF (Prop_ibuf_I_O)         1.421    11.421 r  clk_125mhz_IBUF_inst/O
+                         net (fo=1, routed)           1.162    12.583    clk_125mhz_IBUF
+    MMCME2_ADV_X0Y1      MMCME2_ADV (Prop_mmcme2_adv_CLKIN1_CLKOUT0)
+                                                     -7.105     5.478 r  u_mmcm/CLKOUT0
+                         net (fo=1, routed)           1.599     7.077    clk_100mhz_unbuf
+    BUFGCTRL_X0Y16       BUFG (Prop_bufg_I_O)         0.091     7.168 r  u_bufg_clkout/O
+                         net (fo=5582, routed)        1.539     8.708    u_soc/u_ascon/u_mode_ctrl/clk_100mhz
+    SLICE_X2Y23          FDCE                                         r  u_soc/u_ascon/u_mode_ctrl/perm_in_x2_reg[48]/C
+                         clock pessimism              0.487     9.195    
+                         clock uncertainty           -0.071     9.124    
+    SLICE_X2Y23          FDCE (Setup_fdce_C_D)        0.029     9.153    u_soc/u_ascon/u_mode_ctrl/perm_in_x2_reg[48]
+  -------------------------------------------------------------------
+                         required time                          9.153    
+                         arrival time                          -7.623    
+  -------------------------------------------------------------------
+                         slack                                  1.530    
+
+Slack (MET) :             1.575ns  (required time - arrival time)
   Source:                 u_soc/u_ascon/u_boot_ctrl/FSM_sequential_state_q_reg[2]/C
                             (rising edge-triggered cell FDCE clocked by clk_100mhz_unbuf  {rise@0.000ns fall@5.000ns period=10.000ns})
   Destination:            u_soc/u_cpu/picorv32_core/reg_out_reg[3]/D
@@ -310,7 +438,7 @@ Slack (MET) :             1.635ns  (required time - arrival time)
   Path Group:             clk_100mhz_unbuf
   Path Type:              Setup (Max at Slow Process Corner)
   Requirement:            10.000ns  (clk_100mhz_unbuf rise@10.000ns - clk_100mhz_unbuf rise@0.000ns)
-  Data Path Delay:        8.234ns  (logic 1.627ns (19.759%)  route 6.607ns (80.241%))
+  Data Path Delay:        8.294ns  (logic 1.627ns (19.617%)  route 6.667ns (80.383%))
   Logic Levels:           6  (LUT4=1 LUT5=2 LUT6=3)
   Clock Path Skew:        -0.137ns (DCD - SCD + CPR)
     Destination Clock Delay (DCD):    -1.342ns = ( 8.658 - 10.000 ) 
@@ -337,19 +465,19 @@ Slack (MET) :             1.635ns  (required time - arrival time)
     SLICE_X38Y21         FDCE                                         r  u_soc/u_ascon/u_boot_ctrl/FSM_sequential_state_q_reg[2]/C
   -------------------------------------------------------------------    -------------------
     SLICE_X38Y21         FDCE (Prop_fdce_C_Q)         0.478    -0.139 r  u_soc/u_ascon/u_boot_ctrl/FSM_sequential_state_q_reg[2]/Q
-                         net (fo=17, routed)          1.920     1.780    u_soc/u_ascon/u_boot_ctrl/p_7_in[10]
-    SLICE_X22Y33         LUT6 (Prop_lut6_I1_O)        0.301     2.081 r  u_soc/u_ascon/u_boot_ctrl/mem_rdata_q[5]_i_9/O
-                         net (fo=2, routed)           0.672     2.753    u_soc/u_ascon/u_boot_ctrl/mem_rdata_q[5]_i_9_n_0
-    SLICE_X22Y33         LUT5 (Prop_lut5_I4_O)        0.150     2.903 r  u_soc/u_ascon/u_boot_ctrl/mem_rdata_q[5]_i_5/O
-                         net (fo=2, routed)           1.039     3.942    u_soc/u_cpu/picorv32_core/mem_rdata_q_reg[31]_2
-    SLICE_X32Y24         LUT6 (Prop_lut6_I1_O)        0.326     4.268 f  u_soc/u_cpu/picorv32_core/mem_rdata_q[5]_i_2/O
-                         net (fo=35, routed)          1.086     5.354    u_soc/u_cpu/picorv32_core/mem_rdata_q[5]_i_2_n_0
-    SLICE_X23Y29         LUT5 (Prop_lut5_I0_O)        0.124     5.478 r  u_soc/u_cpu/picorv32_core/mem_rdata_q[27]_i_1/O
-                         net (fo=5, routed)           1.286     6.764    u_soc/u_cpu/picorv32_core/axi_rdata[27]
-    SLICE_X32Y27         LUT6 (Prop_lut6_I0_O)        0.124     6.888 r  u_soc/u_cpu/picorv32_core/reg_out[3]_i_3/O
-                         net (fo=1, routed)           0.605     7.493    u_soc/u_cpu/picorv32_core/reg_out[3]_i_3_n_0
-    SLICE_X32Y27         LUT4 (Prop_lut4_I1_O)        0.124     7.617 r  u_soc/u_cpu/picorv32_core/reg_out[3]_i_1/O
-                         net (fo=1, routed)           0.000     7.617    u_soc/u_cpu/picorv32_core/reg_out[3]
+                         net (fo=17, routed)          1.979     1.840    u_soc/u_ascon/u_boot_ctrl/p_7_in[10]
+    SLICE_X22Y33         LUT6 (Prop_lut6_I1_O)        0.301     2.141 r  u_soc/u_ascon/u_boot_ctrl/mem_rdata_q[5]_i_9/O
+                         net (fo=2, routed)           0.672     2.813    u_soc/u_ascon/u_boot_ctrl/mem_rdata_q[5]_i_9_n_0
+    SLICE_X22Y33         LUT5 (Prop_lut5_I4_O)        0.150     2.963 r  u_soc/u_ascon/u_boot_ctrl/mem_rdata_q[5]_i_5/O
+                         net (fo=2, routed)           1.039     4.001    u_soc/u_cpu/picorv32_core/mem_rdata_q_reg[31]_2
+    SLICE_X32Y24         LUT6 (Prop_lut6_I1_O)        0.326     4.327 f  u_soc/u_cpu/picorv32_core/mem_rdata_q[5]_i_2/O
+                         net (fo=35, routed)          1.086     5.413    u_soc/u_cpu/picorv32_core/mem_rdata_q[5]_i_2_n_0
+    SLICE_X23Y29         LUT5 (Prop_lut5_I0_O)        0.124     5.537 r  u_soc/u_cpu/picorv32_core/mem_rdata_q[27]_i_1/O
+                         net (fo=5, routed)           1.286     6.823    u_soc/u_cpu/picorv32_core/axi_rdata[27]
+    SLICE_X32Y27         LUT6 (Prop_lut6_I0_O)        0.124     6.947 r  u_soc/u_cpu/picorv32_core/reg_out[3]_i_3/O
+                         net (fo=1, routed)           0.605     7.553    u_soc/u_cpu/picorv32_core/reg_out[3]_i_3_n_0
+    SLICE_X32Y27         LUT4 (Prop_lut4_I1_O)        0.124     7.677 r  u_soc/u_cpu/picorv32_core/reg_out[3]_i_1/O
+                         net (fo=1, routed)           0.000     7.677    u_soc/u_cpu/picorv32_core/reg_out[3]
     SLICE_X32Y27         FDRE                                         r  u_soc/u_cpu/picorv32_core/reg_out_reg[3]/D
   -------------------------------------------------------------------    -------------------
 
@@ -370,11 +498,11 @@ Slack (MET) :             1.635ns  (required time - arrival time)
     SLICE_X32Y27         FDRE (Setup_fdre_C_D)        0.077     9.252    u_soc/u_cpu/picorv32_core/reg_out_reg[3]
   -------------------------------------------------------------------
                          required time                          9.252    
-                         arrival time                          -7.617    
+                         arrival time                          -7.677    
   -------------------------------------------------------------------
-                         slack                                  1.635    
+                         slack                                  1.575    
 
-Slack (MET) :             1.684ns  (required time - arrival time)
+Slack (MET) :             1.670ns  (required time - arrival time)
   Source:                 u_soc/u_ascon/u_mode_ctrl/r_bytes_left_reg[30]/C
                             (rising edge-triggered cell FDCE clocked by clk_100mhz_unbuf  {rise@0.000ns fall@5.000ns period=10.000ns})
   Destination:            u_soc/u_ascon/u_mode_ctrl/perm_in_x3_reg[56]/CE
@@ -382,7 +510,7 @@ Slack (MET) :             1.684ns  (required time - arrival time)
   Path Group:             clk_100mhz_unbuf
   Path Type:              Setup (Max at Slow Process Corner)
   Requirement:            10.000ns  (clk_100mhz_unbuf rise@10.000ns - clk_100mhz_unbuf rise@0.000ns)
-  Data Path Delay:        7.879ns  (logic 1.498ns (19.011%)  route 6.381ns (80.989%))
+  Data Path Delay:        7.894ns  (logic 1.498ns (18.977%)  route 6.396ns (81.023%))
   Logic Levels:           6  (LUT3=1 LUT4=1 LUT6=4)
   Clock Path Skew:        -0.161ns (DCD - SCD + CPR)
     Destination Clock Delay (DCD):    -1.334ns = ( 8.666 - 10.000 ) 
@@ -415,13 +543,13 @@ Slack (MET) :             1.684ns  (required time - arrival time)
     SLICE_X38Y14         LUT6 (Prop_lut6_I2_O)        0.332     1.883 f  u_soc/u_ascon/u_mode_ctrl/s1[63]_i_7/O
                          net (fo=4, routed)           0.782     2.665    u_soc/u_ascon/u_mode_ctrl/s1[63]_i_7_n_0
     SLICE_X34Y12         LUT6 (Prop_lut6_I5_O)        0.124     2.789 r  u_soc/u_ascon/u_mode_ctrl/s1[63]_i_4/O
-                         net (fo=154, routed)         0.878     3.666    u_soc/u_ascon/u_mode_ctrl/s1[63]_i_4_n_0
-    SLICE_X33Y8          LUT4 (Prop_lut4_I2_O)        0.124     3.790 r  u_soc/u_ascon/u_mode_ctrl/perm_running_i_8/O
-                         net (fo=2, routed)           0.441     4.231    u_soc/u_ascon/u_mode_ctrl/gen_perm_1r.u_perm/perm_start_reg_2
-    SLICE_X31Y8          LUT6 (Prop_lut6_I5_O)        0.124     4.355 f  u_soc/u_ascon/u_mode_ctrl/gen_perm_1r.u_perm/perm_start_i_4/O
-                         net (fo=1, routed)           0.490     4.845    u_soc/u_ascon/u_mode_ctrl/gen_perm_1r.u_perm/perm_start_i_4_n_0
-    SLICE_X31Y14         LUT6 (Prop_lut6_I5_O)        0.124     4.969 r  u_soc/u_ascon/u_mode_ctrl/gen_perm_1r.u_perm/perm_start_i_1/O
-                         net (fo=322, routed)         2.225     7.193    u_soc/u_ascon/u_mode_ctrl/gen_perm_1r.u_perm_n_0
+                         net (fo=154, routed)         0.892     3.680    u_soc/u_ascon/u_mode_ctrl/s1[63]_i_4_n_0
+    SLICE_X33Y8          LUT4 (Prop_lut4_I2_O)        0.124     3.804 r  u_soc/u_ascon/u_mode_ctrl/perm_running_i_8/O
+                         net (fo=2, routed)           0.441     4.245    u_soc/u_ascon/u_mode_ctrl/gen_perm_1r.u_perm/perm_start_reg_2
+    SLICE_X31Y8          LUT6 (Prop_lut6_I5_O)        0.124     4.369 f  u_soc/u_ascon/u_mode_ctrl/gen_perm_1r.u_perm/perm_start_i_4/O
+                         net (fo=1, routed)           0.490     4.859    u_soc/u_ascon/u_mode_ctrl/gen_perm_1r.u_perm/perm_start_i_4_n_0
+    SLICE_X31Y14         LUT6 (Prop_lut6_I5_O)        0.124     4.983 r  u_soc/u_ascon/u_mode_ctrl/gen_perm_1r.u_perm/perm_start_i_1/O
+                         net (fo=322, routed)         2.225     7.207    u_soc/u_ascon/u_mode_ctrl/gen_perm_1r.u_perm_n_0
     SLICE_X7Y28          FDCE                                         r  u_soc/u_ascon/u_mode_ctrl/perm_in_x3_reg[56]/CE
   -------------------------------------------------------------------    -------------------
 
@@ -442,305 +570,19 @@ Slack (MET) :             1.684ns  (required time - arrival time)
     SLICE_X7Y28          FDCE (Setup_fdce_C_CE)      -0.205     8.877    u_soc/u_ascon/u_mode_ctrl/perm_in_x3_reg[56]
   -------------------------------------------------------------------
                          required time                          8.877    
-                         arrival time                          -7.193    
+                         arrival time                          -7.207    
   -------------------------------------------------------------------
-                         slack                                  1.684    
+                         slack                                  1.670    
 
-Slack (MET) :             1.728ns  (required time - arrival time)
-  Source:                 u_soc/u_ascon/u_mode_ctrl/r_bytes_left_reg[30]/C
-                            (rising edge-triggered cell FDCE clocked by clk_100mhz_unbuf  {rise@0.000ns fall@5.000ns period=10.000ns})
-  Destination:            u_soc/u_ascon/u_mode_ctrl/perm_in_x2_reg[52]/CE
-                            (rising edge-triggered cell FDCE clocked by clk_100mhz_unbuf  {rise@0.000ns fall@5.000ns period=10.000ns})
-  Path Group:             clk_100mhz_unbuf
-  Path Type:              Setup (Max at Slow Process Corner)
-  Requirement:            10.000ns  (clk_100mhz_unbuf rise@10.000ns - clk_100mhz_unbuf rise@0.000ns)
-  Data Path Delay:        7.876ns  (logic 1.498ns (19.021%)  route 6.378ns (80.979%))
-  Logic Levels:           6  (LUT3=1 LUT4=1 LUT6=4)
-  Clock Path Skew:        -0.121ns (DCD - SCD + CPR)
-    Destination Clock Delay (DCD):    -1.294ns = ( 8.706 - 10.000 ) 
-    Source Clock Delay      (SCD):    -0.686ns
-    Clock Pessimism Removal (CPR):    0.487ns
-  Clock Uncertainty:      0.071ns  ((TSJ^2 + DJ^2)^1/2) / 2 + PE
-    Total System Jitter     (TSJ):    0.071ns
-    Discrete Jitter          (DJ):    0.123ns
-    Phase Error              (PE):    0.000ns
-
-    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
-  -------------------------------------------------------------------    -------------------
-                         (clock clk_100mhz_unbuf rise edge)
-                                                      0.000     0.000 r  
-    K17                                               0.000     0.000 r  clk_125mhz (IN)
-                         net (fo=0)                   0.000     0.000    clk_125mhz
-    K17                  IBUF (Prop_ibuf_I_O)         1.492     1.492 r  clk_125mhz_IBUF_inst/O
-                         net (fo=1, routed)           1.285     2.777    clk_125mhz_IBUF
-    MMCME2_ADV_X0Y1      MMCME2_ADV (Prop_mmcme2_adv_CLKIN1_CLKOUT0)
-                                                     -6.996    -4.219 r  u_mmcm/CLKOUT0
-                         net (fo=1, routed)           1.760    -2.459    clk_100mhz_unbuf
-    BUFGCTRL_X0Y16       BUFG (Prop_bufg_I_O)         0.101    -2.358 r  u_bufg_clkout/O
-                         net (fo=5582, routed)        1.672    -0.686    u_soc/u_ascon/u_mode_ctrl/clk_100mhz
-    SLICE_X34Y13         FDCE                                         r  u_soc/u_ascon/u_mode_ctrl/r_bytes_left_reg[30]/C
-  -------------------------------------------------------------------    -------------------
-    SLICE_X34Y13         FDCE (Prop_fdce_C_Q)         0.518    -0.168 r  u_soc/u_ascon/u_mode_ctrl/r_bytes_left_reg[30]/Q
-                         net (fo=4, routed)           0.884     0.716    u_soc/u_ascon/u_mode_ctrl/r_bytes_left_reg_n_0_[30]
-    SLICE_X36Y15         LUT3 (Prop_lut3_I1_O)        0.152     0.868 r  u_soc/u_ascon/u_mode_ctrl/s1[63]_i_14/O
-                         net (fo=1, routed)           0.683     1.551    u_soc/u_ascon/u_mode_ctrl/s1[63]_i_14_n_0
-    SLICE_X38Y14         LUT6 (Prop_lut6_I2_O)        0.332     1.883 f  u_soc/u_ascon/u_mode_ctrl/s1[63]_i_7/O
-                         net (fo=4, routed)           0.782     2.665    u_soc/u_ascon/u_mode_ctrl/s1[63]_i_7_n_0
-    SLICE_X34Y12         LUT6 (Prop_lut6_I5_O)        0.124     2.789 r  u_soc/u_ascon/u_mode_ctrl/s1[63]_i_4/O
-                         net (fo=154, routed)         0.878     3.666    u_soc/u_ascon/u_mode_ctrl/s1[63]_i_4_n_0
-    SLICE_X33Y8          LUT4 (Prop_lut4_I2_O)        0.124     3.790 r  u_soc/u_ascon/u_mode_ctrl/perm_running_i_8/O
-                         net (fo=2, routed)           0.441     4.231    u_soc/u_ascon/u_mode_ctrl/gen_perm_1r.u_perm/perm_start_reg_2
-    SLICE_X31Y8          LUT6 (Prop_lut6_I5_O)        0.124     4.355 f  u_soc/u_ascon/u_mode_ctrl/gen_perm_1r.u_perm/perm_start_i_4/O
-                         net (fo=1, routed)           0.490     4.845    u_soc/u_ascon/u_mode_ctrl/gen_perm_1r.u_perm/perm_start_i_4_n_0
-    SLICE_X31Y14         LUT6 (Prop_lut6_I5_O)        0.124     4.969 r  u_soc/u_ascon/u_mode_ctrl/gen_perm_1r.u_perm/perm_start_i_1/O
-                         net (fo=322, routed)         2.221     7.189    u_soc/u_ascon/u_mode_ctrl/gen_perm_1r.u_perm_n_0
-    SLICE_X3Y24          FDCE                                         r  u_soc/u_ascon/u_mode_ctrl/perm_in_x2_reg[52]/CE
-  -------------------------------------------------------------------    -------------------
-
-                         (clock clk_100mhz_unbuf rise edge)
-                                                     10.000    10.000 r  
-    K17                                               0.000    10.000 r  clk_125mhz (IN)
-                         net (fo=0)                   0.000    10.000    clk_125mhz
-    K17                  IBUF (Prop_ibuf_I_O)         1.421    11.421 r  clk_125mhz_IBUF_inst/O
-                         net (fo=1, routed)           1.162    12.583    clk_125mhz_IBUF
-    MMCME2_ADV_X0Y1      MMCME2_ADV (Prop_mmcme2_adv_CLKIN1_CLKOUT0)
-                                                     -7.105     5.478 r  u_mmcm/CLKOUT0
-                         net (fo=1, routed)           1.599     7.077    clk_100mhz_unbuf
-    BUFGCTRL_X0Y16       BUFG (Prop_bufg_I_O)         0.091     7.168 r  u_bufg_clkout/O
-                         net (fo=5582, routed)        1.537     8.706    u_soc/u_ascon/u_mode_ctrl/clk_100mhz
-    SLICE_X3Y24          FDCE                                         r  u_soc/u_ascon/u_mode_ctrl/perm_in_x2_reg[52]/C
-                         clock pessimism              0.487     9.193    
-                         clock uncertainty           -0.071     9.122    
-    SLICE_X3Y24          FDCE (Setup_fdce_C_CE)      -0.205     8.917    u_soc/u_ascon/u_mode_ctrl/perm_in_x2_reg[52]
-  -------------------------------------------------------------------
-                         required time                          8.917    
-                         arrival time                          -7.189    
-  -------------------------------------------------------------------
-                         slack                                  1.728    
-
-Slack (MET) :             1.728ns  (required time - arrival time)
-  Source:                 u_soc/u_ascon/u_mode_ctrl/r_bytes_left_reg[30]/C
-                            (rising edge-triggered cell FDCE clocked by clk_100mhz_unbuf  {rise@0.000ns fall@5.000ns period=10.000ns})
-  Destination:            u_soc/u_ascon/u_mode_ctrl/perm_in_x2_reg[61]/CE
-                            (rising edge-triggered cell FDCE clocked by clk_100mhz_unbuf  {rise@0.000ns fall@5.000ns period=10.000ns})
-  Path Group:             clk_100mhz_unbuf
-  Path Type:              Setup (Max at Slow Process Corner)
-  Requirement:            10.000ns  (clk_100mhz_unbuf rise@10.000ns - clk_100mhz_unbuf rise@0.000ns)
-  Data Path Delay:        7.876ns  (logic 1.498ns (19.021%)  route 6.378ns (80.979%))
-  Logic Levels:           6  (LUT3=1 LUT4=1 LUT6=4)
-  Clock Path Skew:        -0.121ns (DCD - SCD + CPR)
-    Destination Clock Delay (DCD):    -1.294ns = ( 8.706 - 10.000 ) 
-    Source Clock Delay      (SCD):    -0.686ns
-    Clock Pessimism Removal (CPR):    0.487ns
-  Clock Uncertainty:      0.071ns  ((TSJ^2 + DJ^2)^1/2) / 2 + PE
-    Total System Jitter     (TSJ):    0.071ns
-    Discrete Jitter          (DJ):    0.123ns
-    Phase Error              (PE):    0.000ns
-
-    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
-  -------------------------------------------------------------------    -------------------
-                         (clock clk_100mhz_unbuf rise edge)
-                                                      0.000     0.000 r  
-    K17                                               0.000     0.000 r  clk_125mhz (IN)
-                         net (fo=0)                   0.000     0.000    clk_125mhz
-    K17                  IBUF (Prop_ibuf_I_O)         1.492     1.492 r  clk_125mhz_IBUF_inst/O
-                         net (fo=1, routed)           1.285     2.777    clk_125mhz_IBUF
-    MMCME2_ADV_X0Y1      MMCME2_ADV (Prop_mmcme2_adv_CLKIN1_CLKOUT0)
-                                                     -6.996    -4.219 r  u_mmcm/CLKOUT0
-                         net (fo=1, routed)           1.760    -2.459    clk_100mhz_unbuf
-    BUFGCTRL_X0Y16       BUFG (Prop_bufg_I_O)         0.101    -2.358 r  u_bufg_clkout/O
-                         net (fo=5582, routed)        1.672    -0.686    u_soc/u_ascon/u_mode_ctrl/clk_100mhz
-    SLICE_X34Y13         FDCE                                         r  u_soc/u_ascon/u_mode_ctrl/r_bytes_left_reg[30]/C
-  -------------------------------------------------------------------    -------------------
-    SLICE_X34Y13         FDCE (Prop_fdce_C_Q)         0.518    -0.168 r  u_soc/u_ascon/u_mode_ctrl/r_bytes_left_reg[30]/Q
-                         net (fo=4, routed)           0.884     0.716    u_soc/u_ascon/u_mode_ctrl/r_bytes_left_reg_n_0_[30]
-    SLICE_X36Y15         LUT3 (Prop_lut3_I1_O)        0.152     0.868 r  u_soc/u_ascon/u_mode_ctrl/s1[63]_i_14/O
-                         net (fo=1, routed)           0.683     1.551    u_soc/u_ascon/u_mode_ctrl/s1[63]_i_14_n_0
-    SLICE_X38Y14         LUT6 (Prop_lut6_I2_O)        0.332     1.883 f  u_soc/u_ascon/u_mode_ctrl/s1[63]_i_7/O
-                         net (fo=4, routed)           0.782     2.665    u_soc/u_ascon/u_mode_ctrl/s1[63]_i_7_n_0
-    SLICE_X34Y12         LUT6 (Prop_lut6_I5_O)        0.124     2.789 r  u_soc/u_ascon/u_mode_ctrl/s1[63]_i_4/O
-                         net (fo=154, routed)         0.878     3.666    u_soc/u_ascon/u_mode_ctrl/s1[63]_i_4_n_0
-    SLICE_X33Y8          LUT4 (Prop_lut4_I2_O)        0.124     3.790 r  u_soc/u_ascon/u_mode_ctrl/perm_running_i_8/O
-                         net (fo=2, routed)           0.441     4.231    u_soc/u_ascon/u_mode_ctrl/gen_perm_1r.u_perm/perm_start_reg_2
-    SLICE_X31Y8          LUT6 (Prop_lut6_I5_O)        0.124     4.355 f  u_soc/u_ascon/u_mode_ctrl/gen_perm_1r.u_perm/perm_start_i_4/O
-                         net (fo=1, routed)           0.490     4.845    u_soc/u_ascon/u_mode_ctrl/gen_perm_1r.u_perm/perm_start_i_4_n_0
-    SLICE_X31Y14         LUT6 (Prop_lut6_I5_O)        0.124     4.969 r  u_soc/u_ascon/u_mode_ctrl/gen_perm_1r.u_perm/perm_start_i_1/O
-                         net (fo=322, routed)         2.221     7.189    u_soc/u_ascon/u_mode_ctrl/gen_perm_1r.u_perm_n_0
-    SLICE_X3Y24          FDCE                                         r  u_soc/u_ascon/u_mode_ctrl/perm_in_x2_reg[61]/CE
-  -------------------------------------------------------------------    -------------------
-
-                         (clock clk_100mhz_unbuf rise edge)
-                                                     10.000    10.000 r  
-    K17                                               0.000    10.000 r  clk_125mhz (IN)
-                         net (fo=0)                   0.000    10.000    clk_125mhz
-    K17                  IBUF (Prop_ibuf_I_O)         1.421    11.421 r  clk_125mhz_IBUF_inst/O
-                         net (fo=1, routed)           1.162    12.583    clk_125mhz_IBUF
-    MMCME2_ADV_X0Y1      MMCME2_ADV (Prop_mmcme2_adv_CLKIN1_CLKOUT0)
-                                                     -7.105     5.478 r  u_mmcm/CLKOUT0
-                         net (fo=1, routed)           1.599     7.077    clk_100mhz_unbuf
-    BUFGCTRL_X0Y16       BUFG (Prop_bufg_I_O)         0.091     7.168 r  u_bufg_clkout/O
-                         net (fo=5582, routed)        1.537     8.706    u_soc/u_ascon/u_mode_ctrl/clk_100mhz
-    SLICE_X3Y24          FDCE                                         r  u_soc/u_ascon/u_mode_ctrl/perm_in_x2_reg[61]/C
-                         clock pessimism              0.487     9.193    
-                         clock uncertainty           -0.071     9.122    
-    SLICE_X3Y24          FDCE (Setup_fdce_C_CE)      -0.205     8.917    u_soc/u_ascon/u_mode_ctrl/perm_in_x2_reg[61]
-  -------------------------------------------------------------------
-                         required time                          8.917    
-                         arrival time                          -7.189    
-  -------------------------------------------------------------------
-                         slack                                  1.728    
-
-Slack (MET) :             1.728ns  (required time - arrival time)
-  Source:                 u_soc/u_ascon/u_mode_ctrl/r_bytes_left_reg[30]/C
-                            (rising edge-triggered cell FDCE clocked by clk_100mhz_unbuf  {rise@0.000ns fall@5.000ns period=10.000ns})
-  Destination:            u_soc/u_ascon/u_mode_ctrl/perm_in_x3_reg[45]/CE
-                            (rising edge-triggered cell FDCE clocked by clk_100mhz_unbuf  {rise@0.000ns fall@5.000ns period=10.000ns})
-  Path Group:             clk_100mhz_unbuf
-  Path Type:              Setup (Max at Slow Process Corner)
-  Requirement:            10.000ns  (clk_100mhz_unbuf rise@10.000ns - clk_100mhz_unbuf rise@0.000ns)
-  Data Path Delay:        7.876ns  (logic 1.498ns (19.021%)  route 6.378ns (80.979%))
-  Logic Levels:           6  (LUT3=1 LUT4=1 LUT6=4)
-  Clock Path Skew:        -0.121ns (DCD - SCD + CPR)
-    Destination Clock Delay (DCD):    -1.294ns = ( 8.706 - 10.000 ) 
-    Source Clock Delay      (SCD):    -0.686ns
-    Clock Pessimism Removal (CPR):    0.487ns
-  Clock Uncertainty:      0.071ns  ((TSJ^2 + DJ^2)^1/2) / 2 + PE
-    Total System Jitter     (TSJ):    0.071ns
-    Discrete Jitter          (DJ):    0.123ns
-    Phase Error              (PE):    0.000ns
-
-    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
-  -------------------------------------------------------------------    -------------------
-                         (clock clk_100mhz_unbuf rise edge)
-                                                      0.000     0.000 r  
-    K17                                               0.000     0.000 r  clk_125mhz (IN)
-                         net (fo=0)                   0.000     0.000    clk_125mhz
-    K17                  IBUF (Prop_ibuf_I_O)         1.492     1.492 r  clk_125mhz_IBUF_inst/O
-                         net (fo=1, routed)           1.285     2.777    clk_125mhz_IBUF
-    MMCME2_ADV_X0Y1      MMCME2_ADV (Prop_mmcme2_adv_CLKIN1_CLKOUT0)
-                                                     -6.996    -4.219 r  u_mmcm/CLKOUT0
-                         net (fo=1, routed)           1.760    -2.459    clk_100mhz_unbuf
-    BUFGCTRL_X0Y16       BUFG (Prop_bufg_I_O)         0.101    -2.358 r  u_bufg_clkout/O
-                         net (fo=5582, routed)        1.672    -0.686    u_soc/u_ascon/u_mode_ctrl/clk_100mhz
-    SLICE_X34Y13         FDCE                                         r  u_soc/u_ascon/u_mode_ctrl/r_bytes_left_reg[30]/C
-  -------------------------------------------------------------------    -------------------
-    SLICE_X34Y13         FDCE (Prop_fdce_C_Q)         0.518    -0.168 r  u_soc/u_ascon/u_mode_ctrl/r_bytes_left_reg[30]/Q
-                         net (fo=4, routed)           0.884     0.716    u_soc/u_ascon/u_mode_ctrl/r_bytes_left_reg_n_0_[30]
-    SLICE_X36Y15         LUT3 (Prop_lut3_I1_O)        0.152     0.868 r  u_soc/u_ascon/u_mode_ctrl/s1[63]_i_14/O
-                         net (fo=1, routed)           0.683     1.551    u_soc/u_ascon/u_mode_ctrl/s1[63]_i_14_n_0
-    SLICE_X38Y14         LUT6 (Prop_lut6_I2_O)        0.332     1.883 f  u_soc/u_ascon/u_mode_ctrl/s1[63]_i_7/O
-                         net (fo=4, routed)           0.782     2.665    u_soc/u_ascon/u_mode_ctrl/s1[63]_i_7_n_0
-    SLICE_X34Y12         LUT6 (Prop_lut6_I5_O)        0.124     2.789 r  u_soc/u_ascon/u_mode_ctrl/s1[63]_i_4/O
-                         net (fo=154, routed)         0.878     3.666    u_soc/u_ascon/u_mode_ctrl/s1[63]_i_4_n_0
-    SLICE_X33Y8          LUT4 (Prop_lut4_I2_O)        0.124     3.790 r  u_soc/u_ascon/u_mode_ctrl/perm_running_i_8/O
-                         net (fo=2, routed)           0.441     4.231    u_soc/u_ascon/u_mode_ctrl/gen_perm_1r.u_perm/perm_start_reg_2
-    SLICE_X31Y8          LUT6 (Prop_lut6_I5_O)        0.124     4.355 f  u_soc/u_ascon/u_mode_ctrl/gen_perm_1r.u_perm/perm_start_i_4/O
-                         net (fo=1, routed)           0.490     4.845    u_soc/u_ascon/u_mode_ctrl/gen_perm_1r.u_perm/perm_start_i_4_n_0
-    SLICE_X31Y14         LUT6 (Prop_lut6_I5_O)        0.124     4.969 r  u_soc/u_ascon/u_mode_ctrl/gen_perm_1r.u_perm/perm_start_i_1/O
-                         net (fo=322, routed)         2.221     7.189    u_soc/u_ascon/u_mode_ctrl/gen_perm_1r.u_perm_n_0
-    SLICE_X3Y24          FDCE                                         r  u_soc/u_ascon/u_mode_ctrl/perm_in_x3_reg[45]/CE
-  -------------------------------------------------------------------    -------------------
-
-                         (clock clk_100mhz_unbuf rise edge)
-                                                     10.000    10.000 r  
-    K17                                               0.000    10.000 r  clk_125mhz (IN)
-                         net (fo=0)                   0.000    10.000    clk_125mhz
-    K17                  IBUF (Prop_ibuf_I_O)         1.421    11.421 r  clk_125mhz_IBUF_inst/O
-                         net (fo=1, routed)           1.162    12.583    clk_125mhz_IBUF
-    MMCME2_ADV_X0Y1      MMCME2_ADV (Prop_mmcme2_adv_CLKIN1_CLKOUT0)
-                                                     -7.105     5.478 r  u_mmcm/CLKOUT0
-                         net (fo=1, routed)           1.599     7.077    clk_100mhz_unbuf
-    BUFGCTRL_X0Y16       BUFG (Prop_bufg_I_O)         0.091     7.168 r  u_bufg_clkout/O
-                         net (fo=5582, routed)        1.537     8.706    u_soc/u_ascon/u_mode_ctrl/clk_100mhz
-    SLICE_X3Y24          FDCE                                         r  u_soc/u_ascon/u_mode_ctrl/perm_in_x3_reg[45]/C
-                         clock pessimism              0.487     9.193    
-                         clock uncertainty           -0.071     9.122    
-    SLICE_X3Y24          FDCE (Setup_fdce_C_CE)      -0.205     8.917    u_soc/u_ascon/u_mode_ctrl/perm_in_x3_reg[45]
-  -------------------------------------------------------------------
-                         required time                          8.917    
-                         arrival time                          -7.189    
-  -------------------------------------------------------------------
-                         slack                                  1.728    
-
-Slack (MET) :             1.743ns  (required time - arrival time)
+Slack (MET) :             1.677ns  (required time - arrival time)
   Source:                 u_soc/u_ascon/u_boot_ctrl/FSM_sequential_state_q_reg[2]/C
                             (rising edge-triggered cell FDCE clocked by clk_100mhz_unbuf  {rise@0.000ns fall@5.000ns period=10.000ns})
-  Destination:            u_soc/u_cpu/picorv32_core/decoded_rs2_reg_rep[3]/D
-                            (rising edge-triggered cell FDRE clocked by clk_100mhz_unbuf  {rise@0.000ns fall@5.000ns period=10.000ns})
+  Destination:            u_soc/u_cpu/picorv32_core/reg_out_reg[4]/D
+                            (rising edge-triggered cell FDSE clocked by clk_100mhz_unbuf  {rise@0.000ns fall@5.000ns period=10.000ns})
   Path Group:             clk_100mhz_unbuf
   Path Type:              Setup (Max at Slow Process Corner)
   Requirement:            10.000ns  (clk_100mhz_unbuf rise@10.000ns - clk_100mhz_unbuf rise@0.000ns)
-  Data Path Delay:        7.778ns  (logic 1.531ns (19.685%)  route 6.247ns (80.315%))
-  Logic Levels:           5  (LUT3=1 LUT5=2 LUT6=2)
-  Clock Path Skew:        -0.135ns (DCD - SCD + CPR)
-    Destination Clock Delay (DCD):    -1.340ns = ( 8.660 - 10.000 ) 
-    Source Clock Delay      (SCD):    -0.617ns
-    Clock Pessimism Removal (CPR):    0.588ns
-  Clock Uncertainty:      0.071ns  ((TSJ^2 + DJ^2)^1/2) / 2 + PE
-    Total System Jitter     (TSJ):    0.071ns
-    Discrete Jitter          (DJ):    0.123ns
-    Phase Error              (PE):    0.000ns
-
-    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
-  -------------------------------------------------------------------    -------------------
-                         (clock clk_100mhz_unbuf rise edge)
-                                                      0.000     0.000 r  
-    K17                                               0.000     0.000 r  clk_125mhz (IN)
-                         net (fo=0)                   0.000     0.000    clk_125mhz
-    K17                  IBUF (Prop_ibuf_I_O)         1.492     1.492 r  clk_125mhz_IBUF_inst/O
-                         net (fo=1, routed)           1.285     2.777    clk_125mhz_IBUF
-    MMCME2_ADV_X0Y1      MMCME2_ADV (Prop_mmcme2_adv_CLKIN1_CLKOUT0)
-                                                     -6.996    -4.219 r  u_mmcm/CLKOUT0
-                         net (fo=1, routed)           1.760    -2.459    clk_100mhz_unbuf
-    BUFGCTRL_X0Y16       BUFG (Prop_bufg_I_O)         0.101    -2.358 r  u_bufg_clkout/O
-                         net (fo=5582, routed)        1.741    -0.617    u_soc/u_ascon/u_boot_ctrl/clk_100mhz
-    SLICE_X38Y21         FDCE                                         r  u_soc/u_ascon/u_boot_ctrl/FSM_sequential_state_q_reg[2]/C
-  -------------------------------------------------------------------    -------------------
-    SLICE_X38Y21         FDCE (Prop_fdce_C_Q)         0.478    -0.139 r  u_soc/u_ascon/u_boot_ctrl/FSM_sequential_state_q_reg[2]/Q
-                         net (fo=17, routed)          1.920     1.780    u_soc/u_ascon/u_boot_ctrl/p_7_in[10]
-    SLICE_X22Y33         LUT6 (Prop_lut6_I1_O)        0.301     2.081 r  u_soc/u_ascon/u_boot_ctrl/mem_rdata_q[5]_i_9/O
-                         net (fo=2, routed)           0.672     2.753    u_soc/u_ascon/u_boot_ctrl/mem_rdata_q[5]_i_9_n_0
-    SLICE_X22Y33         LUT5 (Prop_lut5_I4_O)        0.150     2.903 r  u_soc/u_ascon/u_boot_ctrl/mem_rdata_q[5]_i_5/O
-                         net (fo=2, routed)           1.039     3.942    u_soc/u_cpu/picorv32_core/mem_rdata_q_reg[31]_2
-    SLICE_X32Y24         LUT6 (Prop_lut6_I1_O)        0.326     4.268 f  u_soc/u_cpu/picorv32_core/mem_rdata_q[5]_i_2/O
-                         net (fo=35, routed)          1.055     5.322    u_soc/u_cpu/picorv32_core/mem_rdata_q[5]_i_2_n_0
-    SLICE_X28Y26         LUT5 (Prop_lut5_I0_O)        0.124     5.446 r  u_soc/u_cpu/picorv32_core/mem_rdata_q[23]_i_1/O
-                         net (fo=5, routed)           0.852     6.298    u_soc/u_cpu/picorv32_core/axi_rdata[23]
-    SLICE_X27Y29         LUT3 (Prop_lut3_I2_O)        0.152     6.450 r  u_soc/u_cpu/picorv32_core/decoded_rs2_rep[3]_i_1/O
-                         net (fo=2, routed)           0.710     7.160    u_soc/u_cpu/picorv32_core/decoded_rs2_rep[3]_i_1_n_0
-    SLICE_X28Y30         FDRE                                         r  u_soc/u_cpu/picorv32_core/decoded_rs2_reg_rep[3]/D
-  -------------------------------------------------------------------    -------------------
-
-                         (clock clk_100mhz_unbuf rise edge)
-                                                     10.000    10.000 r  
-    K17                                               0.000    10.000 r  clk_125mhz (IN)
-                         net (fo=0)                   0.000    10.000    clk_125mhz
-    K17                  IBUF (Prop_ibuf_I_O)         1.421    11.421 r  clk_125mhz_IBUF_inst/O
-                         net (fo=1, routed)           1.162    12.583    clk_125mhz_IBUF
-    MMCME2_ADV_X0Y1      MMCME2_ADV (Prop_mmcme2_adv_CLKIN1_CLKOUT0)
-                                                     -7.105     5.478 r  u_mmcm/CLKOUT0
-                         net (fo=1, routed)           1.599     7.077    clk_100mhz_unbuf
-    BUFGCTRL_X0Y16       BUFG (Prop_bufg_I_O)         0.091     7.168 r  u_bufg_clkout/O
-                         net (fo=5582, routed)        1.491     8.660    u_soc/u_cpu/picorv32_core/clk_100mhz
-    SLICE_X28Y30         FDRE                                         r  u_soc/u_cpu/picorv32_core/decoded_rs2_reg_rep[3]/C
-                         clock pessimism              0.588     9.248    
-                         clock uncertainty           -0.071     9.177    
-    SLICE_X28Y30         FDRE (Setup_fdre_C_D)       -0.273     8.904    u_soc/u_cpu/picorv32_core/decoded_rs2_reg_rep[3]
-  -------------------------------------------------------------------
-                         required time                          8.904    
-                         arrival time                          -7.160    
-  -------------------------------------------------------------------
-                         slack                                  1.743    
-
-Slack (MET) :             1.755ns  (required time - arrival time)
-  Source:                 u_soc/u_ascon/u_boot_ctrl/FSM_sequential_state_q_reg[2]/C
-                            (rising edge-triggered cell FDCE clocked by clk_100mhz_unbuf  {rise@0.000ns fall@5.000ns period=10.000ns})
-  Destination:            u_soc/u_cpu/picorv32_core/reg_out_reg[2]/D
-                            (rising edge-triggered cell FDRE clocked by clk_100mhz_unbuf  {rise@0.000ns fall@5.000ns period=10.000ns})
-  Path Group:             clk_100mhz_unbuf
-  Path Type:              Setup (Max at Slow Process Corner)
-  Requirement:            10.000ns  (clk_100mhz_unbuf rise@10.000ns - clk_100mhz_unbuf rise@0.000ns)
-  Data Path Delay:        8.113ns  (logic 1.627ns (20.054%)  route 6.486ns (79.946%))
+  Data Path Delay:        8.191ns  (logic 1.627ns (19.863%)  route 6.564ns (80.137%))
   Logic Levels:           6  (LUT4=1 LUT5=2 LUT6=3)
   Clock Path Skew:        -0.138ns (DCD - SCD + CPR)
     Destination Clock Delay (DCD):    -1.343ns = ( 8.657 - 10.000 ) 
@@ -767,19 +609,161 @@ Slack (MET) :             1.755ns  (required time - arrival time)
     SLICE_X38Y21         FDCE                                         r  u_soc/u_ascon/u_boot_ctrl/FSM_sequential_state_q_reg[2]/C
   -------------------------------------------------------------------    -------------------
     SLICE_X38Y21         FDCE (Prop_fdce_C_Q)         0.478    -0.139 r  u_soc/u_ascon/u_boot_ctrl/FSM_sequential_state_q_reg[2]/Q
-                         net (fo=17, routed)          1.920     1.780    u_soc/u_ascon/u_boot_ctrl/p_7_in[10]
-    SLICE_X22Y33         LUT6 (Prop_lut6_I1_O)        0.301     2.081 r  u_soc/u_ascon/u_boot_ctrl/mem_rdata_q[5]_i_9/O
-                         net (fo=2, routed)           0.672     2.753    u_soc/u_ascon/u_boot_ctrl/mem_rdata_q[5]_i_9_n_0
-    SLICE_X22Y33         LUT5 (Prop_lut5_I4_O)        0.150     2.903 r  u_soc/u_ascon/u_boot_ctrl/mem_rdata_q[5]_i_5/O
-                         net (fo=2, routed)           1.039     3.942    u_soc/u_cpu/picorv32_core/mem_rdata_q_reg[31]_2
-    SLICE_X32Y24         LUT6 (Prop_lut6_I1_O)        0.326     4.268 f  u_soc/u_cpu/picorv32_core/mem_rdata_q[5]_i_2/O
-                         net (fo=35, routed)          1.246     5.513    u_soc/u_cpu/picorv32_core/mem_rdata_q[5]_i_2_n_0
-    SLICE_X24Y29         LUT5 (Prop_lut5_I0_O)        0.124     5.637 r  u_soc/u_cpu/picorv32_core/mem_rdata_q[26]_i_1/O
-                         net (fo=5, routed)           1.114     6.751    u_soc/u_cpu/picorv32_core/axi_rdata[26]
-    SLICE_X30Y27         LUT6 (Prop_lut6_I0_O)        0.124     6.875 r  u_soc/u_cpu/picorv32_core/reg_out[2]_i_3/O
-                         net (fo=1, routed)           0.496     7.372    u_soc/u_cpu/picorv32_core/reg_out[2]_i_3_n_0
-    SLICE_X30Y27         LUT4 (Prop_lut4_I1_O)        0.124     7.496 r  u_soc/u_cpu/picorv32_core/reg_out[2]_i_1/O
-                         net (fo=1, routed)           0.000     7.496    u_soc/u_cpu/picorv32_core/reg_out[2]
+                         net (fo=17, routed)          1.979     1.840    u_soc/u_ascon/u_boot_ctrl/p_7_in[10]
+    SLICE_X22Y33         LUT6 (Prop_lut6_I1_O)        0.301     2.141 r  u_soc/u_ascon/u_boot_ctrl/mem_rdata_q[5]_i_9/O
+                         net (fo=2, routed)           0.672     2.813    u_soc/u_ascon/u_boot_ctrl/mem_rdata_q[5]_i_9_n_0
+    SLICE_X22Y33         LUT5 (Prop_lut5_I4_O)        0.150     2.963 r  u_soc/u_ascon/u_boot_ctrl/mem_rdata_q[5]_i_5/O
+                         net (fo=2, routed)           1.039     4.001    u_soc/u_cpu/picorv32_core/mem_rdata_q_reg[31]_2
+    SLICE_X32Y24         LUT6 (Prop_lut6_I1_O)        0.326     4.327 f  u_soc/u_cpu/picorv32_core/mem_rdata_q[5]_i_2/O
+                         net (fo=35, routed)          1.256     5.583    u_soc/u_cpu/picorv32_core/mem_rdata_q[5]_i_2_n_0
+    SLICE_X24Y29         LUT5 (Prop_lut5_I0_O)        0.124     5.707 r  u_soc/u_cpu/picorv32_core/mem_rdata_q[28]_i_1/O
+                         net (fo=5, routed)           1.012     6.719    u_soc/u_cpu/picorv32_core/axi_rdata[28]
+    SLICE_X28Y27         LUT6 (Prop_lut6_I0_O)        0.124     6.843 r  u_soc/u_cpu/picorv32_core/reg_out[4]_i_3/O
+                         net (fo=1, routed)           0.606     7.450    u_soc/u_cpu/picorv32_core/reg_out[4]_i_3_n_0
+    SLICE_X28Y27         LUT4 (Prop_lut4_I1_O)        0.124     7.574 r  u_soc/u_cpu/picorv32_core/reg_out[4]_i_1/O
+                         net (fo=1, routed)           0.000     7.574    u_soc/u_cpu/picorv32_core/reg_out[4]
+    SLICE_X28Y27         FDSE                                         r  u_soc/u_cpu/picorv32_core/reg_out_reg[4]/D
+  -------------------------------------------------------------------    -------------------
+
+                         (clock clk_100mhz_unbuf rise edge)
+                                                     10.000    10.000 r  
+    K17                                               0.000    10.000 r  clk_125mhz (IN)
+                         net (fo=0)                   0.000    10.000    clk_125mhz
+    K17                  IBUF (Prop_ibuf_I_O)         1.421    11.421 r  clk_125mhz_IBUF_inst/O
+                         net (fo=1, routed)           1.162    12.583    clk_125mhz_IBUF
+    MMCME2_ADV_X0Y1      MMCME2_ADV (Prop_mmcme2_adv_CLKIN1_CLKOUT0)
+                                                     -7.105     5.478 r  u_mmcm/CLKOUT0
+                         net (fo=1, routed)           1.599     7.077    clk_100mhz_unbuf
+    BUFGCTRL_X0Y16       BUFG (Prop_bufg_I_O)         0.091     7.168 r  u_bufg_clkout/O
+                         net (fo=5582, routed)        1.488     8.657    u_soc/u_cpu/picorv32_core/clk_100mhz
+    SLICE_X28Y27         FDSE                                         r  u_soc/u_cpu/picorv32_core/reg_out_reg[4]/C
+                         clock pessimism              0.588     9.245    
+                         clock uncertainty           -0.071     9.174    
+    SLICE_X28Y27         FDSE (Setup_fdse_C_D)        0.077     9.251    u_soc/u_cpu/picorv32_core/reg_out_reg[4]
+  -------------------------------------------------------------------
+                         required time                          9.251    
+                         arrival time                          -7.574    
+  -------------------------------------------------------------------
+                         slack                                  1.677    
+
+Slack (MET) :             1.695ns  (required time - arrival time)
+  Source:                 u_soc/u_ascon/u_boot_ctrl/FSM_sequential_state_q_reg[2]/C
+                            (rising edge-triggered cell FDCE clocked by clk_100mhz_unbuf  {rise@0.000ns fall@5.000ns period=10.000ns})
+  Destination:            u_soc/u_cpu/picorv32_core/decoded_rs2_reg_rep[3]/D
+                            (rising edge-triggered cell FDRE clocked by clk_100mhz_unbuf  {rise@0.000ns fall@5.000ns period=10.000ns})
+  Path Group:             clk_100mhz_unbuf
+  Path Type:              Setup (Max at Slow Process Corner)
+  Requirement:            10.000ns  (clk_100mhz_unbuf rise@10.000ns - clk_100mhz_unbuf rise@0.000ns)
+  Data Path Delay:        7.826ns  (logic 1.531ns (19.563%)  route 6.295ns (80.437%))
+  Logic Levels:           5  (LUT3=1 LUT5=2 LUT6=2)
+  Clock Path Skew:        -0.135ns (DCD - SCD + CPR)
+    Destination Clock Delay (DCD):    -1.340ns = ( 8.660 - 10.000 ) 
+    Source Clock Delay      (SCD):    -0.617ns
+    Clock Pessimism Removal (CPR):    0.588ns
+  Clock Uncertainty:      0.071ns  ((TSJ^2 + DJ^2)^1/2) / 2 + PE
+    Total System Jitter     (TSJ):    0.071ns
+    Discrete Jitter          (DJ):    0.123ns
+    Phase Error              (PE):    0.000ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock clk_100mhz_unbuf rise edge)
+                                                      0.000     0.000 r  
+    K17                                               0.000     0.000 r  clk_125mhz (IN)
+                         net (fo=0)                   0.000     0.000    clk_125mhz
+    K17                  IBUF (Prop_ibuf_I_O)         1.492     1.492 r  clk_125mhz_IBUF_inst/O
+                         net (fo=1, routed)           1.285     2.777    clk_125mhz_IBUF
+    MMCME2_ADV_X0Y1      MMCME2_ADV (Prop_mmcme2_adv_CLKIN1_CLKOUT0)
+                                                     -6.996    -4.219 r  u_mmcm/CLKOUT0
+                         net (fo=1, routed)           1.760    -2.459    clk_100mhz_unbuf
+    BUFGCTRL_X0Y16       BUFG (Prop_bufg_I_O)         0.101    -2.358 r  u_bufg_clkout/O
+                         net (fo=5582, routed)        1.741    -0.617    u_soc/u_ascon/u_boot_ctrl/clk_100mhz
+    SLICE_X38Y21         FDCE                                         r  u_soc/u_ascon/u_boot_ctrl/FSM_sequential_state_q_reg[2]/C
+  -------------------------------------------------------------------    -------------------
+    SLICE_X38Y21         FDCE (Prop_fdce_C_Q)         0.478    -0.139 r  u_soc/u_ascon/u_boot_ctrl/FSM_sequential_state_q_reg[2]/Q
+                         net (fo=17, routed)          1.979     1.840    u_soc/u_ascon/u_boot_ctrl/p_7_in[10]
+    SLICE_X22Y33         LUT6 (Prop_lut6_I1_O)        0.301     2.141 r  u_soc/u_ascon/u_boot_ctrl/mem_rdata_q[5]_i_9/O
+                         net (fo=2, routed)           0.672     2.813    u_soc/u_ascon/u_boot_ctrl/mem_rdata_q[5]_i_9_n_0
+    SLICE_X22Y33         LUT5 (Prop_lut5_I4_O)        0.150     2.963 r  u_soc/u_ascon/u_boot_ctrl/mem_rdata_q[5]_i_5/O
+                         net (fo=2, routed)           1.039     4.001    u_soc/u_cpu/picorv32_core/mem_rdata_q_reg[31]_2
+    SLICE_X32Y24         LUT6 (Prop_lut6_I1_O)        0.326     4.327 f  u_soc/u_cpu/picorv32_core/mem_rdata_q[5]_i_2/O
+                         net (fo=35, routed)          1.055     5.382    u_soc/u_cpu/picorv32_core/mem_rdata_q[5]_i_2_n_0
+    SLICE_X28Y26         LUT5 (Prop_lut5_I0_O)        0.124     5.506 r  u_soc/u_cpu/picorv32_core/mem_rdata_q[23]_i_1/O
+                         net (fo=5, routed)           0.841     6.347    u_soc/u_cpu/picorv32_core/axi_rdata[23]
+    SLICE_X27Y29         LUT3 (Prop_lut3_I2_O)        0.152     6.499 r  u_soc/u_cpu/picorv32_core/decoded_rs2_rep[3]_i_1/O
+                         net (fo=2, routed)           0.710     7.209    u_soc/u_cpu/picorv32_core/decoded_rs2_rep[3]_i_1_n_0
+    SLICE_X28Y30         FDRE                                         r  u_soc/u_cpu/picorv32_core/decoded_rs2_reg_rep[3]/D
+  -------------------------------------------------------------------    -------------------
+
+                         (clock clk_100mhz_unbuf rise edge)
+                                                     10.000    10.000 r  
+    K17                                               0.000    10.000 r  clk_125mhz (IN)
+                         net (fo=0)                   0.000    10.000    clk_125mhz
+    K17                  IBUF (Prop_ibuf_I_O)         1.421    11.421 r  clk_125mhz_IBUF_inst/O
+                         net (fo=1, routed)           1.162    12.583    clk_125mhz_IBUF
+    MMCME2_ADV_X0Y1      MMCME2_ADV (Prop_mmcme2_adv_CLKIN1_CLKOUT0)
+                                                     -7.105     5.478 r  u_mmcm/CLKOUT0
+                         net (fo=1, routed)           1.599     7.077    clk_100mhz_unbuf
+    BUFGCTRL_X0Y16       BUFG (Prop_bufg_I_O)         0.091     7.168 r  u_bufg_clkout/O
+                         net (fo=5582, routed)        1.491     8.660    u_soc/u_cpu/picorv32_core/clk_100mhz
+    SLICE_X28Y30         FDRE                                         r  u_soc/u_cpu/picorv32_core/decoded_rs2_reg_rep[3]/C
+                         clock pessimism              0.588     9.248    
+                         clock uncertainty           -0.071     9.177    
+    SLICE_X28Y30         FDRE (Setup_fdre_C_D)       -0.273     8.904    u_soc/u_cpu/picorv32_core/decoded_rs2_reg_rep[3]
+  -------------------------------------------------------------------
+                         required time                          8.904    
+                         arrival time                          -7.209    
+  -------------------------------------------------------------------
+                         slack                                  1.695    
+
+Slack (MET) :             1.695ns  (required time - arrival time)
+  Source:                 u_soc/u_ascon/u_boot_ctrl/FSM_sequential_state_q_reg[2]/C
+                            (rising edge-triggered cell FDCE clocked by clk_100mhz_unbuf  {rise@0.000ns fall@5.000ns period=10.000ns})
+  Destination:            u_soc/u_cpu/picorv32_core/reg_out_reg[2]/D
+                            (rising edge-triggered cell FDRE clocked by clk_100mhz_unbuf  {rise@0.000ns fall@5.000ns period=10.000ns})
+  Path Group:             clk_100mhz_unbuf
+  Path Type:              Setup (Max at Slow Process Corner)
+  Requirement:            10.000ns  (clk_100mhz_unbuf rise@10.000ns - clk_100mhz_unbuf rise@0.000ns)
+  Data Path Delay:        8.173ns  (logic 1.627ns (19.908%)  route 6.546ns (80.092%))
+  Logic Levels:           6  (LUT4=1 LUT5=2 LUT6=3)
+  Clock Path Skew:        -0.138ns (DCD - SCD + CPR)
+    Destination Clock Delay (DCD):    -1.343ns = ( 8.657 - 10.000 ) 
+    Source Clock Delay      (SCD):    -0.617ns
+    Clock Pessimism Removal (CPR):    0.588ns
+  Clock Uncertainty:      0.071ns  ((TSJ^2 + DJ^2)^1/2) / 2 + PE
+    Total System Jitter     (TSJ):    0.071ns
+    Discrete Jitter          (DJ):    0.123ns
+    Phase Error              (PE):    0.000ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock clk_100mhz_unbuf rise edge)
+                                                      0.000     0.000 r  
+    K17                                               0.000     0.000 r  clk_125mhz (IN)
+                         net (fo=0)                   0.000     0.000    clk_125mhz
+    K17                  IBUF (Prop_ibuf_I_O)         1.492     1.492 r  clk_125mhz_IBUF_inst/O
+                         net (fo=1, routed)           1.285     2.777    clk_125mhz_IBUF
+    MMCME2_ADV_X0Y1      MMCME2_ADV (Prop_mmcme2_adv_CLKIN1_CLKOUT0)
+                                                     -6.996    -4.219 r  u_mmcm/CLKOUT0
+                         net (fo=1, routed)           1.760    -2.459    clk_100mhz_unbuf
+    BUFGCTRL_X0Y16       BUFG (Prop_bufg_I_O)         0.101    -2.358 r  u_bufg_clkout/O
+                         net (fo=5582, routed)        1.741    -0.617    u_soc/u_ascon/u_boot_ctrl/clk_100mhz
+    SLICE_X38Y21         FDCE                                         r  u_soc/u_ascon/u_boot_ctrl/FSM_sequential_state_q_reg[2]/C
+  -------------------------------------------------------------------    -------------------
+    SLICE_X38Y21         FDCE (Prop_fdce_C_Q)         0.478    -0.139 r  u_soc/u_ascon/u_boot_ctrl/FSM_sequential_state_q_reg[2]/Q
+                         net (fo=17, routed)          1.979     1.840    u_soc/u_ascon/u_boot_ctrl/p_7_in[10]
+    SLICE_X22Y33         LUT6 (Prop_lut6_I1_O)        0.301     2.141 r  u_soc/u_ascon/u_boot_ctrl/mem_rdata_q[5]_i_9/O
+                         net (fo=2, routed)           0.672     2.813    u_soc/u_ascon/u_boot_ctrl/mem_rdata_q[5]_i_9_n_0
+    SLICE_X22Y33         LUT5 (Prop_lut5_I4_O)        0.150     2.963 r  u_soc/u_ascon/u_boot_ctrl/mem_rdata_q[5]_i_5/O
+                         net (fo=2, routed)           1.039     4.001    u_soc/u_cpu/picorv32_core/mem_rdata_q_reg[31]_2
+    SLICE_X32Y24         LUT6 (Prop_lut6_I1_O)        0.326     4.327 f  u_soc/u_cpu/picorv32_core/mem_rdata_q[5]_i_2/O
+                         net (fo=35, routed)          1.246     5.573    u_soc/u_cpu/picorv32_core/mem_rdata_q[5]_i_2_n_0
+    SLICE_X24Y29         LUT5 (Prop_lut5_I0_O)        0.124     5.697 r  u_soc/u_cpu/picorv32_core/mem_rdata_q[26]_i_1/O
+                         net (fo=5, routed)           1.114     6.811    u_soc/u_cpu/picorv32_core/axi_rdata[26]
+    SLICE_X30Y27         LUT6 (Prop_lut6_I0_O)        0.124     6.935 r  u_soc/u_cpu/picorv32_core/reg_out[2]_i_3/O
+                         net (fo=1, routed)           0.496     7.431    u_soc/u_cpu/picorv32_core/reg_out[2]_i_3_n_0
+    SLICE_X30Y27         LUT4 (Prop_lut4_I1_O)        0.124     7.555 r  u_soc/u_cpu/picorv32_core/reg_out[2]_i_1/O
+                         net (fo=1, routed)           0.000     7.555    u_soc/u_cpu/picorv32_core/reg_out[2]
     SLICE_X30Y27         FDRE                                         r  u_soc/u_cpu/picorv32_core/reg_out_reg[2]/D
   -------------------------------------------------------------------    -------------------
 
@@ -800,22 +784,92 @@ Slack (MET) :             1.755ns  (required time - arrival time)
     SLICE_X30Y27         FDRE (Setup_fdre_C_D)        0.077     9.251    u_soc/u_cpu/picorv32_core/reg_out_reg[2]
   -------------------------------------------------------------------
                          required time                          9.251    
-                         arrival time                          -7.496    
+                         arrival time                          -7.555    
   -------------------------------------------------------------------
-                         slack                                  1.755    
+                         slack                                  1.695    
 
-Slack (MET) :             1.759ns  (required time - arrival time)
+Slack (MET) :             1.710ns  (required time - arrival time)
+  Source:                 u_soc/u_ascon/u_boot_ctrl/FSM_sequential_state_q_reg[2]/C
+                            (rising edge-triggered cell FDCE clocked by clk_100mhz_unbuf  {rise@0.000ns fall@5.000ns period=10.000ns})
+  Destination:            u_soc/u_cpu/picorv32_core/decoded_rs1_reg_rep_rep[1]/D
+                            (rising edge-triggered cell FDRE clocked by clk_100mhz_unbuf  {rise@0.000ns fall@5.000ns period=10.000ns})
+  Path Group:             clk_100mhz_unbuf
+  Path Type:              Setup (Max at Slow Process Corner)
+  Requirement:            10.000ns  (clk_100mhz_unbuf rise@10.000ns - clk_100mhz_unbuf rise@0.000ns)
+  Data Path Delay:        7.834ns  (logic 1.531ns (19.543%)  route 6.303ns (80.457%))
+  Logic Levels:           5  (LUT3=1 LUT5=2 LUT6=2)
+  Clock Path Skew:        -0.133ns (DCD - SCD + CPR)
+    Destination Clock Delay (DCD):    -1.338ns = ( 8.662 - 10.000 ) 
+    Source Clock Delay      (SCD):    -0.617ns
+    Clock Pessimism Removal (CPR):    0.588ns
+  Clock Uncertainty:      0.071ns  ((TSJ^2 + DJ^2)^1/2) / 2 + PE
+    Total System Jitter     (TSJ):    0.071ns
+    Discrete Jitter          (DJ):    0.123ns
+    Phase Error              (PE):    0.000ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock clk_100mhz_unbuf rise edge)
+                                                      0.000     0.000 r  
+    K17                                               0.000     0.000 r  clk_125mhz (IN)
+                         net (fo=0)                   0.000     0.000    clk_125mhz
+    K17                  IBUF (Prop_ibuf_I_O)         1.492     1.492 r  clk_125mhz_IBUF_inst/O
+                         net (fo=1, routed)           1.285     2.777    clk_125mhz_IBUF
+    MMCME2_ADV_X0Y1      MMCME2_ADV (Prop_mmcme2_adv_CLKIN1_CLKOUT0)
+                                                     -6.996    -4.219 r  u_mmcm/CLKOUT0
+                         net (fo=1, routed)           1.760    -2.459    clk_100mhz_unbuf
+    BUFGCTRL_X0Y16       BUFG (Prop_bufg_I_O)         0.101    -2.358 r  u_bufg_clkout/O
+                         net (fo=5582, routed)        1.741    -0.617    u_soc/u_ascon/u_boot_ctrl/clk_100mhz
+    SLICE_X38Y21         FDCE                                         r  u_soc/u_ascon/u_boot_ctrl/FSM_sequential_state_q_reg[2]/C
+  -------------------------------------------------------------------    -------------------
+    SLICE_X38Y21         FDCE (Prop_fdce_C_Q)         0.478    -0.139 r  u_soc/u_ascon/u_boot_ctrl/FSM_sequential_state_q_reg[2]/Q
+                         net (fo=17, routed)          1.979     1.840    u_soc/u_ascon/u_boot_ctrl/p_7_in[10]
+    SLICE_X22Y33         LUT6 (Prop_lut6_I1_O)        0.301     2.141 r  u_soc/u_ascon/u_boot_ctrl/mem_rdata_q[5]_i_9/O
+                         net (fo=2, routed)           0.672     2.813    u_soc/u_ascon/u_boot_ctrl/mem_rdata_q[5]_i_9_n_0
+    SLICE_X22Y33         LUT5 (Prop_lut5_I4_O)        0.150     2.963 r  u_soc/u_ascon/u_boot_ctrl/mem_rdata_q[5]_i_5/O
+                         net (fo=2, routed)           1.039     4.001    u_soc/u_cpu/picorv32_core/mem_rdata_q_reg[31]_2
+    SLICE_X32Y24         LUT6 (Prop_lut6_I1_O)        0.326     4.327 f  u_soc/u_cpu/picorv32_core/mem_rdata_q[5]_i_2/O
+                         net (fo=35, routed)          1.066     5.394    u_soc/u_cpu/picorv32_core/mem_rdata_q[5]_i_2_n_0
+    SLICE_X25Y26         LUT5 (Prop_lut5_I0_O)        0.124     5.518 r  u_soc/u_cpu/picorv32_core/mem_rdata_q[16]_i_1/O
+                         net (fo=5, routed)           1.047     6.565    u_soc/u_cpu/picorv32_core/axi_rdata[16]
+    SLICE_X24Y31         LUT3 (Prop_lut3_I2_O)        0.152     6.717 r  u_soc/u_cpu/picorv32_core/decoded_rs1_rep_rep[1]_i_1/O
+                         net (fo=2, routed)           0.499     7.217    u_soc/u_cpu/picorv32_core/decoded_rs1_rep_rep[1]_i_1_n_0
+    SLICE_X24Y35         FDRE                                         r  u_soc/u_cpu/picorv32_core/decoded_rs1_reg_rep_rep[1]/D
+  -------------------------------------------------------------------    -------------------
+
+                         (clock clk_100mhz_unbuf rise edge)
+                                                     10.000    10.000 r  
+    K17                                               0.000    10.000 r  clk_125mhz (IN)
+                         net (fo=0)                   0.000    10.000    clk_125mhz
+    K17                  IBUF (Prop_ibuf_I_O)         1.421    11.421 r  clk_125mhz_IBUF_inst/O
+                         net (fo=1, routed)           1.162    12.583    clk_125mhz_IBUF
+    MMCME2_ADV_X0Y1      MMCME2_ADV (Prop_mmcme2_adv_CLKIN1_CLKOUT0)
+                                                     -7.105     5.478 r  u_mmcm/CLKOUT0
+                         net (fo=1, routed)           1.599     7.077    clk_100mhz_unbuf
+    BUFGCTRL_X0Y16       BUFG (Prop_bufg_I_O)         0.091     7.168 r  u_bufg_clkout/O
+                         net (fo=5582, routed)        1.493     8.662    u_soc/u_cpu/picorv32_core/clk_100mhz
+    SLICE_X24Y35         FDRE                                         r  u_soc/u_cpu/picorv32_core/decoded_rs1_reg_rep_rep[1]/C
+                         clock pessimism              0.588     9.250    
+                         clock uncertainty           -0.071     9.179    
+    SLICE_X24Y35         FDRE (Setup_fdre_C_D)       -0.252     8.927    u_soc/u_cpu/picorv32_core/decoded_rs1_reg_rep_rep[1]
+  -------------------------------------------------------------------
+                         required time                          8.927    
+                         arrival time                          -7.217    
+  -------------------------------------------------------------------
+                         slack                                  1.710    
+
+Slack (MET) :             1.714ns  (required time - arrival time)
   Source:                 u_soc/u_ascon/u_mode_ctrl/r_bytes_left_reg[30]/C
                             (rising edge-triggered cell FDCE clocked by clk_100mhz_unbuf  {rise@0.000ns fall@5.000ns period=10.000ns})
-  Destination:            u_soc/u_ascon/u_mode_ctrl/perm_in_x2_reg[48]/CE
+  Destination:            u_soc/u_ascon/u_mode_ctrl/perm_in_x2_reg[52]/CE
                             (rising edge-triggered cell FDCE clocked by clk_100mhz_unbuf  {rise@0.000ns fall@5.000ns period=10.000ns})
   Path Group:             clk_100mhz_unbuf
   Path Type:              Setup (Max at Slow Process Corner)
   Requirement:            10.000ns  (clk_100mhz_unbuf rise@10.000ns - clk_100mhz_unbuf rise@0.000ns)
-  Data Path Delay:        7.846ns  (logic 1.498ns (19.092%)  route 6.348ns (80.908%))
+  Data Path Delay:        7.890ns  (logic 1.498ns (18.987%)  route 6.392ns (81.013%))
   Logic Levels:           6  (LUT3=1 LUT4=1 LUT6=4)
-  Clock Path Skew:        -0.119ns (DCD - SCD + CPR)
-    Destination Clock Delay (DCD):    -1.292ns = ( 8.708 - 10.000 ) 
+  Clock Path Skew:        -0.121ns (DCD - SCD + CPR)
+    Destination Clock Delay (DCD):    -1.294ns = ( 8.706 - 10.000 ) 
     Source Clock Delay      (SCD):    -0.686ns
     Clock Pessimism Removal (CPR):    0.487ns
   Clock Uncertainty:      0.071ns  ((TSJ^2 + DJ^2)^1/2) / 2 + PE
@@ -845,14 +899,14 @@ Slack (MET) :             1.759ns  (required time - arrival time)
     SLICE_X38Y14         LUT6 (Prop_lut6_I2_O)        0.332     1.883 f  u_soc/u_ascon/u_mode_ctrl/s1[63]_i_7/O
                          net (fo=4, routed)           0.782     2.665    u_soc/u_ascon/u_mode_ctrl/s1[63]_i_7_n_0
     SLICE_X34Y12         LUT6 (Prop_lut6_I5_O)        0.124     2.789 r  u_soc/u_ascon/u_mode_ctrl/s1[63]_i_4/O
-                         net (fo=154, routed)         0.878     3.666    u_soc/u_ascon/u_mode_ctrl/s1[63]_i_4_n_0
-    SLICE_X33Y8          LUT4 (Prop_lut4_I2_O)        0.124     3.790 r  u_soc/u_ascon/u_mode_ctrl/perm_running_i_8/O
-                         net (fo=2, routed)           0.441     4.231    u_soc/u_ascon/u_mode_ctrl/gen_perm_1r.u_perm/perm_start_reg_2
-    SLICE_X31Y8          LUT6 (Prop_lut6_I5_O)        0.124     4.355 f  u_soc/u_ascon/u_mode_ctrl/gen_perm_1r.u_perm/perm_start_i_4/O
-                         net (fo=1, routed)           0.490     4.845    u_soc/u_ascon/u_mode_ctrl/gen_perm_1r.u_perm/perm_start_i_4_n_0
-    SLICE_X31Y14         LUT6 (Prop_lut6_I5_O)        0.124     4.969 r  u_soc/u_ascon/u_mode_ctrl/gen_perm_1r.u_perm/perm_start_i_1/O
-                         net (fo=322, routed)         2.192     7.160    u_soc/u_ascon/u_mode_ctrl/gen_perm_1r.u_perm_n_0
-    SLICE_X2Y23          FDCE                                         r  u_soc/u_ascon/u_mode_ctrl/perm_in_x2_reg[48]/CE
+                         net (fo=154, routed)         0.892     3.680    u_soc/u_ascon/u_mode_ctrl/s1[63]_i_4_n_0
+    SLICE_X33Y8          LUT4 (Prop_lut4_I2_O)        0.124     3.804 r  u_soc/u_ascon/u_mode_ctrl/perm_running_i_8/O
+                         net (fo=2, routed)           0.441     4.245    u_soc/u_ascon/u_mode_ctrl/gen_perm_1r.u_perm/perm_start_reg_2
+    SLICE_X31Y8          LUT6 (Prop_lut6_I5_O)        0.124     4.369 f  u_soc/u_ascon/u_mode_ctrl/gen_perm_1r.u_perm/perm_start_i_4/O
+                         net (fo=1, routed)           0.490     4.859    u_soc/u_ascon/u_mode_ctrl/gen_perm_1r.u_perm/perm_start_i_4_n_0
+    SLICE_X31Y14         LUT6 (Prop_lut6_I5_O)        0.124     4.983 r  u_soc/u_ascon/u_mode_ctrl/gen_perm_1r.u_perm/perm_start_i_1/O
+                         net (fo=322, routed)         2.221     7.203    u_soc/u_ascon/u_mode_ctrl/gen_perm_1r.u_perm_n_0
+    SLICE_X3Y24          FDCE                                         r  u_soc/u_ascon/u_mode_ctrl/perm_in_x2_reg[52]/CE
   -------------------------------------------------------------------    -------------------
 
                          (clock clk_100mhz_unbuf rise edge)
@@ -865,88 +919,16 @@ Slack (MET) :             1.759ns  (required time - arrival time)
                                                      -7.105     5.478 r  u_mmcm/CLKOUT0
                          net (fo=1, routed)           1.599     7.077    clk_100mhz_unbuf
     BUFGCTRL_X0Y16       BUFG (Prop_bufg_I_O)         0.091     7.168 r  u_bufg_clkout/O
-                         net (fo=5582, routed)        1.539     8.708    u_soc/u_ascon/u_mode_ctrl/clk_100mhz
-    SLICE_X2Y23          FDCE                                         r  u_soc/u_ascon/u_mode_ctrl/perm_in_x2_reg[48]/C
-                         clock pessimism              0.487     9.195    
-                         clock uncertainty           -0.071     9.124    
-    SLICE_X2Y23          FDCE (Setup_fdce_C_CE)      -0.205     8.919    u_soc/u_ascon/u_mode_ctrl/perm_in_x2_reg[48]
+                         net (fo=5582, routed)        1.537     8.706    u_soc/u_ascon/u_mode_ctrl/clk_100mhz
+    SLICE_X3Y24          FDCE                                         r  u_soc/u_ascon/u_mode_ctrl/perm_in_x2_reg[52]/C
+                         clock pessimism              0.487     9.193    
+                         clock uncertainty           -0.071     9.122    
+    SLICE_X3Y24          FDCE (Setup_fdce_C_CE)      -0.205     8.917    u_soc/u_ascon/u_mode_ctrl/perm_in_x2_reg[52]
   -------------------------------------------------------------------
-                         required time                          8.919    
-                         arrival time                          -7.160    
+                         required time                          8.917    
+                         arrival time                          -7.203    
   -------------------------------------------------------------------
-                         slack                                  1.759    
-
-Slack (MET) :             1.759ns  (required time - arrival time)
-  Source:                 u_soc/u_ascon/u_mode_ctrl/r_bytes_left_reg[30]/C
-                            (rising edge-triggered cell FDCE clocked by clk_100mhz_unbuf  {rise@0.000ns fall@5.000ns period=10.000ns})
-  Destination:            u_soc/u_ascon/u_mode_ctrl/perm_in_x2_reg[49]/CE
-                            (rising edge-triggered cell FDCE clocked by clk_100mhz_unbuf  {rise@0.000ns fall@5.000ns period=10.000ns})
-  Path Group:             clk_100mhz_unbuf
-  Path Type:              Setup (Max at Slow Process Corner)
-  Requirement:            10.000ns  (clk_100mhz_unbuf rise@10.000ns - clk_100mhz_unbuf rise@0.000ns)
-  Data Path Delay:        7.846ns  (logic 1.498ns (19.092%)  route 6.348ns (80.908%))
-  Logic Levels:           6  (LUT3=1 LUT4=1 LUT6=4)
-  Clock Path Skew:        -0.119ns (DCD - SCD + CPR)
-    Destination Clock Delay (DCD):    -1.292ns = ( 8.708 - 10.000 ) 
-    Source Clock Delay      (SCD):    -0.686ns
-    Clock Pessimism Removal (CPR):    0.487ns
-  Clock Uncertainty:      0.071ns  ((TSJ^2 + DJ^2)^1/2) / 2 + PE
-    Total System Jitter     (TSJ):    0.071ns
-    Discrete Jitter          (DJ):    0.123ns
-    Phase Error              (PE):    0.000ns
-
-    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
-  -------------------------------------------------------------------    -------------------
-                         (clock clk_100mhz_unbuf rise edge)
-                                                      0.000     0.000 r  
-    K17                                               0.000     0.000 r  clk_125mhz (IN)
-                         net (fo=0)                   0.000     0.000    clk_125mhz
-    K17                  IBUF (Prop_ibuf_I_O)         1.492     1.492 r  clk_125mhz_IBUF_inst/O
-                         net (fo=1, routed)           1.285     2.777    clk_125mhz_IBUF
-    MMCME2_ADV_X0Y1      MMCME2_ADV (Prop_mmcme2_adv_CLKIN1_CLKOUT0)
-                                                     -6.996    -4.219 r  u_mmcm/CLKOUT0
-                         net (fo=1, routed)           1.760    -2.459    clk_100mhz_unbuf
-    BUFGCTRL_X0Y16       BUFG (Prop_bufg_I_O)         0.101    -2.358 r  u_bufg_clkout/O
-                         net (fo=5582, routed)        1.672    -0.686    u_soc/u_ascon/u_mode_ctrl/clk_100mhz
-    SLICE_X34Y13         FDCE                                         r  u_soc/u_ascon/u_mode_ctrl/r_bytes_left_reg[30]/C
-  -------------------------------------------------------------------    -------------------
-    SLICE_X34Y13         FDCE (Prop_fdce_C_Q)         0.518    -0.168 r  u_soc/u_ascon/u_mode_ctrl/r_bytes_left_reg[30]/Q
-                         net (fo=4, routed)           0.884     0.716    u_soc/u_ascon/u_mode_ctrl/r_bytes_left_reg_n_0_[30]
-    SLICE_X36Y15         LUT3 (Prop_lut3_I1_O)        0.152     0.868 r  u_soc/u_ascon/u_mode_ctrl/s1[63]_i_14/O
-                         net (fo=1, routed)           0.683     1.551    u_soc/u_ascon/u_mode_ctrl/s1[63]_i_14_n_0
-    SLICE_X38Y14         LUT6 (Prop_lut6_I2_O)        0.332     1.883 f  u_soc/u_ascon/u_mode_ctrl/s1[63]_i_7/O
-                         net (fo=4, routed)           0.782     2.665    u_soc/u_ascon/u_mode_ctrl/s1[63]_i_7_n_0
-    SLICE_X34Y12         LUT6 (Prop_lut6_I5_O)        0.124     2.789 r  u_soc/u_ascon/u_mode_ctrl/s1[63]_i_4/O
-                         net (fo=154, routed)         0.878     3.666    u_soc/u_ascon/u_mode_ctrl/s1[63]_i_4_n_0
-    SLICE_X33Y8          LUT4 (Prop_lut4_I2_O)        0.124     3.790 r  u_soc/u_ascon/u_mode_ctrl/perm_running_i_8/O
-                         net (fo=2, routed)           0.441     4.231    u_soc/u_ascon/u_mode_ctrl/gen_perm_1r.u_perm/perm_start_reg_2
-    SLICE_X31Y8          LUT6 (Prop_lut6_I5_O)        0.124     4.355 f  u_soc/u_ascon/u_mode_ctrl/gen_perm_1r.u_perm/perm_start_i_4/O
-                         net (fo=1, routed)           0.490     4.845    u_soc/u_ascon/u_mode_ctrl/gen_perm_1r.u_perm/perm_start_i_4_n_0
-    SLICE_X31Y14         LUT6 (Prop_lut6_I5_O)        0.124     4.969 r  u_soc/u_ascon/u_mode_ctrl/gen_perm_1r.u_perm/perm_start_i_1/O
-                         net (fo=322, routed)         2.192     7.160    u_soc/u_ascon/u_mode_ctrl/gen_perm_1r.u_perm_n_0
-    SLICE_X2Y23          FDCE                                         r  u_soc/u_ascon/u_mode_ctrl/perm_in_x2_reg[49]/CE
-  -------------------------------------------------------------------    -------------------
-
-                         (clock clk_100mhz_unbuf rise edge)
-                                                     10.000    10.000 r  
-    K17                                               0.000    10.000 r  clk_125mhz (IN)
-                         net (fo=0)                   0.000    10.000    clk_125mhz
-    K17                  IBUF (Prop_ibuf_I_O)         1.421    11.421 r  clk_125mhz_IBUF_inst/O
-                         net (fo=1, routed)           1.162    12.583    clk_125mhz_IBUF
-    MMCME2_ADV_X0Y1      MMCME2_ADV (Prop_mmcme2_adv_CLKIN1_CLKOUT0)
-                                                     -7.105     5.478 r  u_mmcm/CLKOUT0
-                         net (fo=1, routed)           1.599     7.077    clk_100mhz_unbuf
-    BUFGCTRL_X0Y16       BUFG (Prop_bufg_I_O)         0.091     7.168 r  u_bufg_clkout/O
-                         net (fo=5582, routed)        1.539     8.708    u_soc/u_ascon/u_mode_ctrl/clk_100mhz
-    SLICE_X2Y23          FDCE                                         r  u_soc/u_ascon/u_mode_ctrl/perm_in_x2_reg[49]/C
-                         clock pessimism              0.487     9.195    
-                         clock uncertainty           -0.071     9.124    
-    SLICE_X2Y23          FDCE (Setup_fdce_C_CE)      -0.205     8.919    u_soc/u_ascon/u_mode_ctrl/perm_in_x2_reg[49]
-  -------------------------------------------------------------------
-                         required time                          8.919    
-                         arrival time                          -7.160    
-  -------------------------------------------------------------------
-                         slack                                  1.759    
+                         slack                                  1.714    
 
 
 
@@ -1066,7 +1048,7 @@ Slack (MET) :             0.029ns  (arrival time - required time)
   -------------------------------------------------------------------
                          slack                                  0.029    
 
-Slack (MET) :             0.049ns  (arrival time - required time)
+Slack (MET) :             0.047ns  (arrival time - required time)
   Source:                 u_soc/u_ascon/r_expected_tag_reg[2][27]/C
                             (rising edge-triggered cell FDCE clocked by clk_100mhz_unbuf  {rise@0.000ns fall@5.000ns period=10.000ns})
   Destination:            u_soc/u_ascon/u_mode_ctrl/r_expected_t1_reg[27]/D
@@ -1074,7 +1056,7 @@ Slack (MET) :             0.049ns  (arrival time - required time)
   Path Group:             clk_100mhz_unbuf
   Path Type:              Hold (Min at Fast Process Corner)
   Requirement:            0.000ns  (clk_100mhz_unbuf rise@0.000ns - clk_100mhz_unbuf rise@0.000ns)
-  Data Path Delay:        0.356ns  (logic 0.164ns (46.035%)  route 0.192ns (53.965%))
+  Data Path Delay:        0.354ns  (logic 0.164ns (46.287%)  route 0.190ns (53.713%))
   Logic Levels:           0  
   Clock Path Skew:        0.260ns (DCD - SCD - CPR)
     Destination Clock Delay (DCD):    -0.749ns
@@ -1097,7 +1079,7 @@ Slack (MET) :             0.049ns  (arrival time - required time)
     SLICE_X20Y25         FDCE                                         r  u_soc/u_ascon/r_expected_tag_reg[2][27]/C
   -------------------------------------------------------------------    -------------------
     SLICE_X20Y25         FDCE (Prop_fdce_C_Q)         0.164    -0.347 r  u_soc/u_ascon/r_expected_tag_reg[2][27]/Q
-                         net (fo=2, routed)           0.192    -0.155    u_soc/u_ascon/u_mode_ctrl/expected_tag[91]
+                         net (fo=2, routed)           0.190    -0.157    u_soc/u_ascon/u_mode_ctrl/expected_tag[91]
     SLICE_X22Y25         FDCE                                         r  u_soc/u_ascon/u_mode_ctrl/r_expected_t1_reg[27]/D
   -------------------------------------------------------------------    -------------------
 
@@ -1117,9 +1099,9 @@ Slack (MET) :             0.049ns  (arrival time - required time)
     SLICE_X22Y25         FDCE (Hold_fdce_C_D)         0.047    -0.204    u_soc/u_ascon/u_mode_ctrl/r_expected_t1_reg[27]
   -------------------------------------------------------------------
                          required time                          0.204    
-                         arrival time                          -0.155    
+                         arrival time                          -0.157    
   -------------------------------------------------------------------
-                         slack                                  0.049    
+                         slack                                  0.047    
 
 Slack (MET) :             0.053ns  (arrival time - required time)
   Source:                 u_soc/u_ascon/r_expected_tag_reg[3][17]/C
@@ -1780,7 +1762,7 @@ Slack (MET) :             2.267ns  (required time - arrival time)
   -------------------------------------------------------------------
                          slack                                  2.267    
 
-Slack (MET) :             2.327ns  (required time - arrival time)
+Slack (MET) :             2.317ns  (required time - arrival time)
   Source:                 rst_sync_reg[2]/C
                             (rising edge-triggered cell FDCE clocked by clk_100mhz_unbuf  {rise@0.000ns fall@5.000ns period=10.000ns})
   Destination:            u_soc/u_ascon/r_data_in_0_reg[20]/CLR
@@ -1788,7 +1770,7 @@ Slack (MET) :             2.327ns  (required time - arrival time)
   Path Group:             **async_default**
   Path Type:              Recovery (Max at Slow Process Corner)
   Requirement:            10.000ns  (clk_100mhz_unbuf rise@10.000ns - clk_100mhz_unbuf rise@0.000ns)
-  Data Path Delay:        6.797ns  (logic 0.608ns (8.945%)  route 6.189ns (91.055%))
+  Data Path Delay:        6.807ns  (logic 0.608ns (8.932%)  route 6.199ns (91.068%))
   Logic Levels:           1  (LUT1=1)
   Clock Path Skew:        -0.176ns (DCD - SCD + CPR)
     Destination Clock Delay (DCD):    -1.277ns = ( 8.723 - 10.000 ) 
@@ -1817,7 +1799,7 @@ Slack (MET) :             2.327ns  (required time - arrival time)
     SLICE_X36Y31         FDCE (Prop_fdce_C_Q)         0.456    -0.158 r  rst_sync_reg[2]/Q
                          net (fo=40, routed)          1.127     0.969    u_soc/u_ascon/u_mode_ctrl/u_pt_gate/mem_reg[31][63]_0[0]
     SLICE_X32Y35         LUT1 (Prop_lut1_I0_O)        0.152     1.121 f  u_soc/u_ascon/u_mode_ctrl/u_pt_gate/FSM_sequential_mem_state[1]_i_1/O
-                         net (fo=5102, routed)        5.062     6.183    u_soc/u_ascon/p_0_in
+                         net (fo=5102, routed)        5.072     6.193    u_soc/u_ascon/p_0_in
     SLICE_X5Y3           FDCE                                         f  u_soc/u_ascon/r_data_in_0_reg[20]/CLR
   -------------------------------------------------------------------    -------------------
 
@@ -1838,11 +1820,11 @@ Slack (MET) :             2.327ns  (required time - arrival time)
     SLICE_X5Y3           FDCE (Recov_fdce_C_CLR)     -0.629     8.510    u_soc/u_ascon/r_data_in_0_reg[20]
   -------------------------------------------------------------------
                          required time                          8.510    
-                         arrival time                          -6.183    
+                         arrival time                          -6.193    
   -------------------------------------------------------------------
-                         slack                                  2.327    
+                         slack                                  2.317    
 
-Slack (MET) :             2.327ns  (required time - arrival time)
+Slack (MET) :             2.317ns  (required time - arrival time)
   Source:                 rst_sync_reg[2]/C
                             (rising edge-triggered cell FDCE clocked by clk_100mhz_unbuf  {rise@0.000ns fall@5.000ns period=10.000ns})
   Destination:            u_soc/u_ascon/r_data_in_0_reg[21]/CLR
@@ -1850,7 +1832,7 @@ Slack (MET) :             2.327ns  (required time - arrival time)
   Path Group:             **async_default**
   Path Type:              Recovery (Max at Slow Process Corner)
   Requirement:            10.000ns  (clk_100mhz_unbuf rise@10.000ns - clk_100mhz_unbuf rise@0.000ns)
-  Data Path Delay:        6.797ns  (logic 0.608ns (8.945%)  route 6.189ns (91.055%))
+  Data Path Delay:        6.807ns  (logic 0.608ns (8.932%)  route 6.199ns (91.068%))
   Logic Levels:           1  (LUT1=1)
   Clock Path Skew:        -0.176ns (DCD - SCD + CPR)
     Destination Clock Delay (DCD):    -1.277ns = ( 8.723 - 10.000 ) 
@@ -1879,7 +1861,7 @@ Slack (MET) :             2.327ns  (required time - arrival time)
     SLICE_X36Y31         FDCE (Prop_fdce_C_Q)         0.456    -0.158 r  rst_sync_reg[2]/Q
                          net (fo=40, routed)          1.127     0.969    u_soc/u_ascon/u_mode_ctrl/u_pt_gate/mem_reg[31][63]_0[0]
     SLICE_X32Y35         LUT1 (Prop_lut1_I0_O)        0.152     1.121 f  u_soc/u_ascon/u_mode_ctrl/u_pt_gate/FSM_sequential_mem_state[1]_i_1/O
-                         net (fo=5102, routed)        5.062     6.183    u_soc/u_ascon/p_0_in
+                         net (fo=5102, routed)        5.072     6.193    u_soc/u_ascon/p_0_in
     SLICE_X5Y3           FDCE                                         f  u_soc/u_ascon/r_data_in_0_reg[21]/CLR
   -------------------------------------------------------------------    -------------------
 
@@ -1900,9 +1882,9 @@ Slack (MET) :             2.327ns  (required time - arrival time)
     SLICE_X5Y3           FDCE (Recov_fdce_C_CLR)     -0.629     8.510    u_soc/u_ascon/r_data_in_0_reg[21]
   -------------------------------------------------------------------
                          required time                          8.510    
-                         arrival time                          -6.183    
+                         arrival time                          -6.193    
   -------------------------------------------------------------------
-                         slack                                  2.327    
+                         slack                                  2.317    
 
 Slack (MET) :             2.337ns  (required time - arrival time)
   Source:                 rst_sync_reg[2]/C
@@ -1912,7 +1894,7 @@ Slack (MET) :             2.337ns  (required time - arrival time)
   Path Group:             **async_default**
   Path Type:              Recovery (Max at Slow Process Corner)
   Requirement:            10.000ns  (clk_100mhz_unbuf rise@10.000ns - clk_100mhz_unbuf rise@0.000ns)
-  Data Path Delay:        6.743ns  (logic 0.608ns (9.016%)  route 6.135ns (90.984%))
+  Data Path Delay:        6.744ns  (logic 0.608ns (9.016%)  route 6.136ns (90.984%))
   Logic Levels:           1  (LUT1=1)
   Clock Path Skew:        -0.220ns (DCD - SCD + CPR)
     Destination Clock Delay (DCD):    -1.321ns = ( 8.679 - 10.000 ) 
@@ -1941,7 +1923,7 @@ Slack (MET) :             2.337ns  (required time - arrival time)
     SLICE_X36Y31         FDCE (Prop_fdce_C_Q)         0.456    -0.158 r  rst_sync_reg[2]/Q
                          net (fo=40, routed)          1.127     0.969    u_soc/u_ascon/u_mode_ctrl/u_pt_gate/mem_reg[31][63]_0[0]
     SLICE_X32Y35         LUT1 (Prop_lut1_I0_O)        0.152     1.121 f  u_soc/u_ascon/u_mode_ctrl/u_pt_gate/FSM_sequential_mem_state[1]_i_1/O
-                         net (fo=5102, routed)        5.008     6.129    u_soc/u_dma_master/p_0_in
+                         net (fo=5102, routed)        5.009     6.129    u_soc/u_dma_master/p_0_in
     SLICE_X11Y5          FDCE                                         f  u_soc/u_dma_master/w0_reg_reg[16]/CLR
   -------------------------------------------------------------------    -------------------
 
@@ -1974,7 +1956,7 @@ Slack (MET) :             2.337ns  (required time - arrival time)
   Path Group:             **async_default**
   Path Type:              Recovery (Max at Slow Process Corner)
   Requirement:            10.000ns  (clk_100mhz_unbuf rise@10.000ns - clk_100mhz_unbuf rise@0.000ns)
-  Data Path Delay:        6.743ns  (logic 0.608ns (9.016%)  route 6.135ns (90.984%))
+  Data Path Delay:        6.744ns  (logic 0.608ns (9.016%)  route 6.136ns (90.984%))
   Logic Levels:           1  (LUT1=1)
   Clock Path Skew:        -0.220ns (DCD - SCD + CPR)
     Destination Clock Delay (DCD):    -1.321ns = ( 8.679 - 10.000 ) 
@@ -2003,7 +1985,7 @@ Slack (MET) :             2.337ns  (required time - arrival time)
     SLICE_X36Y31         FDCE (Prop_fdce_C_Q)         0.456    -0.158 r  rst_sync_reg[2]/Q
                          net (fo=40, routed)          1.127     0.969    u_soc/u_ascon/u_mode_ctrl/u_pt_gate/mem_reg[31][63]_0[0]
     SLICE_X32Y35         LUT1 (Prop_lut1_I0_O)        0.152     1.121 f  u_soc/u_ascon/u_mode_ctrl/u_pt_gate/FSM_sequential_mem_state[1]_i_1/O
-                         net (fo=5102, routed)        5.008     6.129    u_soc/u_dma_master/p_0_in
+                         net (fo=5102, routed)        5.009     6.129    u_soc/u_dma_master/p_0_in
     SLICE_X11Y5          FDCE                                         f  u_soc/u_dma_master/w0_reg_reg[17]/CLR
   -------------------------------------------------------------------    -------------------
 
@@ -2036,7 +2018,7 @@ Slack (MET) :             2.337ns  (required time - arrival time)
   Path Group:             **async_default**
   Path Type:              Recovery (Max at Slow Process Corner)
   Requirement:            10.000ns  (clk_100mhz_unbuf rise@10.000ns - clk_100mhz_unbuf rise@0.000ns)
-  Data Path Delay:        6.743ns  (logic 0.608ns (9.016%)  route 6.135ns (90.984%))
+  Data Path Delay:        6.744ns  (logic 0.608ns (9.016%)  route 6.136ns (90.984%))
   Logic Levels:           1  (LUT1=1)
   Clock Path Skew:        -0.220ns (DCD - SCD + CPR)
     Destination Clock Delay (DCD):    -1.321ns = ( 8.679 - 10.000 ) 
@@ -2065,7 +2047,7 @@ Slack (MET) :             2.337ns  (required time - arrival time)
     SLICE_X36Y31         FDCE (Prop_fdce_C_Q)         0.456    -0.158 r  rst_sync_reg[2]/Q
                          net (fo=40, routed)          1.127     0.969    u_soc/u_ascon/u_mode_ctrl/u_pt_gate/mem_reg[31][63]_0[0]
     SLICE_X32Y35         LUT1 (Prop_lut1_I0_O)        0.152     1.121 f  u_soc/u_ascon/u_mode_ctrl/u_pt_gate/FSM_sequential_mem_state[1]_i_1/O
-                         net (fo=5102, routed)        5.008     6.129    u_soc/u_dma_master/p_0_in
+                         net (fo=5102, routed)        5.009     6.129    u_soc/u_dma_master/p_0_in
     SLICE_X11Y5          FDCE                                         f  u_soc/u_dma_master/w0_reg_reg[23]/CLR
   -------------------------------------------------------------------    -------------------
 
@@ -2098,7 +2080,7 @@ Slack (MET) :             2.337ns  (required time - arrival time)
   Path Group:             **async_default**
   Path Type:              Recovery (Max at Slow Process Corner)
   Requirement:            10.000ns  (clk_100mhz_unbuf rise@10.000ns - clk_100mhz_unbuf rise@0.000ns)
-  Data Path Delay:        6.743ns  (logic 0.608ns (9.016%)  route 6.135ns (90.984%))
+  Data Path Delay:        6.744ns  (logic 0.608ns (9.016%)  route 6.136ns (90.984%))
   Logic Levels:           1  (LUT1=1)
   Clock Path Skew:        -0.220ns (DCD - SCD + CPR)
     Destination Clock Delay (DCD):    -1.321ns = ( 8.679 - 10.000 ) 
@@ -2127,7 +2109,7 @@ Slack (MET) :             2.337ns  (required time - arrival time)
     SLICE_X36Y31         FDCE (Prop_fdce_C_Q)         0.456    -0.158 r  rst_sync_reg[2]/Q
                          net (fo=40, routed)          1.127     0.969    u_soc/u_ascon/u_mode_ctrl/u_pt_gate/mem_reg[31][63]_0[0]
     SLICE_X32Y35         LUT1 (Prop_lut1_I0_O)        0.152     1.121 f  u_soc/u_ascon/u_mode_ctrl/u_pt_gate/FSM_sequential_mem_state[1]_i_1/O
-                         net (fo=5102, routed)        5.008     6.129    u_soc/u_dma_master/p_0_in
+                         net (fo=5102, routed)        5.009     6.129    u_soc/u_dma_master/p_0_in
     SLICE_X11Y5          FDCE                                         f  u_soc/u_dma_master/w0_reg_reg[26]/CLR
   -------------------------------------------------------------------    -------------------
 
@@ -2160,7 +2142,7 @@ Slack (MET) :             2.337ns  (required time - arrival time)
   Path Group:             **async_default**
   Path Type:              Recovery (Max at Slow Process Corner)
   Requirement:            10.000ns  (clk_100mhz_unbuf rise@10.000ns - clk_100mhz_unbuf rise@0.000ns)
-  Data Path Delay:        6.743ns  (logic 0.608ns (9.016%)  route 6.135ns (90.984%))
+  Data Path Delay:        6.744ns  (logic 0.608ns (9.016%)  route 6.136ns (90.984%))
   Logic Levels:           1  (LUT1=1)
   Clock Path Skew:        -0.220ns (DCD - SCD + CPR)
     Destination Clock Delay (DCD):    -1.321ns = ( 8.679 - 10.000 ) 
@@ -2189,7 +2171,7 @@ Slack (MET) :             2.337ns  (required time - arrival time)
     SLICE_X36Y31         FDCE (Prop_fdce_C_Q)         0.456    -0.158 r  rst_sync_reg[2]/Q
                          net (fo=40, routed)          1.127     0.969    u_soc/u_ascon/u_mode_ctrl/u_pt_gate/mem_reg[31][63]_0[0]
     SLICE_X32Y35         LUT1 (Prop_lut1_I0_O)        0.152     1.121 f  u_soc/u_ascon/u_mode_ctrl/u_pt_gate/FSM_sequential_mem_state[1]_i_1/O
-                         net (fo=5102, routed)        5.008     6.129    u_soc/u_dma_master/p_0_in
+                         net (fo=5102, routed)        5.009     6.129    u_soc/u_dma_master/p_0_in
     SLICE_X11Y5          FDCE                                         f  u_soc/u_dma_master/w0_reg_reg[5]/CLR
   -------------------------------------------------------------------    -------------------
 

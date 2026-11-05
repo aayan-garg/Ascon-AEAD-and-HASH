@@ -113,12 +113,12 @@ results/
 ### Permutation Variants (XC7Z010 OOC @ 100 MHz)
 See [`results/performance/comparison_table.md`](results/performance/comparison_table.md) for full table.
 
-| Variant | Fmax (MHz) | AEAD Throughput |
-|---------|-----------|-----------------|
-| permutation_1r (baseline) | ~200 | 1600 Mbit/s |
-| permutation_2r (unrolled) | ~165 | ~2640 Mbit/s |
-| permutation_half (serialized) | ~264 | ~800 Mbit/s |
-| permutation_serial32 (paper) | TBD | ~800 Mbit/s |
+| Variant | Fmax (MHz) | AEAD Throughput @ 100MHz | AEAD Throughput @ Fmax |
+|---------|:---:|:---:|:---:|
+| permutation_1r (baseline) | 206.36 | 1600.00 Mbit/s | 3301.69 Mbit/s |
+| permutation_2r (unrolled) | 135.85 | 3200.00 Mbit/s | 4347.24 Mbit/s |
+| permutation_half (folded) | 264.90 | 800.00 Mbit/s | 2119.21 Mbit/s |
+| permutation_serial32 (paper) | 153.99 | 800.00 Mbit/s | 1231.91 Mbit/s |
 
 ### Formal Verification
 - **NuSMV 2.6.0** proved `AG(jump → hash_ok)` and 4 other safety properties on `formal/ctl/boot_safety_corrected.smv`
@@ -134,10 +134,13 @@ See [`results/board/HARDWARE_RUNBOOK.md`](results/board/HARDWARE_RUNBOOK.md) for
 | LED Pattern | Meaning |
 |-------------|---------|
 | Blue RGB + LED[0] | Booting / hashing in progress |
-| All 4 LEDs on + Green RGB | BOOT OK — image verified |
-| LEDs 1,3 alternating + Red RGB | BOOT REFUSED — tamper detected |
+| All 4 LEDs on (`4'b1111`) + Green RGB | **BOOT OK** — candidate firmware authentic & verified |
+| Alternating LEDs (`4'b1010`) + Red RGB | **BOOT REFUSED** — hash mismatch or tamper detected |
 
-**Tamper demo:** Flip SW1 high to inject `tamper_det=1` → immediate sticky BOOT REFUSED lockout.
+**Deliverable Demo (Byte-Flip via Switch):**
+- **SW0 = 0:** Candidate image authentic → system boots, discrete LEDs illuminate solid `4'b1111` and RGB glows GREEN.
+- **SW0 = 1:** Hardware inverts bit 0 of payload byte `0x1040` during DMA stream → hash digest fails → discrete LEDs display `4'b1010` and RGB glows RED.
+- **SW1 = 1:** Asserts physical `tamper_det` → immediate sticky refusal lockout.
 
 ---
 

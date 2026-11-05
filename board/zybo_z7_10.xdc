@@ -17,11 +17,11 @@ create_clock -add -name sys_clk_pin -period 8.000 -waveform {0 4.000} [get_ports
 set_property -dict { PACKAGE_PIN K18   IOSTANDARD LVCMOS33 } [get_ports { rst_btn }]; # btn[0], IO_L12N_T1_MRCC_35 Sch=btn[0]
 
 ## -----------------------------------------------------------------------------
-## 3. User Push Buttons (BTN1..BTN3)
+## 3. User Push Buttons (BTN1..BTN3) — Unused in top_bringup_board
 ## -----------------------------------------------------------------------------
-set_property -dict { PACKAGE_PIN P16   IOSTANDARD LVCMOS33 } [get_ports { btn[1] }]; # IO_L24N_T3_34 Sch=btn[1]
-set_property -dict { PACKAGE_PIN K19   IOSTANDARD LVCMOS33 } [get_ports { btn[2] }]; # IO_L10P_T1_AD11P_35 Sch=btn[2]
-set_property -dict { PACKAGE_PIN Y16   IOSTANDARD LVCMOS33 } [get_ports { btn[3] }]; # IO_L7P_T1_34 Sch=btn[3]
+# set_property -dict { PACKAGE_PIN P16   IOSTANDARD LVCMOS33 } [get_ports { btn[1] }]; # IO_L24N_T3_34 Sch=btn[1]
+# set_property -dict { PACKAGE_PIN K19   IOSTANDARD LVCMOS33 } [get_ports { btn[2] }]; # IO_L10P_T1_AD11P_35 Sch=btn[2]
+# set_property -dict { PACKAGE_PIN Y16   IOSTANDARD LVCMOS33 } [get_ports { btn[3] }]; # IO_L7P_T1_34 Sch=btn[3]
 
 ## -----------------------------------------------------------------------------
 ## 4. User Slide Switches (SW0..SW3) - Used for tamper injection / mode select

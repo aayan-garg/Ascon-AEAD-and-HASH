@@ -34,62 +34,83 @@ vivado -mode batch -source scripts/program_board.tcl
 **Setup:** All switches SW0–SW3 = LOW (0)
 
 **Expected sequence:**
-1. Blue RGB LED on → Hashing in progress (boot_ctrl in HASH/WAIT_HASH state)
-2. After ~22 µs (≈2,200 cycles @ 100 MHz for 64-byte image): All 4 LEDs solid ON + Green RGB LED → **BOOT OK**
+1. Blue RGB LED on → Hashing in progress (`boot_ctrl` in HASH/WAIT_HASH state)
+2. After 906 cycles (9.06 µs @ 100 MHz for 64-byte image): Hardware verifies digest and grants `jump_enable`.
+3. After 1,342 cycles (13.42 µs @ 100 MHz): Application payload executes, asserting all 4 LEDs solid ON (`4'b1111`) + Green RGB LED → **BOOT OK**.
 
-**Pass criteria:** LED[3:0] = 4'b1111, RGB = Green
+**Pass criteria:** LED[3:0] = 4'b1111, RGB = Green.
 
 ---
 
-## Step 3 — Tamper Demo (SW1 = HIGH)
+## Step 3 — Primary Project Deliverable Demo: Byte-Flipping Fault Injection (SW0 = HIGH)
 
-**Setup:** Flip SW1 to HIGH before or during boot
+**Requirement:** `[SPEC]` Project_PS.md "Demo: good image boots (LED pattern); flipping one byte via a switch makes the boot refuse."
 
-**What it does:** SW1 asserts `tamper_det` input to `boot_ctrl.sv`. The FSM latches tamper and enters `STATE_HALT_REFUSE` immediately and permanently.
+**Setup:**
+1. Flip **SW0 to HIGH (1)** before pressing BTN0 (reset), or while the system is running.
+2. Press **BTN0 (Reset)** to trigger a fresh boot cycle with SW0 active.
+
+**Hardware Fault Mechanism:**
+- When `SW0 == 1`, hardware in `top_bringup.sv` intercepts the DMA stream at address `0x0000_1040` (word index `12'h410`), inverting bit 0 of the first application payload byte:
+  ```systemverilog
+  wire [31:0] dma_bram_rdata = (sw[0] && (dma_bram_addr_q == 12'h410)) ?
+                               (dma_bram_raw ^ 32'h00000001) : dma_bram_raw;
+  ```
+- The Boot ROM streams candidate payload through DMA into the Ascon Hash-256 accelerator.
+- The computed hash digest fails comparison against the reference manifest in Boot ROM and hardware `boot_ctrl`.
+- The system unconditionally enters `STATE_HALT_REFUSE`, activating the hardware refusal pattern.
+
+**Expected Observation:**
+1. Discrete LEDs display alternating refusal pattern: **`4'b1010`** (LD3 ON, LD2 OFF, LD1 ON, LD0 OFF).
+2. RGB LED LD6 lights solid **RED** (`3'b001`).
+3. Execution locks out in an infinite dead-loop; `fetch_guard` suppresses any instruction fetches to application memory.
+
+**Recovery (Proving Both Outcomes on Hardware):**
+1. Flip **SW0 back to LOW (0)**.
+2. Press **BTN0 (Reset)**.
+3. System immediately returns to **BOOT OK**: all 4 discrete LEDs ON (`4'b1111`) and RGB LED glowing **GREEN**.
+
+---
+
+## Step 4 — Glitch / Tamper Sensor Injection Demo (SW1 = HIGH)
+
+**Setup:** Flip SW1 to HIGH.
+
+**What it does:** SW1 asserts physical `tamper_det` input to `boot_ctrl.sv`. The hardware FSM latches tamper sticky in `tamper_latched_q` and immediately enters `STATE_HALT_REFUSE`.
 
 **Expected:**
-1. LEDs 1 and 3 toggle alternately (pattern 4'b1010 / 4'b0101) + Red RGB LED → **BOOT REFUSED**
-2. State is **sticky** — pressing BTN0 (reset) is the only way to clear it.
-
-**Pass criteria:** RGB = Red, LEDs show refusal pattern. Toggling SW1 back to LOW does NOT clear the refusal.
+1. Discrete LEDs show **`4'b1010`** + solid **RED** RGB LED → **BOOT REFUSED**.
+2. State is **sticky** — flipping SW1 back to LOW does NOT clear the refusal. Only pressing BTN0 (system reset) clears the latch.
 
 ---
 
-## Step 4 — Corrupted Image Demo
+## Step 5 — Corrupted Image Hex Demonstration
 
-The FIRMWARE_HEX parameter in `top_bringup_board.sv` can be changed to load a corrupted image:
+The `FIRMWARE_HEX` parameter in `top_bringup_board.sv` can be changed to load a pre-compiled faulty image:
 
-| FIRMWARE_HEX | Expected Outcome |
-|---|---|
-| `firmware/tests/boot_matrix/bram_case1_valid.hex` | BOOT OK (Green) |
-| `firmware/tests/boot_matrix/bram_case2_flipped.hex` | BOOT REFUSED (Red) |
-| `firmware/tests/boot_matrix/bram_case3_wrong_digest.hex` | BOOT REFUSED (Red) |
-| `firmware/tests/boot_matrix/bram_case4_invalid_len.hex` | BOOT REFUSED (Red) |
-| `firmware/tests/boot_matrix/bram_case5_bad_magic.hex` | BOOT REFUSED (Red) |
-
-To switch images: rebuild bitstream with new FIRMWARE_HEX generic, then reprogram.
+| FIRMWARE_HEX | Expected Outcome | Discrete LEDs | RGB LED |
+|---|:---:|:---:|:---:|
+| `firmware/tests/boot_matrix/bram_case1_valid.hex` | **BOOT OK** | `4'b1111` | **GREEN** |
+| `firmware/tests/boot_matrix/bram_case2_flipped.hex` | **BOOT REFUSED** | `4'b1010` | **RED** |
+| `firmware/tests/boot_matrix/bram_case3_wrong_digest.hex` | **BOOT REFUSED** | `4'b1010` | **RED** |
+| `firmware/tests/boot_matrix/bram_case4_invalid_len.hex` | **BOOT REFUSED** | `4'b1010` | **RED** |
+| `firmware/tests/boot_matrix/bram_case5_bad_magic.hex` | **BOOT REFUSED** | `4'b1010` | **RED** |
 
 ---
 
-## Step 5 — Reading Boot Cycles
+## Step 6 — Cycle-Accurate Boot Latency Benchmarks
 
-Boot time is measured cycle-accurately in simulation by `tb_secure_boot.sv` (see case log files in `results/board/boot_matrix/`).
+Boot time was measured cycle-accurately in simulation by `tb_secure_boot.sv` and `tb_payload_sizes.sv` (see [`results/board/boot_matrix/boot_scaling_benchmark.log`](boot_matrix/boot_scaling_benchmark.log)):
 
-For on-board measurement, use a logic analyzer on GPIO pins or route `boot_ctrl`'s `jump_enable` to a spare GPIO and use an oscilloscope.
+| Payload Size | Reset Release $\rightarrow$ `jump_enable` | Time to Jump (@ 100 MHz) | Reset Release $\rightarrow$ `test_pass` | Total Boot Time (@ 100 MHz) |
+|:---:|:---:|:---:|:---:|:---:|
+| **64 Bytes** | **906 cycles** | **9.06 µs** | **1,342 cycles** | **13.42 µs** |
+| **1,024 Bytes (1 KB)** | **2,706 cycles** | **27.06 µs** | **3,155 cycles** | **31.55 µs** |
+| **4,096 Bytes (4 KB)** | **8,462 cycles** | **84.62 µs** | **8,933 cycles** | **89.33 µs** |
 
-**Formula:**
-```
-Boot time (µs) = cycles_to_jump / 100.0
-```
-
-| Image Size | Expected Cycles (sim) | Expected Time @ 100 MHz |
-|---|---|---|
-| 64 B | ~2,200 | ~22 µs |
-| 256 B | ~5,400 | ~54 µs |
-| 1 KB | ~19,000 | ~190 µs |
-| 4 KB | ~73,000 | ~730 µs |
-
-*(Cycle counts are estimates based on: 12-round hash init + 8 rounds/64-bit block × blocks + 12-round finalize + DMA overhead. Measured values from simulation take precedence.)*
+**Empirical Scaling Model ($L$ in bytes):**
+$$\text{Cycles to Jump}(L) = 1.874 \times L + 786.5\quad (18.74\text{ ns/byte} + 7.865\ \mu\text{s})$$
+$$\text{Cycles to Pass}(L) = 1.882 \times L + 1225.2\quad (18.82\text{ ns/byte} + 12.252\ \mu\text{s})$$
 
 ---
 
