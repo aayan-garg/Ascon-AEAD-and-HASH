@@ -9,6 +9,7 @@ This document records all architectural improvements, audit remediations, verifi
 - Regenerated `results/board/dma_boundary.log` by running `tb/integration/tb_dma.sv` with Vivado XSim; the testbench now writes the evidence log itself.
 - Rewrote the stale T6.3 row in `docs/AUDIT_RESPONSE.md` to identify external ESPRESSO minimization, RTL-to-PLA conversion, and the NOT DONE extraction/decomposition status.
 - Attempted to refresh `results/regression.log` with `python scripts/run_regression.py` from a clean clone; 38 suites passed, but `tb_hash_full_2r.sv` exceeded the runner timeout, so the transcript records a failure rather than claiming a full pass. The forced-jump and SoC-DMA integration evidence was regenerated with XSim.
+- Retried `tb/unit/tb_hash_full_2r.sv` with Vivado XSim using an extended timeout; all 1,025 Hash-256 vectors passed and the fresh KAT log was regenerated.
 
 - **November 5, 2026 audit correction:** Renamed the circular PLA artifact,
   removed the unexecuted ESPRESSO provenance claim, and documented that the
