@@ -49,16 +49,17 @@ If a question arises about:
 
 | Document | Location | Consult When... |
 |---|---|---|
-| **Initial Research** | [`../Initial Research.md`](../Initial%20Research.md) | Starting a new phase; needing architecture rationale; checking requirements traceability (§3); understanding the S-box/permutation/CTL strategy |
-| **Research Plan** | [`docs/research_plan.md`](docs/research_plan.md) | Performing any research task; verifying sources; deciding which paper/technique to implement for R15 |
-| **Implementation Plan** | [`docs/implementation_plan.md`](docs/implementation_plan.md) | Deciding what to build next; checking phase dependencies; verifying exit gates before moving on |
+| **Initial Research** | [`../Initial Research.md`](../Initial Research.md) | Needing architecture rationale; checking original requirements analysis (§3); understanding initial S-box/permutation/CTL strategy |
+| **Final Technical Report** | [`docs/final_report.md`](docs/final_report.md) | Reviewing complete technical evaluation, verification results, and project closure |
+| **Research Review** | [`docs/research_review.md`](docs/research_review.md) | Reviewing peer-reviewed literature, verified DOIs, and S-box optimization trade-offs |
+| **Requirements Traceability** | [`docs/requirements_traceability.md`](docs/requirements_traceability.md) | Single source of truth for R1–R19 status and evidence file links |
 | **Directory Structure** | [`docs/directory_structure.md`](docs/directory_structure.md) | Creating any new file or directory; doing a structural review |
 | **Status Tracker** | [`docs/status.md`](docs/status.md) | Starting any session (to know where we left off); after completing any task (to update it) |
 | **Project Spec** | [`../Project_PS.md`](../Project_PS.md) | Verifying a requirement is real vs. recommended; checking exact spec wording |
-| **Requirements Traceability** | [`docs/requirements_traceability.md`](docs/requirements_traceability.md) | Mapping a task to its requirement; verifying no requirement is orphaned |
 | **Register Map** | [`docs/register_map.md`](docs/register_map.md) | Writing bus integration RTL or firmware that accesses the accelerator |
 | **Architecture** | [`docs/architecture.md`](docs/architecture.md) | Understanding FSMs, data flows, mode controller state table |
 | **Threat Model** | [`docs/threat_model.md`](docs/threat_model.md) | Writing secure-boot logic; understanding trust boundaries |
+| **Audit Response** | [`docs/AUDIT_RESPONSE.md`](docs/AUDIT_RESPONSE.md) | Reviewing audit findings, remediation history, and evidence artifacts |
 | **Decisions Log** | [`docs/decisions/`](docs/decisions/) | Checking if an ambiguity has been resolved; recording a new decision |
 
 ---
@@ -107,7 +108,7 @@ All claims, numbers, and recommendations in documentation must be tagged:
 ## 5. Phase Gate Protocol
 
 Before advancing from Phase N to Phase N+1:
-1. **All** Phase N checklist items in [`docs/implementation_plan.md`](docs/implementation_plan.md) must be `[x]`.
+1. **All** requirement items in [`docs/requirements_traceability.md`](docs/requirements_traceability.md) must be verified.
 2. **All** tests for Phase N must show `PASS` with evidence files in `results/`.
 3. [`docs/status.md`](docs/status.md) must reflect the completed phase.
 4. If a hard gate exists (e.g., "board LED toggle" for Phase 2), that evidence must be recorded before proceeding.
@@ -135,7 +136,7 @@ If any answer is "no" → stop and research before continuing.
 At the beginning of every new conversation/session:
 1. Read this file (`AGENTS.md`).
 2. Read [`docs/status.md`](docs/status.md) to understand current state.
-3. Read [`docs/implementation_plan.md`](docs/implementation_plan.md) to understand what's next.
+3. Read [`docs/requirements_traceability.md`](docs/requirements_traceability.md) and [`docs/final_report.md`](docs/final_report.md) to understand verification status.
 4. If the user gives a task, map it to a phase/requirement before starting work.
 5. After completing the task, update `docs/status.md`.
 

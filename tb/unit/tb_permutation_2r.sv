@@ -170,7 +170,7 @@ module tb_permutation_2r;
 
         $display("================================================================");
         if (errors == 0) begin
-            $display("[SUCCESS] ALL PERMUTATION 2R TESTS PASSED (100% BIT-EXACT)!");
+            $display("[SUCCESS] All permutation 2R tests passed.");
             $finish(0);
         end else begin
             $display("[FATAL] Permutation 2R test failed with %0d errors!", errors);

@@ -1,10 +1,12 @@
 // ==============================================================================
 // Testbench: tb_sbox_equiv.sv
-// Target: Phase 4 Permutation Datapath Verification
+// Target: Phase 4 Permutation Datapath Verification & Task B4 S-Box Characterization
 // Description: Exhaustive 32-vector formal equivalence testbench comparing:
 //   1. Baseline bit-slice algebraic S-box (sbox5.sv)
 //   2. ESPRESSO two-level minimized S-box (sbox5_espresso.sv)
-//   3. NIST SP 800-232 Table 6 Normative Golden Truth Table
+//   3. Algebraic Kernel factored S-box (sbox5_kernel.sv)
+//   4. Binary Decision Diagram / Shannon Mux S-box (sbox5_bdd.sv)
+//   5. NIST SP 800-232 Table 6 Normative Golden Truth Table
 // ==============================================================================
 
 `timescale 1ns / 1ps
@@ -14,17 +16,31 @@ module tb_sbox_equiv;
     logic [4:0] in_x;
     wire  [4:0] out_base;
     wire  [4:0] out_espresso;
+    wire  [4:0] out_kernel;
+    wire  [4:0] out_bdd;
 
-    // Instantiate Baseline S-box
+    // 1. Instantiate Baseline S-box
     sbox5 u_base (
         .in_x  (in_x),
         .out_y (out_base)
     );
 
-    // Instantiate ESPRESSO-minimized S-box
+    // 2. Instantiate ESPRESSO-minimized S-box
     sbox5_espresso u_espresso (
         .in_x  (in_x),
         .out_y (out_espresso)
+    );
+
+    // 3. Instantiate Algebraic Kernel S-box
+    sbox5_kernel u_kernel (
+        .in_x  (in_x),
+        .out_y (out_kernel)
+    );
+
+    // 4. Instantiate BDD Shannon Mux S-box
+    sbox5_bdd u_bdd (
+        .in_x  (in_x),
+        .out_y (out_bdd)
     );
 
     // NIST SP 800-232 Table 6 Normative Golden Array
@@ -39,8 +55,8 @@ module tb_sbox_equiv;
 
     initial begin
         $display("================================================================");
-        $display("STARTING ASCON S-BOX DUAL-IMPLEMENTATION EQUIVALENCE CHECK: tb_sbox_equiv");
-        $display("Implementations: sbox5.sv vs sbox5_espresso.sv vs NIST Table 6");
+        $display("STARTING ASCON S-BOX QUAD-IMPLEMENTATION EQUIVALENCE CHECK");
+        $display("Implementations: Baseline vs ESPRESSO vs Kernel vs BDD vs NIST Table 6");
         $display("================================================================");
 
         for (int i = 0; i < 32; i++) begin
@@ -57,17 +73,21 @@ module tb_sbox_equiv;
                 errors++;
             end
 
-            if (out_base !== out_espresso) begin
-                $display("[ERROR] Equivalence mismatch between Base (0x%02h) and ESPRESSO (0x%02h) at 0x%02h",
-                         out_base, out_espresso, i);
+            if (out_kernel !== SBOX_GOLDEN[i]) begin
+                $display("[ERROR] Kernel mismatch at 0x%02h: Got 0x%02h, Exp 0x%02h", i, out_kernel, SBOX_GOLDEN[i]);
+                errors++;
+            end
+
+            if (out_bdd !== SBOX_GOLDEN[i]) begin
+                $display("[ERROR] BDD mismatch at 0x%02h: Got 0x%02h, Exp 0x%02h", i, out_bdd, SBOX_GOLDEN[i]);
                 errors++;
             end
         end
 
         $display("================================================================");
         if (errors == 0) begin
-            $display("[SUCCESS] 100% EQUIVALENCE CONFIRMED: Baseline == ESPRESSO == NIST Golden Table!");
-            $display("Total vectors checked: 32 / 32 (Zero mismatches)");
+            $display("[SUCCESS] Equivalence confirmed: Baseline == ESPRESSO == Kernel == BDD == NIST Golden Table.");
+            $display("Total vectors checked: 32 / 32 per implementation (128 assertions, 0 mismatches)");
             $finish(0);
         end else begin
             $display("[FATAL] Equivalence check failed with %0d errors!", errors);

@@ -58,6 +58,16 @@ module round_core #(
                     .in_x  (sbox_in),
                     .out_y (sbox_out)
                 );
+            end else if (SBOX_TYPE == "KERNEL") begin : gen_kernel
+                sbox5_kernel u_sbox5 (
+                    .in_x  (sbox_in),
+                    .out_y (sbox_out)
+                );
+            end else if (SBOX_TYPE == "BDD") begin : gen_bdd
+                sbox5_bdd u_sbox5 (
+                    .in_x  (sbox_in),
+                    .out_y (sbox_out)
+                );
             end else begin : gen_baseline
                 sbox5 u_sbox5 (
                     .in_x  (sbox_in),

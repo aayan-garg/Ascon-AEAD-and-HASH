@@ -28,8 +28,8 @@
 | When doing... | Read... |
 |---|---|
 | Starting a session | `AGENTS.md`, `docs/status.md` |
-| Planning next steps | `docs/implementation_plan.md` |
-| Doing research | `docs/research_plan.md` |
+| Checking project status | `docs/final_report.md`, `docs/requirements_traceability.md` |
+| Doing research | `docs/research_review.md` |
 | Writing RTL | `docs/architecture.md`, `docs/register_map.md` |
 | Adding files | `docs/directory_structure.md` |
 | Checking requirements | `docs/requirements_traceability.md` |

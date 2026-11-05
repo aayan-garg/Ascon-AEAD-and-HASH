@@ -83,12 +83,14 @@ board/
   zybo_z7_10.xdc         Physical constraints (pins, clock, I/O)
   timing_ooc.xdc         OOC timing constraints
 docs/
-  architecture.md         System architecture
+  final_report.md         Comprehensive technical evaluation report
+  requirements_traceability.md Single source of truth for R1-R19
+  AUDIT_RESPONSE.md       Single source of truth for audit remediations
+  architecture.md         System architecture and submodule design
   research_review.md      Literature survey + technique selection
+  threat_model.md         Security threat model & attack surfaces
+  CHANGELOG.md            Consolidation record & change history
   decisions/              Architecture decision records
-  ps_reevaluation.md      Independent audit against problem statement
-  threat_model.md         Security threat model
-  validation_report.md    Verification evidence + corrections log
 results/
   kat/            KAT pass logs
   formal/nuxmv/   Real NuSMV 2.6.0 transcripts

@@ -113,7 +113,7 @@ module tb_diffusion;
 
         $display("================================================================");
         if (errors == 0) begin
-            $display("[SUCCESS] LINEAR DIFFUSION LAYER 100% VERIFIED!");
+            $display("[SUCCESS] Linear diffusion layer tests passed.");
             $finish(0);
         end else begin
             $display("[FATAL] Diffusion verification failed with %0d errors!", errors);

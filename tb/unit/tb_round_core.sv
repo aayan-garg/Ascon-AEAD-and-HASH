@@ -68,7 +68,7 @@ module tb_round_core;
 
         $display("================================================================");
         if (errors == 0) begin
-            $display("[SUCCESS] ASCON COMBINATIONAL ROUND CORE 100% VERIFIED!");
+            $display("[SUCCESS] Ascon combinational round core tests passed.");
             $finish(0);
         end else begin
             $display("[FATAL] Round core verification failed with %0d errors!", errors);

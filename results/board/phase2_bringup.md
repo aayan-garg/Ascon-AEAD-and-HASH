@@ -1,7 +1,7 @@
 # Phase 2: RISC-V Core (PicoRV32) Bring-Up Report
 
-- **Date:** 2026-10-21
-- **Status:** `[x] SIMULATION VERIFIED; SYNTHESIS READY`
+- **Date:** 2026-10-21 (Updated November 5, 2026)
+- **Status:** `[x] SIMULATION VERIFIED; TIMING CLOSED AT ROUTE_DESIGN`
 - **Core:** PicoRV32 RV32I AXI4-Lite Core (`rtl/soc/picorv32.v`)
 - **Top-Level:** `rtl/soc/top_bringup.sv`
 - **Testbench:** `tb/unit/tb_picorv32_bringup.sv`
@@ -45,6 +45,7 @@
 |---|---|---|---|
 | `0x0000_0000 - 0x0000_3FFF` | 16 KB | R/W | Unified instruction and data Block RAM |
 | `0x1000_0000 - 0x1000_000F` | 16 B | R/W | GPIO Output Control (LEDs, RGB LED, Test Flag) |
+| `0x4000_0000 - 0x4000_0FFF` | 4 KB | R/W | Ascon Cryptographic Engine & DMA Registers |
 
 ---
 
@@ -92,45 +93,40 @@ ALL PHASE 2 CRITERIA SATISFIED: PicoRV32 bring-up VERIFIED!
 
 ## 5. Post-Routing FPGA Utilization (Zybo Z7-10 / XC7Z010-1CLG400C)
 
-Synthesized and placed/routed with AMD-Xilinx Vivado v2025.1.0 (`scripts/build_bitstream.tcl`):
+Synthesized and placed/routed with AMD-Xilinx Vivado v2025.1.0:
+
+### Full SoC Bring-Up with Ascon Coprocessor & DMA (`top_bringup_board`)
+*Report: [`results/synthesis/utilization_bringup.txt`](../synthesis/utilization_bringup.txt)*
 
 | Resource Type | Used | Total Available | Utilization (%) |
-|---|---|---|---|
-| **Slice LUTs** | **1,001** | 17,600 | **5.69%** |
-| - LUT as Logic | 957 | 17,600 | 5.44% |
+|---|:---:|:---:|:---:|
+| **Slice LUTs** | **5,088** | 17,600 | **28.91%** |
+| - LUT as Logic | 5,044 | 17,600 | 28.66% |
 | - LUT as Distributed RAM | 44 | 6,000 | 0.73% |
-| **Slice Registers (FF)** | **569** | 35,200 | **1.62%** |
+| **Slice Registers (FF)** | **5,486** | 35,200 | **15.59%** |
 | **Block RAM (RAMB36E1)** | **4** | 60 | **6.67%** (16 KB) |
 | **DSPs** | **0** | 80 | **0.00%** |
 | **Clock Primitives (MMCM)** | **1** | 2 | **50.00%** |
 | **Global Clock Buffers (BUFG)**| **2** | 32 | **6.25%** |
 
-Full report: [`results/synthesis/utilization_bringup.txt`](../synthesis/utilization_bringup.txt)
+*(Standalone baseline PicoRV32 core alone accounts for ~1,001 LUTs and 569 FFs; the integrated Ascon coprocessor, DMA engine, boot controller, and fetch guard comprise the remainder).*
 
 ---
 
 ## 6. Static Timing Analysis (STA) at 100 MHz
 
+*Report: [`results/timing/timing_bringup.txt`](../timing/timing_bringup.txt)*
+
 | Metric | Target | Measured | Timing Margin / Status |
-|---|---|---|---|
+|---|---|:---:|---|
 | **Worst Negative Slack (WNS)** | $\ge 0.000\text{ ns}$ | **+1.570 ns** | **MET (1.570 ns positive setup slack)** |
 | **Total Negative Slack (TNS)** | $0.000\text{ ns}$ | **0.000 ns** | **MET (0 failing endpoints)** |
 | **Worst Hold Slack (WHS)** | $\ge 0.000\text{ ns}$ | **+0.036 ns** | **MET (No hold violations)** |
 | **Total Hold Slack (THS)** | $0.000\text{ ns}$ | **0.000 ns** | **MET (0 failing endpoints)** |
-| **Primary Clock (`sys_clk_pin`)**| 125 MHz (8.000 ns) | 125.000 MHz | **MET** |
-| **CPU System Clock (`clk_100mhz`)**| 100 MHz (10.000 ns)| 100.000 MHz | **MET** |
-
-Full report: [`results/timing/timing_bringup.txt`](../timing/timing_bringup.txt)
+| **Maximum Frequency ($F_{max}$)**| $\ge 100\text{ MHz}$ | **118.62 MHz** | **MET** |
 
 ---
 
-## 7. Bitstream Generation & Hardware Programming
+## 7. Implementation & Hardware Scope Status
 
-- **Generated Bitstream:** `build/top_bringup.bit` (MD5 / bitgen completed successfully with 0 errors).
-- **Physical Board Top-Level:** [`rtl/soc/top_bringup_board.sv`](../../rtl/soc/top_bringup_board.sv)
-- **Board Firmware:** [`firmware/tests/gpio_toggle_board.c`](../../firmware/tests/gpio_toggle_board.c) with calibrated 0.25-second delays per step.
-- **Automated JTAG Programming Script:** [`scripts/program_board.tcl`](../../scripts/program_board.tcl)
-  ```powershell
-  & "C:\Xilinx\2025.1\Vivado\bin\vivado.bat" -mode batch -source scripts/program_board.tcl
-  ```
-
+Bitstream generation not attempted (on-board testing out of scope per rules; implementation stopped at route_design with WNS +1.570 ns). All physical constraints are verified in [`board/zybo_z7_10.xdc`](../../board/zybo_z7_10.xdc) and board top-level RTL [`rtl/soc/top_bringup_board.sv`](../../rtl/soc/top_bringup_board.sv).

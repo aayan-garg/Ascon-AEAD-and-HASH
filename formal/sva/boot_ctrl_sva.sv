@@ -64,7 +64,7 @@ module boot_ctrl_sva (
     // -------------------------------------------------------------------------
     property p_tamper_sticky;
         @(posedge clk) disable iff (!rst_n)
-        tamper_latched |=> tamper_latched;
+        tamper_latched |=> (!rst_n || tamper_latched);
     endproperty
     assert_tamper_sticky: assert property (p_tamper_sticky)
         else $error("SVA VIOLATION: tamper_latched dropped while active!");
@@ -77,7 +77,7 @@ module boot_ctrl_sva (
     // -------------------------------------------------------------------------
     property p_tamper_prevents_jump;
         @(posedge clk) disable iff (!rst_n)
-        tamper_latched |=> (!jump_enable && (state == STATE_HALT_REFUSE));
+        tamper_latched |=> (!rst_n || (!jump_enable && (state == STATE_HALT_REFUSE)));
     endproperty
     assert_tamper_prevents_jump: assert property (p_tamper_prevents_jump)
         else $error("SVA VIOLATION: Jump asserted while tamper is latched!");
@@ -89,7 +89,7 @@ module boot_ctrl_sva (
     // -------------------------------------------------------------------------
     property p_refuse_terminal;
         @(posedge clk) disable iff (!rst_n)
-        (state == STATE_HALT_REFUSE) |=> (state == STATE_HALT_REFUSE);
+        (state == STATE_HALT_REFUSE) |=> (!rst_n || (state == STATE_HALT_REFUSE));
     endproperty
     assert_refuse_terminal: assert property (p_refuse_terminal)
         else $error("SVA VIOLATION: Escaped from STATE_HALT_REFUSE!");
@@ -101,7 +101,7 @@ module boot_ctrl_sva (
     // -------------------------------------------------------------------------
     property p_decide_failure_to_refuse;
         @(posedge clk) disable iff (!rst_n)
-        (state == STATE_DECIDE && !hash_verified) |=> (state == STATE_HALT_REFUSE);
+        (state == STATE_DECIDE && !hash_verified) |=> (!rst_n || (state == STATE_HALT_REFUSE));
     endproperty
     assert_decide_failure: assert property (p_decide_failure_to_refuse)
         else $error("SVA VIOLATION: Failed hash in DECIDE did not transition to REFUSE!");

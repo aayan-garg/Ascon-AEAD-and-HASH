@@ -2,7 +2,7 @@
 
 - **Target Component:** 5×5 Non-linear Substitution Box for Ascon (NIST SP 800-232)
 - **Directory:** `tools/sbox_opt/`
-- **Related Requirements:** `[SPEC]` R11, R13; `docs/research_plan.md` R-5; `Initial Research.md` §5.4, §7.5, §18-C
+- **Related Requirements:** `[SPEC]` R11, R13; `docs/requirements_traceability.md` R11, R15; `Initial Research.md` §5.4, §7.5, §18-C
 
 ---
 

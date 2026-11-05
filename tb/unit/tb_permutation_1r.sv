@@ -173,7 +173,7 @@ module tb_permutation_1r;
 
         $display("================================================================");
         if (errors == 0) begin
-            $display("[SUCCESS] ALL PERMUTATION 1R TESTS PASSED (100% BIT-EXACT)!");
+            $display("[SUCCESS] All permutation 1R tests passed.");
             $finish(0);
         end else begin
             $display("[FATAL] Permutation 1R test failed with %0d errors!", errors);

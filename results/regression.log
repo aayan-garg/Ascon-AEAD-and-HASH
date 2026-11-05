@@ -2,7 +2,7 @@
 ================================================================================
 ASCON AEAD & HASH SECURE BOOT RTL REGRESSION SUITE
 Working Directory: C:\Users\Aayan\Desktop\RTL_Project\Ascon-AEAD-and-HASH
-Timestamp:         2026-11-05 00:58:33 UTC
+Timestamp:         2026-11-05 10:02:06 UTC
 ================================================================================
 
 [RUNNING] Golden Model NIST KAT Suite (2,120 vectors)...
@@ -27,6 +27,12 @@ Timestamp:         2026-11-05 00:58:33 UTC
 
 [RUNNING] Execute tb_aead_full_2r (xsim)...
 
+[RUNNING] Compile tb_aead_full_bdd (xvlog)...
+
+[RUNNING] Elaborate tb_aead_full_bdd (xelab)...
+
+[RUNNING] Execute tb_aead_full_bdd (xsim)...
+
 [RUNNING] Compile tb_aead_full_espresso (xvlog)...
 
 [RUNNING] Elaborate tb_aead_full_espresso (xelab)...
@@ -38,6 +44,12 @@ Timestamp:         2026-11-05 00:58:33 UTC
 [RUNNING] Elaborate tb_aead_full_half (xelab)...
 
 [RUNNING] Execute tb_aead_full_half (xsim)...
+
+[RUNNING] Compile tb_aead_full_kernel (xvlog)...
+
+[RUNNING] Elaborate tb_aead_full_kernel (xelab)...
+
+[RUNNING] Execute tb_aead_full_kernel (xsim)...
 
 [RUNNING] Compile tb_aead_full_serial32 (xvlog)...
 
@@ -87,6 +99,12 @@ Timestamp:         2026-11-05 00:58:33 UTC
 
 [RUNNING] Execute tb_hash_full_2r (xsim)...
 
+[RUNNING] Compile tb_hash_full_bdd (xvlog)...
+
+[RUNNING] Elaborate tb_hash_full_bdd (xelab)...
+
+[RUNNING] Execute tb_hash_full_bdd (xsim)...
+
 [RUNNING] Compile tb_hash_full_espresso (xvlog)...
 
 [RUNNING] Elaborate tb_hash_full_espresso (xelab)...
@@ -98,6 +116,12 @@ Timestamp:         2026-11-05 00:58:33 UTC
 [RUNNING] Elaborate tb_hash_full_half (xelab)...
 
 [RUNNING] Execute tb_hash_full_half (xsim)...
+
+[RUNNING] Compile tb_hash_full_kernel (xvlog)...
+
+[RUNNING] Elaborate tb_hash_full_kernel (xelab)...
+
+[RUNNING] Execute tb_hash_full_kernel (xsim)...
 
 [RUNNING] Compile tb_hash_full_serial32 (xvlog)...
 
@@ -177,6 +201,12 @@ Timestamp:         2026-11-05 00:58:33 UTC
 
 [RUNNING] Execute tb_dma (xsim)...
 
+[RUNNING] Compile tb_forced_jump (xvlog)...
+
+[RUNNING] Elaborate tb_forced_jump (xelab)...
+
+[RUNNING] Execute tb_forced_jump (xsim)...
+
 [RUNNING] Compile tb_payload_sizes (xvlog)...
 
 [RUNNING] Elaborate tb_payload_sizes (xelab)...
@@ -206,41 +236,46 @@ REGRESSION EXECUTION SUMMARY
 ================================================================================
 Test Suite / Component                   Status       Duration  
 --------------------------------------------------------------------------------
-Golden Model (NIST KATs)                 [PASS]         3.79s
-Formal CTL Verification                  [PASS]         0.37s
-Unit Sim: tb_aead.sv                     [PASS]         5.31s
-Unit Sim: tb_aead_full.sv                [PASS]        21.41s
-Unit Sim: tb_aead_full_2r.sv             [PASS]        24.11s
-Unit Sim: tb_aead_full_espresso.sv       [PASS]        22.10s
-Unit Sim: tb_aead_full_half.sv           [PASS]        21.93s
-Unit Sim: tb_aead_full_serial32.sv       [PASS]        27.18s
-Unit Sim: tb_boot_ctrl.sv                [PASS]         4.86s
-Unit Sim: tb_boot_ctrl_sva.sv            [PASS]         4.85s
-Unit Sim: tb_diff_perm_serial32.sv       [PASS]         7.21s
-Unit Sim: tb_diffusion.sv                [PASS]         4.66s
-Unit Sim: tb_hash.sv                     [PASS]         5.21s
-Unit Sim: tb_hash_full.sv                [PASS]        77.94s
-Unit Sim: tb_hash_full_2r.sv             [PASS]        88.76s
-Unit Sim: tb_hash_full_espresso.sv       [PASS]        82.13s
-Unit Sim: tb_hash_full_half.sv           [PASS]        81.60s
-Unit Sim: tb_hash_full_serial32.sv       [PASS]       106.90s
-Unit Sim: tb_hello.sv                    [PASS]         4.48s
-Unit Sim: tb_mode_ctrl.sv                [PASS]         5.24s
-Unit Sim: tb_permutation_1r.sv           [PASS]         6.27s
-Unit Sim: tb_permutation_2r.sv           [PASS]         6.38s
-Unit Sim: tb_permutation_half.sv         [PASS]         6.46s
-Unit Sim: tb_picorv32_bringup.sv         [PASS]         5.83s
-Unit Sim: tb_round_core.sv               [PASS]         5.95s
-Unit Sim: tb_sbox5.sv                    [PASS]         4.53s
-Unit Sim: tb_sbox_equiv.sv               [PASS]         4.80s
+Golden Model (NIST KATs)                 [PASS]         3.74s
+Formal CTL Verification                  [PASS]         0.36s
+Unit Sim: tb_aead.sv                     [PASS]         7.00s
+Unit Sim: tb_aead_full.sv                [PASS]        21.53s
+Unit Sim: tb_aead_full_2r.sv             [PASS]        24.96s
+Unit Sim: tb_aead_full_bdd.sv            [PASS]        15.82s
+Unit Sim: tb_aead_full_espresso.sv       [PASS]        21.65s
+Unit Sim: tb_aead_full_half.sv           [PASS]        21.48s
+Unit Sim: tb_aead_full_kernel.sv         [PASS]        23.11s
+Unit Sim: tb_aead_full_serial32.sv       [PASS]        26.43s
+Unit Sim: tb_boot_ctrl.sv                [PASS]         4.80s
+Unit Sim: tb_boot_ctrl_sva.sv            [PASS]         4.83s
+Unit Sim: tb_diff_perm_serial32.sv       [PASS]         7.02s
+Unit Sim: tb_diffusion.sv                [PASS]         4.57s
+Unit Sim: tb_hash.sv                     [PASS]         5.17s
+Unit Sim: tb_hash_full.sv                [PASS]        76.37s
+Unit Sim: tb_hash_full_2r.sv             [PASS]        87.08s
+Unit Sim: tb_hash_full_bdd.sv            [PASS]        53.82s
+Unit Sim: tb_hash_full_espresso.sv       [PASS]        79.57s
+Unit Sim: tb_hash_full_half.sv           [PASS]        79.31s
+Unit Sim: tb_hash_full_kernel.sv         [PASS]        89.00s
+Unit Sim: tb_hash_full_serial32.sv       [PASS]       103.96s
+Unit Sim: tb_hello.sv                    [PASS]         4.46s
+Unit Sim: tb_mode_ctrl.sv                [PASS]         5.12s
+Unit Sim: tb_permutation_1r.sv           [PASS]         6.16s
+Unit Sim: tb_permutation_2r.sv           [PASS]         6.22s
+Unit Sim: tb_permutation_half.sv         [PASS]         6.29s
+Unit Sim: tb_picorv32_bringup.sv         [PASS]         5.75s
+Unit Sim: tb_round_core.sv               [PASS]         5.66s
+Unit Sim: tb_sbox5.sv                    [PASS]         4.56s
+Unit Sim: tb_sbox_equiv.sv               [PASS]         4.82s
 Unit Sim: tb_security_gate.sv            [PASS]         4.65s
-Integration Sim: tb_axil_regs.sv         [PASS]         5.52s
-Integration Sim: tb_dma.sv               [PASS]         5.68s
-Integration Sim: tb_payload_sizes.sv     [PASS]         7.39s
-Integration Sim: tb_secure_boot.sv       [PASS]         6.27s
+Integration Sim: tb_axil_regs.sv         [PASS]         5.57s
+Integration Sim: tb_dma.sv               [PASS]         5.56s
+Integration Sim: tb_forced_jump.sv       [PASS]         5.73s
+Integration Sim: tb_payload_sizes.sv     [PASS]         7.35s
+Integration Sim: tb_secure_boot.sv       [PASS]         6.21s
 Integration Sim: tb_soc_ascon.sv         [PASS]         5.73s
-Integration Sim: tb_soc_dma.sv           [PASS]         5.83s
+Integration Sim: tb_soc_dma.sv           [PASS]         5.71s
 --------------------------------------------------------------------------------
-Total Execution Time: 682.33s
+Total Execution Time: 858.38s
 Overall Result:       SUCCESS - ALL SUITES PASSED
 ================================================================================

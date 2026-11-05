@@ -3,7 +3,7 @@
 - **Status:** `ACCEPTED`
 - **Date:** 2026-10-21
 - **Deciders:** Antigravity Agent, System Architect
-- **Requirement Reference:** `[SPEC]` Project_PS.md §Objective ("RV32 RISC-V processor"); `[SOURCE]` Initial Research §9; `docs/research_plan.md` R-3
+- **Requirement Reference:** `[SPEC]` Project_PS.md §Objective ("RV32 RISC-V processor"); `[SOURCE]` Initial Research §9; `docs/requirements_traceability.md` R13
 
 ---
 

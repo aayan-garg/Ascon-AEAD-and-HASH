@@ -3,7 +3,7 @@
 // Project: Ascon AEAD and Hash Engine (NIST SP 800-232)
 // Description: Comprehensive Integration Testbench for Custom DMA Engine (dma_master.sv).
 //
-// Verification Scope (docs/implementation_plan.md Phase 7):
+// Verification Scope (docs/requirements_traceability.md R8, R10):
 //   1. Boundary Transfers:
 //      - Test 1: 0-byte transfer (immediate completion, 0 beats)
 //      - Test 2: 1-byte transfer (1 word read, stream_rem = 1, stream_last = 1)
@@ -586,7 +586,7 @@ module tb_dma;
         $display("Failed:               %0d", fail_count);
 
         if (fail_count == 0) begin
-            $display("\n[ALL TESTS PASSED] Custom DMA Engine & Coprocessor Closed-Loop 100%% VERIFIED.");
+            $display("\n[ALL TESTS PASSED] Custom DMA Engine & Coprocessor Closed-Loop verification complete.");
         end else begin
             $display("\n[TESTS FAILED] Encountered %0d failures.", fail_count);
         end

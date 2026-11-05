@@ -271,7 +271,7 @@ module tb_boot_ctrl;
         $display("================================================================================");
 
         if (fail_count == 0) begin
-            $display("[ALL TESTS PASSED] Secure Boot Controller FSM 100%% VERIFIED.");
+            $display("[ALL TESTS PASSED] Secure Boot Controller FSM verification complete.");
         end else begin
             $display("[TEST FAILED] Failures detected in boot_ctrl verification!");
         end

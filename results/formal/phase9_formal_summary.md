@@ -5,13 +5,13 @@ Phase 9 achieves the formal verification exit gate for the **Secure Boot Control
 
 Using **Computation Tree Logic (CTL)** model checking on finite Kripke structures $(S, S_0, R, L)$, we formally prove that the processor instruction jump enable (`jump`) cannot be asserted under any sequence of events without prior valid cryptographic authentication (`hash_ok` / `verified_before_jump`). In addition, we prove that hardware tamper events permanently prevent entering the `JUMP` state, and failure transitions are deterministic terminal lockouts.
 
-To validate the soundness of the verification toolchain, we constructed both a **sound, correct model** ([`formal/ctl/boot_safety.smv`](../../formal/ctl/boot_safety.smv)) and a **deliberately broken model** ([`formal/ctl/boot_safety_broken.smv`](../../formal/ctl/boot_safety_broken.smv)). The model checker proved all properties true on the correct model and synthesized a concrete counterexample trace exposing the authentication bypass on the broken model.
+To validate the soundness of the verification toolchain, we evaluated both a **sound, correct model** ([`formal/ctl/boot_safety_corrected.smv`](../../formal/ctl/boot_safety_corrected.smv)) and a **deliberately broken model** ([`formal/ctl/boot_safety_broken.smv`](../../formal/ctl/boot_safety_broken.smv)) in NuSMV 2.6.0. The model checker proved all 5 properties true on the correct model and synthesized a concrete counterexample trace exposing the authentication bypass on the broken model.
 
 ---
 
 ## 1. Formal Model Architecture & State Space
 
-The abstracted FSM model represents the exact control plane of `rtl/soc/boot_ctrl.sv`:
+The abstracted FSM model represents the exact control plane of [`rtl/soc/boot_ctrl.sv`](../../rtl/soc/boot_ctrl.sv):
 
 - **State Space ($S$):** 8 discrete states:
   $$\text{state} \in \{\text{STATE\_RESET}, \text{STATE\_READ\_HEADER}, \text{STATE\_DMA\_STREAM}, \text{STATE\_WAIT\_HASH}, \text{STATE\_CHECK\_TAG}, \text{STATE\_DECIDE}, \text{STATE\_JUMP}, \text{STATE\_HALT\_REFUSE}\}$$
@@ -103,6 +103,7 @@ The proven model is in 1-to-1 isomorphism with the synthesis-ready RTL in [`rtl/
 
 ## 5. Exit Gate Artifacts
 
-- **Correct Model Proof Log:** [`results/formal/proof_correct.log`](proof_correct.log) (All 5 properties PROVED TRUE)
-- **Broken Model Counterexample Log:** [`results/formal/counterexample_broken.log`](counterexample_broken.log) (Counterexample generated)
+- **Correct Model Proof Log:** [`results/formal/nuxmv/proof_corrected_nusmv.log`](nuxmv/proof_corrected_nusmv.log) (All 5 properties PROVED TRUE in NuSMV 2.6.0)
+- **Broken Model Counterexample Log:** [`results/formal/nuxmv/counterexample_broken_nusmv.log`](nuxmv/counterexample_broken_nusmv.log) (Counterexample generated in NuSMV 2.6.0)
+- **SVA Simulation Log:** [`results/formal/sva/sva_boot_ctrl.log`](sva/sva_boot_ctrl.log) (10,000 cycles, 0 assertion errors)
 - **Verification Script:** [`formal/ctl/verify_smv.py`](../../formal/ctl/verify_smv.py)

@@ -205,7 +205,7 @@ module tb_permutation_half;
 
         $display("================================================================");
         if (errors == 0) begin
-            $display("[SUCCESS] ALL PERMUTATION HALF-ROUND TESTS PASSED (100% BIT-EXACT)!");
+            $display("[SUCCESS] All permutation half-round tests passed.");
             $finish(0);
         end else begin
             $display("[FATAL] Permutation Half-Round test failed with %0d errors!", errors);

@@ -97,7 +97,7 @@ module tb_soc_dma;
                 $display("          over AXI4-Lite, streamed 64 bytes from BRAM into Ascon,");
                 $display("          and verified Hash256 digest against Golden Reference!");
                 $display("----------------------------------------------------------------");
-                $display("ALL PHASE 7 EXIT CRITERIA SATISFIED: DMA Integration 100% VERIFIED!");
+                $display("ALL PHASE 7 EXIT CRITERIA SATISFIED: DMA Integration verification complete.");
                 $finish(0);
             end
         end

@@ -22,6 +22,8 @@ file mkdir "$ROOT_DIR/results/timing"
 set ENGINE_VARIANTS {
     "mode_ctrl_1r_wrap"
     "mode_ctrl_1r_espresso_wrap"
+    "mode_ctrl_1r_kernel_wrap"
+    "mode_ctrl_1r_bdd_wrap"
     "mode_ctrl_2r_wrap"
     "mode_ctrl_half_wrap"
     "mode_ctrl_serial32_wrap"
@@ -38,6 +40,8 @@ if { $argc > 0 } {
 set rtl_files [list \
     "$ROOT_DIR/rtl/ascon/sbox5.sv" \
     "$ROOT_DIR/rtl/ascon/sbox5_espresso.sv" \
+    "$ROOT_DIR/rtl/ascon/sbox5_kernel.sv" \
+    "$ROOT_DIR/rtl/ascon/sbox5_bdd.sv" \
     "$ROOT_DIR/rtl/ascon/diffusion.sv" \
     "$ROOT_DIR/rtl/ascon/round_core.sv" \
     "$ROOT_DIR/rtl/ascon/permutation_1r.sv" \

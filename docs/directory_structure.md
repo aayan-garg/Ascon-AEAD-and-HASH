@@ -10,20 +10,21 @@ Ascon-AEAD-and-HASH/
 ├── .gitignore                         # Excludes Vivado projects, sim dumps, __pycache__
 │
 ├── docs/                              # All documentation
-│   ├── research_plan.md               # Research tasks organized by topic
-│   ├── implementation_plan.md         # Phase-by-phase execution plan with checklists
-│   ├── status.md                      # Live project status (updated after every action)
+│   ├── final_report.md                # Comprehensive technical evaluation report (TA writeup)
+│   ├── requirements_traceability.md   # Single source of truth for R1–R19
+│   ├── AUDIT_RESPONSE.md              # Single source of truth for audit remediations
+│   ├── CHANGELOG.md                   # Project changelog & consolidation record
+│   ├── status.md                      # Live project status
 │   ├── directory_structure.md         # THIS FILE — canonical layout reference
-│   ├── requirements_traceability.md   # R1–R19 mapped to phases, artifacts, tests
 │   ├── architecture.md                # Detailed FSMs, data flows, round definitions
-│   ├── research_review.md             # Paper summaries, technique selection, comparisons
-│   ├── threat_model.md                # Secure-boot trust assumptions and explicit limits
+│   ├── research_review.md             # Paper summaries, verified citations, comparisons
+│   ├── threat_model.md                # Secure-boot trust assumptions and defense-in-depth
 │   ├── register_map.md                # AXI4-Lite register map with field definitions
 │   └── decisions/                     # One file per resolved ambiguity/design decision
 │       ├── tooling.md                 # Pinned tool versions
 │       ├── algorithm_version.md       # SP 800-232 vs. v1.2 confirmation
 │       ├── riscv_core.md              # RISC-V core selection rationale
-│       └── sbox_methodology.md        # S-box optimization approach
+│       └── sbox_optimization.md       # S-box optimization approach & variants
 │
 ├── rtl/                               # All synthesizable RTL (SystemVerilog)
 │   ├── ascon/                         # Ascon accelerator core

@@ -3,7 +3,7 @@
 - **Status:** `ACCEPTED`
 - **Date:** 2026-10-21
 - **Deciders:** Antigravity Agent, System Architect
-- **Requirement Reference:** `[SPEC]` R6, R7, R8, R17; `docs/research_plan.md` R-7; `Initial Research.md` §5.6, §13, §18-F
+- **Requirement Reference:** `[SPEC]` R6, R7, R8, R17; `docs/requirements_traceability.md` R17; `Initial Research.md` §5.6, §13, §18-F
 
 ---
 

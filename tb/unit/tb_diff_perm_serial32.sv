@@ -181,7 +181,7 @@ module tb_diff_perm_serial32;
         $display("\n================================================================");
         $display("DIFFERENTIAL TEST RESULTS: PASS=%0d, FAIL=%0d", pass_count, errors);
         if (errors == 0) begin
-            $display("[SUCCESS] permutation_serial32 IS 100%% BIT-EXACT MATCH TO 1R!");
+            $display("[SUCCESS] permutation_serial32 bit-exact match confirmed against 1R.");
             $finish(0);
         end else begin
             $fatal(1, "[FATAL] Differential permutation verification FAILED!");

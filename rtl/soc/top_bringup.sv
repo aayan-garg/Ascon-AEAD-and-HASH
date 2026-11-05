@@ -11,6 +11,7 @@ module top_bringup #(
     parameter string FIRMWARE_HEX = "firmware/tests/gpio_toggle.hex",
     parameter int    RAM_WORDS    = 4096, // 16 KB = 4096 x 32-bit words
     parameter int    BUFFER_DEPTH = 32,   // 32 x 64-bit words = 256 B (sufficient for KAT & SoC boot)
+    parameter int    ENABLE_FETCH_GUARD = 1, // Enable hardware instruction fetch gating
     parameter [31:0] TRUSTED_PAYLOAD_LEN = 32'd64,
     parameter [255:0] TRUSTED_DIGEST = {
         32'hEDB41305, 32'h12075573, 32'h11B6C8A2, 32'hAFB9E393,
@@ -223,7 +224,7 @@ module top_bringup #(
     ) u_fetch_guard (
         .s_axi_arvalid (axi_arvalid && sel_bram_ar),
         .s_axi_araddr  (bram_araddr_q),
-        .jump_enable   (boot_jump_enable),
+        .jump_enable   (ENABLE_FETCH_GUARD ? boot_jump_enable : 1'b1),
         .m_axi_arvalid (),
         .m_axi_araddr  (),
         .bram_rdata    (bram_rdata_raw),

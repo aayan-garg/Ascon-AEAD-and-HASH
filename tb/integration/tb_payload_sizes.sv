@@ -93,11 +93,48 @@ module tb_payload_sizes;
     longint unsigned cycle_count = 0;
     always @(posedge clk) cycle_count <= cycle_count + 1;
 
+    longint start_cyc_64, start_cyc_1k, start_cyc_4k;
     longint j64, p64;
     longint j1k, p1k;
     longint j4k, p4k;
-    longint start_cyc;
+    reg j64_cap, p64_cap;
+    reg j1k_cap, p1k_cap;
+    reg j4k_cap, p4k_cap;
     integer log_fd;
+
+    // Synchronous latching matching tb_secure_boot.sv
+    always @(posedge clk) begin
+        if (rst_n_64) begin
+            if (dut_64.boot_jump_enable && !j64_cap) begin
+                j64     <= cycle_count - start_cyc_64;
+                j64_cap <= 1'b1;
+            end
+            if (test_pass_64 && !p64_cap) begin
+                p64     <= cycle_count - start_cyc_64;
+                p64_cap <= 1'b1;
+            end
+        end
+        if (rst_n_1k) begin
+            if (dut_1k.boot_jump_enable && !j1k_cap) begin
+                j1k     <= cycle_count - start_cyc_1k;
+                j1k_cap <= 1'b1;
+            end
+            if (test_pass_1k && !p1k_cap) begin
+                p1k     <= cycle_count - start_cyc_1k;
+                p1k_cap <= 1'b1;
+            end
+        end
+        if (rst_n_4k) begin
+            if (dut_4k.boot_jump_enable && !j4k_cap) begin
+                j4k     <= cycle_count - start_cyc_4k;
+                j4k_cap <= 1'b1;
+            end
+            if (test_pass_4k && !p4k_cap) begin
+                p4k     <= cycle_count - start_cyc_4k;
+                p4k_cap <= 1'b1;
+            end
+        end
+    end
 
     initial begin
         $display("================================================================================");
@@ -108,6 +145,15 @@ module tb_payload_sizes;
         rst_n_64 = 0;
         rst_n_1k = 0;
         rst_n_4k = 0;
+        j64_cap  = 0;
+        p64_cap  = 0;
+        j1k_cap  = 0;
+        p1k_cap  = 0;
+        j4k_cap  = 0;
+        p4k_cap  = 0;
+        j64 = 0; p64 = 0;
+        j1k = 0; p1k = 0;
+        j4k = 0; p4k = 0;
         #(CLK_PERIOD * 10);
 
         // ---------------------------------------------------------------------
@@ -116,28 +162,17 @@ module tb_payload_sizes;
         $display("\n--- Benchmarking 64 Bytes Payload ---");
         @(negedge clk);
         rst_n_64 = 1;
-        start_cyc = cycle_count;
-        j64 = 0;
-        p64 = 0;
+        start_cyc_64 = cycle_count;
         fork
             begin
-                wait (dut_64.boot_jump_enable == 1'b1);
-                j64 = cycle_count - start_cyc;
-            end
-            begin
                 wait (test_pass_64 == 1'b1);
-                repeat(2) @(posedge clk);
-                p64 = cycle_count - start_cyc;
             end
             begin
                 #(CLK_PERIOD * 50000);
                 $display("  [ERROR] 64B timed out!");
             end
         join_any
-        // Wait until test_pass completes
-        wait (test_pass_64 == 1'b1);
         repeat(2) @(posedge clk);
-        p64 = cycle_count - start_cyc;
         rst_n_64 = 0;
 
         $display("  [64 B]   reset_to_jump = %0d cycles (%.2f us) | reset_to_pass = %0d cycles (%.2f us)",
@@ -150,27 +185,17 @@ module tb_payload_sizes;
         #(CLK_PERIOD * 10);
         @(negedge clk);
         rst_n_1k = 1;
-        start_cyc = cycle_count;
-        j1k = 0;
-        p1k = 0;
+        start_cyc_1k = cycle_count;
         fork
             begin
-                wait (dut_1k.boot_jump_enable == 1'b1);
-                j1k = cycle_count - start_cyc;
-            end
-            begin
                 wait (test_pass_1k == 1'b1);
-                repeat(2) @(posedge clk);
-                p1k = cycle_count - start_cyc;
             end
             begin
                 #(CLK_PERIOD * 100000);
                 $display("  [ERROR] 1KB timed out!");
             end
         join_any
-        wait (test_pass_1k == 1'b1);
         repeat(2) @(posedge clk);
-        p1k = cycle_count - start_cyc;
         rst_n_1k = 0;
 
         $display("  [1024 B] reset_to_jump = %0d cycles (%.2f us) | reset_to_pass = %0d cycles (%.2f us)",
@@ -183,31 +208,45 @@ module tb_payload_sizes;
         #(CLK_PERIOD * 10);
         @(negedge clk);
         rst_n_4k = 1;
-        start_cyc = cycle_count;
-        j4k = 0;
-        p4k = 0;
+        start_cyc_4k = cycle_count;
         fork
             begin
-                wait (dut_4k.boot_jump_enable == 1'b1);
-                j4k = cycle_count - start_cyc;
-            end
-            begin
                 wait (test_pass_4k == 1'b1);
-                repeat(2) @(posedge clk);
-                p4k = cycle_count - start_cyc;
             end
             begin
                 #(CLK_PERIOD * 300000);
                 $display("  [ERROR] 4KB timed out!");
             end
         join_any
-        wait (test_pass_4k == 1'b1);
         repeat(2) @(posedge clk);
-        p4k = cycle_count - start_cyc;
         rst_n_4k = 0;
 
         $display("  [4096 B] reset_to_jump = %0d cycles (%.2f us) | reset_to_pass = %0d cycles (%.2f us)",
                  j4k, j4k * 10.0 / 1000.0, p4k, p4k * 10.0 / 1000.0);
+
+        // ---------------------------------------------------------------------
+        // Self-Checking Assertions (B2)
+        // ---------------------------------------------------------------------
+        assert (j64 > 0 && p64 > j64) else begin
+            $display("[FATAL ASSERTION ERROR] 64B latencies non-positive or non-monotonic: j64=%0d, p64=%0d", j64, p64);
+            $fatal(1);
+        end
+        assert (j1k > j64 && p1k > p64) else begin
+            $display("[FATAL ASSERTION ERROR] 1KB latencies did not increase vs 64B: j1k=%0d, p1k=%0d", j1k, p1k);
+            $fatal(1);
+        end
+        assert (j4k > j1k && p4k > p1k) else begin
+            $display("[FATAL ASSERTION ERROR] 4KB latencies did not increase vs 1KB: j4k=%0d, p4k=%0d", j4k, p4k);
+            $fatal(1);
+        end
+        assert (j64_cap && j1k_cap && j4k_cap) else begin
+            $display("[FATAL ASSERTION ERROR] boot_jump_enable not captured for all instances");
+            $fatal(1);
+        end
+        assert (p64_cap && p1k_cap && p4k_cap) else begin
+            $display("[FATAL ASSERTION ERROR] test_pass not captured for all instances");
+            $fatal(1);
+        end
 
         // ---------------------------------------------------------------------
         // Write Real Evidence Log

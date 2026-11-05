@@ -1,7 +1,7 @@
 # Golden Model Verification Summary (NIST SP 800-232)
 
-- **Date:** 2026-11-05 00:58:37 UTC
-- **Status:** `[x] VERIFIED PASS (2,120 NIST KAT vectors)`
+- **Date:** 2026-11-05 10:02:10 UTC
+- **Status:** `[x] 100% VERIFIED PASS`
 - **Model:** `reference/pyascon/ascon.py`
 - **Standard:** NIST SP 800-232 (Little-Endian)
 

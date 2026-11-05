@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Explicit CTL Model Checker for Ascon Secure Boot Controller Safety
-Requirements: [SPEC] R17, docs/research_plan.md R-7, Phase 9 Exit Gate
+Requirements: [SPEC] R17, docs/requirements_traceability.md R17, Phase 9 Exit Gate
 
 Constructs the finite Kripke structure (S, S0, R, L) for both:
   1. Correct Model (formal/ctl/boot_safety_corrected.smv)

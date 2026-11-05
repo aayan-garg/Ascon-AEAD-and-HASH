@@ -56,14 +56,12 @@ VARIANTS = [
     },
     {
         "id": "permutation_serial32",
-        "name": "32-bit Serialised (Paper Design Point)",
+        "name": "32-bit Serialised (Exploratory Design Point)",
         "sbox": "Bit-sliced, 32-bit datapath",
         "cycles_aead": 16,  # [REC] b=8 rounds x 2 cycles/round (32-bit slice per cycle)
         "cycles_hash": 24,  # [REC] a=12 rounds x 2 cycles/round
-        "desc": "Serialised 32-bit datapath: processes 32 columns of the 5x64-bit state per cycle, "
-                "requiring 2 clock cycles per Ascon round. Reduces area vs 1r at cost of 2x cycle count. "
-                "Based on serial architecture from Graz University ascon-hardware repository. [SOURCE]",
-        "paper_ref": "github.com/ascon/ascon-hardware (Graz University of Technology)"
+        "desc": "Our own 32-bit-slice serialisation of the permutation, motivated by the serialised design space surveyed in Groß et al. (DSD 2015). Processes 32 columns of the 5x64-bit state per cycle (2 clock cycles per Ascon round). On Xilinx 7-series FPGAs (XC7Z010), it consumes more LUTs than 1r (722 vs 544 LUTs core; 3,353 vs 3,191 engine) due to LUT6 slice structure and multiplexing overhead, yielding 0.51x throughput/LUT efficiency.",
+        "paper_ref": "Motivated by Groß, Wenger, Dobraunig, Ehrenhöfer (DSD 2015)"
     }
 ]
 

@@ -504,7 +504,7 @@ module tb_secure_boot;
         end
 
         if (total_fail == 0) begin
-            $display("[ALL 9 CASES PASSED] Secure Boot Implementation 100%% VERIFIED!");
+            $display("[ALL 9 CASES PASSED] Secure Boot Implementation verification complete.");
         end else begin
             $display("[TEST FAILED] Boot matrix failures detected!");
         end
