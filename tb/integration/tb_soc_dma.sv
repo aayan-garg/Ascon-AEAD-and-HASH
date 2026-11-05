@@ -51,6 +51,7 @@ module tb_soc_dma;
 
     int cycle_count = 0;
     logic [3:0] last_led = 4'h0;
+    logic test_pass_seen = 1'b0;
 
     initial begin
         $display("================================================================================");
@@ -70,7 +71,7 @@ module tb_soc_dma;
         $display("[TIME %0t] Reset de-asserted. CPU executing accel_dma_test from 0x00000000...", $time);
 
         // Execution watchdog loop
-        while ((cycle_count < 30000) && !test_pass) begin
+        while ((cycle_count < 30000) && !test_pass_seen) begin
             @(posedge clk);
             cycle_count++;
 
@@ -89,6 +90,7 @@ module tb_soc_dma;
 
             // Completion check
             if (test_pass) begin
+                test_pass_seen = 1'b1;
                 $display("\n----------------------------------------------------------------");
                 $display("[SUCCESS] Test Pass Marker detected (GPIO bit 31 asserted)!");
                 $display("  Cycles Elapsed: %0d cycles (%0t ns)", cycle_count, $time);
@@ -102,8 +104,10 @@ module tb_soc_dma;
             end
         end
 
-        $display("\n[FATAL] Simulation timeout after %0d cycles!", cycle_count);
-        $fatal(1, "Watchdog timeout!");
+        if (!test_pass_seen) begin
+            $display("\n[FATAL] Simulation timeout after %0d cycles!", cycle_count);
+            $fatal(1, "Watchdog timeout!");
+        end
     end
 
 endmodule

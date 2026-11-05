@@ -179,14 +179,17 @@ module tb_dma;
     int test_count = 0;
     int pass_count = 0;
     int fail_count = 0;
+    integer log_fd;
 
     task check(input string name, input bit cond);
         test_count++;
         if (cond) begin
             $display("  [PASS] %s", name);
+            $fdisplay(log_fd, "  [PASS] %s", name);
             pass_count++;
         end else begin
             $display("  [FAIL] %s", name);
+            $fdisplay(log_fd, "  [FAIL] %s", name);
             fail_count++;
         end
     endtask
@@ -288,10 +291,18 @@ module tb_dma;
         logic [ 1:0] b_resp;
         logic [31:0] rd_data;
 
+        log_fd = $fopen("results/board/dma_boundary.log", "w");
+        if (!log_fd) begin
+            $fatal(1, "Unable to open results/board/dma_boundary.log");
+        end
         $display("================================================================================");
         $display("ASCON DMA INTEGRATION TESTBENCH (tb_dma.sv)");
         $display("Testing Custom Streaming DMA Engine, Boundary Cases, & Closed-Loop Hash");
         $display("================================================================================");
+        $fdisplay(log_fd, "================================================================================");
+        $fdisplay(log_fd, "ASCON DMA INTEGRATION TESTBENCH (tb_dma.sv)");
+        $fdisplay(log_fd, "Testing Custom Streaming DMA Engine, Boundary Cases, & Closed-Loop Hash");
+        $fdisplay(log_fd, "================================================================================");
 
         // Reset and initialization
         rst_n            = 1'b0;
@@ -325,6 +336,7 @@ module tb_dma;
         // Test 1: 0-Byte Transfer
         // =====================================================================
         $display("\n--- Test 1: 0-Byte Transfer (Boundary) ---");
+        $fdisplay(log_fd, "\n--- Test 1: 0-Byte Transfer (Boundary) ---");
         dma_launch(32'h0000_1000, 32'd0);
         @(negedge clk);
 
@@ -337,6 +349,7 @@ module tb_dma;
         // Test 2: 1-Byte Transfer
         // =====================================================================
         $display("\n--- Test 2: 1-Byte Transfer (Single Word Boundary) ---");
+        $fdisplay(log_fd, "\n--- Test 2: 1-Byte Transfer (Single Word Boundary) ---");
         bram_mem[12'h400] = 32'hEFCDAB12; // Word at byte address 0x1000
         dma_launch(32'h0000_1000, 32'd1);
 
@@ -354,6 +367,7 @@ module tb_dma;
         // Test 3: 4-Byte Transfer (Full 32-bit Single Word)
         // =====================================================================
         $display("\n--- Test 3: 4-Byte Transfer (Full 32-bit Single Word) ---");
+        $fdisplay(log_fd, "\n--- Test 3: 4-Byte Transfer (Full 32-bit Single Word) ---");
         bram_mem[12'h401] = 32'hAABBCCDD; // Word at byte address 0x1004
         dma_launch(32'h0000_1004, 32'd4);
 
@@ -371,6 +385,7 @@ module tb_dma;
         // Test 4: Exactly-One-Block (8 Bytes: Ascon Hash Rate)
         // =====================================================================
         $display("\n--- Test 4: Exactly-One-Block 8-Byte Transfer ---");
+        $fdisplay(log_fd, "\n--- Test 4: Exactly-One-Block 8-Byte Transfer ---");
         bram_mem[12'h402] = 32'h11223344;
         bram_mem[12'h403] = 32'h55667788;
         dma_launch(32'h0000_1008, 32'd8);
@@ -388,6 +403,7 @@ module tb_dma;
         // Test 5: Exactly-One-Block (16 Bytes: Ascon AEAD Rate, 2 Beats)
         // =====================================================================
         $display("\n--- Test 5: Exactly-One-Block 16-Byte Transfer (2 Beats) ---");
+        $fdisplay(log_fd, "\n--- Test 5: Exactly-One-Block 16-Byte Transfer (2 Beats) ---");
         bram_mem[12'h404] = 32'h01234567;
         bram_mem[12'h405] = 32'h89ABCDEF;
         bram_mem[12'h406] = 32'hFEDCBA98;
@@ -412,6 +428,7 @@ module tb_dma;
         // Test 6: Multi-Block 1 KB Streaming (1024 Bytes = 128 Beats)
         // =====================================================================
         $display("\n--- Test 6: Multi-Block 1 KB Transfer (128 Beats) with Backpressure ---");
+        $fdisplay(log_fd, "\n--- Test 6: Multi-Block 1 KB Transfer (128 Beats) with Backpressure ---");
         for (int i = 0; i < 256; i++) begin
             bram_mem[i] = 32'h1000_0000 + (i * 4);
         end
@@ -458,6 +475,7 @@ module tb_dma;
         // Test 7: Oversized / Out-of-Bounds Rejection
         // =====================================================================
         $display("\n--- Test 7: Oversized & Out-of-Bounds Rejection ---");
+        $fdisplay(log_fd, "\n--- Test 7: Oversized & Out-of-Bounds Rejection ---");
         dma_launch(32'h0000_3F00, 32'd1024); // 0x3F00 + 1024 = 0x4300 > 16384 (16 KB)
         @(negedge clk);
 
@@ -469,6 +487,7 @@ module tb_dma;
         // Test 8: Address Misalignment Rejection
         // =====================================================================
         $display("\n--- Test 8: Address Misalignment Rejection ---");
+        $fdisplay(log_fd, "\n--- Test 8: Address Misalignment Rejection ---");
         dma_launch(32'h0000_1001, 32'd8); // Unaligned address
         @(negedge clk);
 
@@ -479,6 +498,7 @@ module tb_dma;
         // Test 9: Active Transfer Abort
         // =====================================================================
         $display("\n--- Test 9: Active Transfer Abort ---");
+        $fdisplay(log_fd, "\n--- Test 9: Active Transfer Abort ---");
         dma_stream_ready = 1'b0; // Stall DMA transfer
         dma_launch(32'h0000_0000, 32'd512);
 
@@ -501,6 +521,7 @@ module tb_dma;
         // Test 10: Closed-Loop DMA-to-Ascon-Hash256 on 64-Byte Buffer
         // =====================================================================
         $display("\n--- Test 10: Closed-Loop DMA-to-Ascon-Hash256 (64 Bytes) ---");
+        $fdisplay(log_fd, "\n--- Test 10: Closed-Loop DMA-to-Ascon-Hash256 (64 Bytes) ---");
         closed_loop_mode = 1'b1;
 
         // Fill 64 bytes (16 32-bit words) at BRAM byte address 0x0800 (word 0x200)
@@ -584,13 +605,23 @@ module tb_dma;
         $display("Total Tests Executed: %0d", test_count);
         $display("Passed:               %0d", pass_count);
         $display("Failed:               %0d", fail_count);
+        $fdisplay(log_fd, "\n================================================================================");
+        $fdisplay(log_fd, "DMA INTEGRATION TESTBENCH SUMMARY");
+        $fdisplay(log_fd, "================================================================================");
+        $fdisplay(log_fd, "Total Tests Executed: %0d", test_count);
+        $fdisplay(log_fd, "Passed:               %0d", pass_count);
+        $fdisplay(log_fd, "Failed:               %0d", fail_count);
 
         if (fail_count == 0) begin
             $display("\n[ALL TESTS PASSED] Custom DMA Engine & Coprocessor Closed-Loop verification complete.");
+            $fdisplay(log_fd, "\n[ALL TESTS PASSED] Custom DMA Engine & Coprocessor Closed-Loop verification complete.");
         end else begin
             $display("\n[TESTS FAILED] Encountered %0d failures.", fail_count);
+            $fdisplay(log_fd, "\n[TESTS FAILED] Encountered %0d failures.", fail_count);
         end
         $display("================================================================================\n");
+        $fdisplay(log_fd, "================================================================================");
+        $fclose(log_fd);
 
         $finish;
     end

@@ -1,17 +1,3 @@
-=== TB_DMA BOUNDARY SIMULATION LOG ===
-
-****** xsim v2025.1 (64-bit)
-  **** SW Build 6140274 on Thu May 22 00:12:29 MDT 2025
-  **** IP Build 6138677 on Thu May 22 03:10:11 MDT 2025
-  **** SharedData Build 6139179 on Tue May 20 17:58:58 MDT 2025
-  **** Start of session at: Wed Oct 21 20:36:30 2026
-    ** Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.
-    ** Copyright 2022-2025 Advanced Micro Devices, Inc. All Rights Reserved.
-
-source xsim.dir/tb_dma_sim/xsim_script.tcl
-# xsim {tb_dma_sim} -autoloadwcfg -runall
-Time resolution is 1 ps
-run -all
 ================================================================================
 ASCON DMA INTEGRATION TESTBENCH (tb_dma.sv)
 Testing Custom Streaming DMA Engine, Boundary Cases, & Closed-Loop Hash
@@ -86,48 +72,3 @@ Failed:               0
 
 [ALL TESTS PASSED] Custom DMA Engine & Coprocessor Closed-Loop verification complete.
 ================================================================================
-
-$finish called at time : 8205 ns : File "C:/Users/Aayan/Desktop/RTL_Project/Ascon-AEAD-and-HASH/tb/integration/tb_dma.sv" Line 595
-exit
-INFO: [Common 17-206] Exiting xsim at Wed Oct 21 20:36:32 2026...
-
-
-=== TB_SOC_DMA HARDWARE INTEGRATION SIMULATION LOG ===
-
-****** xsim v2025.1 (64-bit)
-  **** SW Build 6140274 on Thu May 22 00:12:29 MDT 2025
-  **** IP Build 6138677 on Thu May 22 03:10:11 MDT 2025
-  **** SharedData Build 6139179 on Tue May 20 17:58:58 MDT 2025
-  **** Start of session at: Wed Oct 21 20:36:35 2026
-    ** Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.
-    ** Copyright 2022-2025 Advanced Micro Devices, Inc. All Rights Reserved.
-
-source xsim.dir/tb_soc_dma_sim/xsim_script.tcl
-# xsim {tb_soc_dma_sim} -autoloadwcfg -runall
-Time resolution is 1 ps
-run -all
-[BRAM] Initializing 16 KB BRAM from: firmware/tests/accel_dma_test.hex
-================================================================================
-STARTING PICORV32 + ASCON DMA INTEGRATION TESTBENCH: tb_soc_dma
-Target Core:  PicoRV32 RV32I AXI Core
-Data Plane:   Custom Streaming DMA Master (dma_master.sv)
-Coprocessor:  Ascon AEAD & Hash Engine (0x4000_0000)
-Firmware:     firmware/tests/accel_dma_test.hex
-Clock:        100 MHz (Period: 10 ns)
-================================================================================
-[TIME 100000] Reset de-asserted. CPU executing accel_dma_test from 0x00000000...
-[TIME 4615000 | Cycle 452] GPIO LED transition: 0x0 -> 0x1
-[TIME 21315000 | Cycle 2122] GPIO LED transition: 0x1 -> 0xf
-
-----------------------------------------------------------------
-[SUCCESS] Test Pass Marker detected (GPIO bit 31 asserted)!
-  Cycles Elapsed: 2122 cycles (21315000 ns)
-  Discrete LEDs:  4'b1111 (0xf)
-  Status: RISC-V Firmware successfully commanded DMA transfer
-          over AXI4-Lite, streamed 64 bytes from BRAM into Ascon,
-          and verified Hash256 digest against Golden Reference!
-----------------------------------------------------------------
-ALL PHASE 7 EXIT CRITERIA SATISFIED: DMA Integration 100  VERIFIED!
-$finish called at time : 21315 ns
-exit
-INFO: [Common 17-206] Exiting xsim at Wed Oct 21 20:36:37 2026...
