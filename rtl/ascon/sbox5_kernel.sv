@@ -1,9 +1,8 @@
 // ==============================================================================
 // Module: sbox5_kernel.sv
 // Project: Ascon AEAD and Hash Engine (NIST SP 800-232)
-// Description: 5-bit Ascon S-box implemented via Algebraic Kernel Decomposition.
-// Implementation: Factors quadratic non-linear terms (~A & B = B ^ (A & B))
-//   into pure algebraic kernels over GF(2) with 5 independent degree-2 products.
+// Description: 5-bit Ascon S-box implemented as an ANF restatement of the
+// standard equations. No kernel extraction was performed.
 // Equivalence: Exhaustively proven equivalent to NIST SP 800-232 Table 6.
 // ==============================================================================
 
@@ -30,11 +29,7 @@ module sbox5_kernel (
     wire s3 = x3;
     wire s4 = x4 ^ x3;
 
-    // -------------------------------------------------------------------------
-    // 2. Algebraic Kernel Factoring (Over GF(2))
-    // Decomposition: (~A & B) = B ^ (A & B)
-    // Common algebraic kernels k_i represent the 5 bilinear products
-    // -------------------------------------------------------------------------
+    // This is an ANF restatement, not an extracted kernel decomposition.
     wire k0 = s1 & s2;
     wire k1 = s2 & s3;
     wire k2 = s3 & s4;
@@ -59,4 +54,3 @@ module sbox5_kernel (
     assign out_y = {y0, y1, y2, y3, y4};
 
 endmodule
-

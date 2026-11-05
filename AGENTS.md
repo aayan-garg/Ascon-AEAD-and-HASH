@@ -49,7 +49,7 @@ If a question arises about:
 
 | Document | Location | Consult When... |
 |---|---|---|
-| **Initial Research** | [`../Initial Research.md`](../Initial Research.md) | Needing architecture rationale; checking original requirements analysis (§3); understanding initial S-box/permutation/CTL strategy |
+| **Initial Research** | `Initial Research.md` (workspace reference outside this repository) | Needing architecture rationale; checking original requirements analysis (§3); understanding initial S-box/permutation/CTL strategy |
 | **Final Technical Report** | [`docs/final_report.md`](docs/final_report.md) | Reviewing complete technical evaluation, verification results, and project closure |
 | **Research Review** | [`docs/research_review.md`](docs/research_review.md) | Reviewing peer-reviewed literature, verified DOIs, and S-box optimization trade-offs |
 | **Requirements Traceability** | [`docs/requirements_traceability.md`](docs/requirements_traceability.md) | Single source of truth for R1–R19 status and evidence file links |

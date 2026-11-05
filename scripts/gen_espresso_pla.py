@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """
-Convert sbox5_espresso.sv equations to Berkeley ESPRESSO PLA format and verify against NIST SP 800-232 Table 6.
+Convert the existing sbox5_espresso.sv equations to PLA format and verify
+against NIST SP 800-232 Table 6. This script does not run ESPRESSO.
 """
 
 import os
@@ -80,13 +81,14 @@ for out_idx, out_name in enumerate(out_names):
         out_col[out_idx] = '1'
         terms.append((cube, ''.join(out_col)))
 
-out_pla_path = os.path.join('results', 'synthesis', 'espresso_sbox_output.pla')
+root_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+out_pla_path = os.path.join(root_dir, 'results', 'synthesis',
+                            'sbox5_espresso_rtl_as_pla.pla')
 os.makedirs(os.path.dirname(out_pla_path), exist_ok=True)
 with open(out_pla_path, 'w', encoding='utf-8') as f:
-    f.write('# Berkeley ESPRESSO Two-Level Logic Minimizer Output\n')
+    f.write('# PLA conversion of rtl/ascon/sbox5_espresso.sv (NOT produced by running ESPRESSO)\n')
     f.write('# Function: Ascon 5-bit S-Box (NIST SP 800-232 Table 6)\n')
-    f.write('# Minimizer: Berkeley ESPRESSO / Quine-McCluskey Minimal Cover\n')
-    f.write('# Input PLA: scripts/ascon_sbox.pla\n')
+    f.write('# Source: equations in rtl/ascon/sbox5_espresso.sv\n')
     f.write(f'.i 5\n.o 5\n.ilb x0 x1 x2 x3 x4\n.ob y0 y1 y2 y3 y4\n.p {len(terms)}\n')
     for cube, out_pat in terms:
         f.write(f'{cube} {out_pat}\n')
@@ -124,4 +126,3 @@ if mismatches == 0:
 else:
     print(f'[ERROR] {mismatches} mismatches found.')
     exit(1)
-

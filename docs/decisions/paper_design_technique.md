@@ -3,7 +3,7 @@
 - **Decision Date:** November 3, 2026 (Updated November 5, 2026 with Measured Tool Reports)
 - **Status:** **FULLY IMPLEMENTED & EMPIRICALLY VERIFIED** (`rtl/ascon/permutation_serial32.sv`)
 - **Finding Addressed:** F7 (Independent Audit Remediation)
-- **Primary Citation:** Hannes Groß, Erich Wenger, Christoph Dobraunig, Christoph Ehrenhöfer, *"Suit up! — Made-to-Measure Hardware Implementations of ASCON"*, 18th Euromicro Conference on Digital System Design (DSD 2015), pp. 645-652. DOI: [10.1109/DSD.2015.52](https://doi.org/10.1109/DSD.2015.52) | IACR ePrint [Report 2015/034](https://eprint.iacr.org/2015/034).
+- **Primary Citation:** Hannes Groß, Erich Wenger, Christoph Dobraunig, Christoph Ehrenhöfer, *"Suit up! — Made-to-Measure Hardware Implementations of ASCON"*, 18th Euromicro Conference on Digital System Design (DSD 2015), pp. 645-652. IACR ePrint [Report 2015/034](https://eprint.iacr.org/2015/034). The DOI was not confirmed in this audit.
 
 ---
 
@@ -12,7 +12,7 @@
 The Problem Statement (`Project_PS.md`) requires:
 > *"Find a paper, implement one technique, and compare area, throughput, throughput/area and, if masked, the protection cost."*
 
-The foundational Graz University of Technology paper explores hardware trade-offs for Ascon, including round-unrolled, round-based, and serialized datapath architectures. Among these, the 32-bit serialized datapath halves the substitution layer hardware by sharing 32 S-boxes across two sub-cycles per round.
+The foundational Graz University of Technology paper explores hardware trade-offs for Ascon. The ePrint page opened for this audit does not establish that it describes this exact 32-bit-slice implementation. `permutation_serial32` is therefore our own 32-bit-slice serialisation, motivated by the serialised designs surveyed in verified papers; it is not a reimplementation of any specific published design.
 
 ---
 
@@ -59,8 +59,8 @@ The foundational Graz University of Technology paper explores hardware trade-off
 |---|:---:|:---:|:---:|
 | **Slice LUTs** | 3,353 | 3,191 | +5.1% |
 | **Slice FFs** | 4,180 | 4,015 | +4.1% |
-| **WNS @ 100 MHz** | +1.598 ns | +1.925 ns | Both `[MET]` |
-| **Fmax** | 119.02 MHz | 123.84 MHz | -3.9% |
+| **WNS @ 100 MHz** | +1.900 ns | +2.130 ns | Both `[MET]` |
+| **Fmax** | 123.46 MHz | 127.06 MHz | -2.8% |
 | **Cycles per 128-bit AEAD Block** | 16 cycles | 8 cycles | 2.0x latency |
 | **AEAD Throughput @ 100 MHz** | 800.00 Mbps | 1,600.00 Mbps | 0.50x |
 | **Area Efficiency ($TP/A$)** | 238.59 kbps/LUT | 501.41 kbps/LUT | 0.476x |

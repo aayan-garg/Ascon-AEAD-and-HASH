@@ -146,7 +146,11 @@ module tb_forced_jump;
         end
 
         $display("\n================================================================================");
-        $display("FETCH-GUARD VERIFICATION COMPLETE: ALL 2 TESTS PASSED");
+        if ((pass_active_count + pass_bypass_count) == 2) begin
+            $display("FETCH-GUARD VERIFICATION COMPLETE: ALL 2 TESTS PASSED");
+        end else begin
+            $display("FETCH-GUARD VERIFICATION COMPLETE: FAIL");
+        end
         $display("  1. Guard Active:   BLOCKED (test_pass=0, jump_enable=0)");
         $display("  2. Guard Bypassed: EXECUTED (test_pass=1)");
         $display("================================================================================");
@@ -154,4 +158,3 @@ module tb_forced_jump;
     end
 
 endmodule
-

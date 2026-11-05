@@ -70,7 +70,7 @@ module tb_soc_dma;
         $display("[TIME %0t] Reset de-asserted. CPU executing accel_dma_test from 0x00000000...", $time);
 
         // Execution watchdog loop
-        while (cycle_count < 30000) begin
+        while ((cycle_count < 30000) && !test_pass) begin
             @(posedge clk);
             cycle_count++;
 

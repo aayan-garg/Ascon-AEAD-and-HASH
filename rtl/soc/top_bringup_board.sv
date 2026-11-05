@@ -86,7 +86,9 @@ module top_bringup_board #(
 
     top_bringup #(
         .FIRMWARE_HEX (FIRMWARE_HEX),
-        .RAM_WORDS    (4096)
+        .RAM_WORDS    (4096),
+        // The physical board always enables the instruction-fetch guard.
+        .ENABLE_FETCH_GUARD (1)
     ) u_soc (
         .clk        (clk_100mhz),
         .rst_n      (rst_n),

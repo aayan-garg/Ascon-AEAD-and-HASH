@@ -2,7 +2,8 @@
 """
 Reproduce and Verify Ascon ESPRESSO 5-Bit S-Box
 Target: NIST SP 800-232 Table 6 & rtl/ascon/sbox5_espresso.sv
-Fulfills Task T6: Documentation of ESPRESSO S-Box Provenance & Verification
+
+This verifies the checked-in equations. It does not run ESPRESSO.
 """
 
 import os
@@ -113,8 +114,7 @@ def main():
             mismatches += 1
 
     if mismatches == 0:
-        print("  SUCCESS: 32/32 vectors match NIST SP 800-232 Table 6 with 100% mathematical precision.")
-        print("  Provenance: Berkeley ESPRESSO logic minimizer (`espresso -e -Dexact scripts/ascon_sbox.pla`)")
+        print("  SUCCESS: 32/32 vectors match NIST SP 800-232 Table 6.")
         return 0
     else:
         print(f"  FAILED: {mismatches} mismatches found.")
@@ -122,4 +122,3 @@ def main():
 
 if __name__ == "__main__":
     sys.exit(main())
-

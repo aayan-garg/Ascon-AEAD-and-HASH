@@ -14,6 +14,12 @@
 | 1/2-Round Folded (Low Area / Pipelined) | `permutation_half` | 546 | 655 | 0 | 0 | +6.225 | **MET** | **264.90** | 3.775 |
 | 1-Round Espresso (ESPRESSO S-box) | `permutation_1r_espresso` | 605 | 335 | 0 | 0 | +3.654 | **MET** | **157.58** | 6.346 |
 | 32-bit Serialised (Exploratory Design Point) | `permutation_serial32` | 722 | 497 | 0 | 0 | +3.506 | **MET** | **153.99** | 6.494 |
+
+Kernel, BDD, baseline, and ESPRESSO S-box variants are compared at engine
+level only in [`engine_comparison_table.md`](engine_comparison_table.md).
+They were not separately synthesized as permutation-level wrappers in the
+same measurement session. S-box variants were evaluated with the 1-round
+permutation only.
 | **Full SoC System (PicoRV32 + Ascon Engine)** | `top_bringup_board` | **5088** | **5486** | **4** | **0** | **+1.570** | **MET** | **118.62** | **8.430** |
 
 ## 2. Cryptographic Throughput & Hardware Efficiency

@@ -1,7 +1,7 @@
 Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2025 Advanced Micro Devices, Inc. All Rights Reserved.
 -----------------------------------------------------------------------------------------------------------------------------------------------------------
 | Tool Version : Vivado v.2025.1 (win64) Build 6140274 Thu May 22 00:12:29 MDT 2025
-| Date         : Wed Oct 21 22:28:54 2026
+| Date         : Thu Nov  5 17:12:12 2026
 | Host         : LAPTOP-9H0QSNOD running 64-bit major release  (build 9200)
 | Command      : report_timing_summary -file C:/Users/Aayan/Desktop/RTL_Project/Ascon-AEAD-and-HASH/results/timing/permutation_2r_timing.rpt -max_paths 10
 | Design       : permutation_2r

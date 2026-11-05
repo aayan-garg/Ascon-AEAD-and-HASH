@@ -84,7 +84,7 @@ Total Tests Executed: 40
 Passed:               40
 Failed:               0
 
-[ALL TESTS PASSED] Custom DMA Engine & Coprocessor Closed-Loop 100% VERIFIED.
+[ALL TESTS PASSED] Custom DMA Engine & Coprocessor Closed-Loop verification complete.
 ================================================================================
 
 $finish called at time : 8205 ns : File "C:/Users/Aayan/Desktop/RTL_Project/Ascon-AEAD-and-HASH/tb/integration/tb_dma.sv" Line 595

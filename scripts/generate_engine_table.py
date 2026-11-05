@@ -12,8 +12,8 @@ variants = [
         "variant": "1R Baseline",
         "lut": 3191,
         "ff": 4015,
-        "wns": 1.925,
-        "fmax": 123.84,
+        "wns": 2.130,
+        "fmax": 127.06,
         "cyc_aead": 8,   # b=8 rounds x 1 cycle/round
         "cyc_hash": 12,  # a=12 rounds x 1 cycle/round
         "sbox": "Standard (Bit-sliced)"
@@ -23,8 +23,8 @@ variants = [
         "variant": "1R ESPRESSO",
         "lut": 3253,
         "ff": 4015,
-        "wns": 1.498,
-        "fmax": 117.62,
+        "wns": 1.879,
+        "fmax": 123.14,
         "cyc_aead": 8,   # b=8 rounds x 1 cycle/round
         "cyc_hash": 12,  # a=12 rounds x 1 cycle/round
         "sbox": "ESPRESSO SOP"
@@ -34,30 +34,30 @@ variants = [
         "variant": "1R Kernel",
         "lut": 3052,
         "ff": 4006,
-        "wns": 1.986,
-        "fmax": 124.78,
+        "wns": 2.142,
+        "fmax": 127.26,
         "cyc_aead": 8,   # b=8 rounds x 1 cycle/round
         "cyc_hash": 12,  # a=12 rounds x 1 cycle/round
-        "sbox": "Algebraic Kernel"
+        "sbox": "ANF restatement (no extraction)"
     },
     {
         "name": "mode_ctrl_1r_bdd_wrap",
         "variant": "1R BDD",
         "lut": 3055,
         "ff": 4006,
-        "wns": 1.826,
-        "fmax": 122.34,
+        "wns": 2.086,
+        "fmax": 126.36,
         "cyc_aead": 8,   # b=8 rounds x 1 cycle/round
         "cyc_hash": 12,  # a=12 rounds x 1 cycle/round
-        "sbox": "BDD Shannon Mux"
+        "sbox": "32-entry lookup (no BDD)"
     },
     {
         "name": "mode_ctrl_2r_wrap",
         "variant": "2R Unrolled",
         "lut": 3604,
         "ff": 4015,
-        "wns": 1.332,
-        "fmax": 115.37,
+        "wns": 1.729,
+        "fmax": 120.90,
         "cyc_aead": 4,   # b=8 rounds / 2 rounds/cycle
         "cyc_hash": 6,   # a=12 rounds / 2 rounds/cycle
         "sbox": "Standard (Bit-sliced)"
@@ -67,8 +67,8 @@ variants = [
         "variant": "Half-Round (0.5R)",
         "lut": 2995,
         "ff": 4328,
-        "wns": 1.776,
-        "fmax": 121.60,
+        "wns": 1.940,
+        "fmax": 124.07,
         "cyc_aead": 16,  # b=8 rounds x 2 cycles/round
         "cyc_hash": 24,  # a=12 rounds x 2 cycles/round
         "sbox": "Standard (Bit-sliced)"
@@ -78,8 +78,8 @@ variants = [
         "variant": "Serial-32",
         "lut": 3353,
         "ff": 4180,
-        "wns": 1.598,
-        "fmax": 119.02,
+        "wns": 1.900,
+        "fmax": 123.46,
         "cyc_aead": 16,  # b=8 rounds x 2 cycles/round
         "cyc_hash": 24,  # a=12 rounds x 2 cycles/round
         "sbox": "32-bit Shared"
@@ -115,10 +115,9 @@ with open(output_md, "w", encoding="utf-8") as f:
         f.write(f"| **{v['variant']}** | {v['cyc_aead']} | {v['cyc_hash']} | {tp_aead_100:.2f} Mbps | {tp_aead_fmax:.2f} Mbps | {tp_hash_100:.2f} Mbps | {tp_hash_fmax:.2f} Mbps | {eff_100:.2f} |\n")
 
     f.write("\n## 3. Key Observations\n\n")
-    f.write("1. **2-Round Unrolled** achieves the highest raw throughput (3,200.00 Mbps @ 100 MHz, 3,691.84 Mbps @ Fmax) and highest area efficiency (**887.90 kbps/LUT**), requiring 3,604 LUTs (+12.9% area vs. 1R baseline).\n")
+    f.write("1. **2-Round Unrolled** achieves the highest raw throughput at 3,200.00 Mbps @ 100 MHz and 3,868.80 Mbps @ Fmax, with 887.90 kbps/LUT and 3,604 LUTs (+12.9% area vs. 1R baseline).\n")
     f.write("2. **Half-Round (0.5R)** minimizes engine area (2,995 LUTs, -6.1% vs. 1R baseline) by folding round operations over 2 clock cycles, delivering 800.00 Mbps @ 100 MHz (267.11 kbps/LUT).\n")
-    f.write("3. **Serial-32 Datapath** on Xilinx 7-series FPGA consumes more LUTs than 1R baseline (3,353 vs 3,191 LUTs, +5.1%) and requires 2x cycles per block (16 cycles AEAD, 24 cycles Hash), resulting in lower efficiency (238.6 Mbps/LUT vs 501.4 Mbps/LUT for 1R baseline). The 6-input LUT architecture makes 1R bit-sliced S-boxes compact, so the multiplexing and state partitioning overhead exceeds the logic sharing savings.\n")
+    f.write("3. **Serial-32 Datapath** on Xilinx 7-series FPGA consumes more LUTs than 1R baseline (3,353 vs 3,191 LUTs, +5.1%) and requires 2x cycles per block (16 cycles AEAD, 24 cycles Hash), resulting in lower efficiency (238.59 kbps/LUT vs 501.41 kbps/LUT for 1R baseline). The 6-input LUT architecture makes 1R bit-sliced S-boxes compact, so the multiplexing and state partitioning overhead exceeds the logic sharing savings.\n")
     f.write("4. **ESPRESSO SOP S-Box** consumes 3,253 LUTs (+1.9% vs baseline) and meets 100 MHz timing with +1.498 ns WNS (Fmax 117.62 MHz), confirming exact functional equivalence and comparable post-route implementation quality.\n")
 
 print(f"Generated {output_md}")
-

@@ -17,7 +17,7 @@ Ascon-AEAD-and-HASH/
 │   ├── status.md                      # Live project status
 │   ├── directory_structure.md         # THIS FILE — canonical layout reference
 │   ├── architecture.md                # Detailed FSMs, data flows, round definitions
-│   ├── research_review.md             # Paper summaries, verified citations, comparisons
+│   ├── research_review.md             # Paper summaries, citation status, comparisons
 │   ├── threat_model.md                # Secure-boot trust assumptions and defense-in-depth
 │   ├── register_map.md                # AXI4-Lite register map with field definitions
 │   └── decisions/                     # One file per resolved ambiguity/design decision
@@ -123,7 +123,7 @@ Ascon-AEAD-and-HASH/
 │       └── demo_evidence/             # Demo photos/videos
 │
 ├── references/                        # Cached citation metadata (not full PDFs)
-│   └── bibliography.md               # All verified citations with URLs
+│   └── bibliography.md                # Citation references and verification status
 │
 └── .agents/                           # Agent configuration
     ├── rules/                         # Antigravity behavioral rules

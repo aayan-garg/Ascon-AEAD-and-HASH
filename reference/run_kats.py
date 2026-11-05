@@ -221,7 +221,7 @@ def run_tests():
     summary_md = f"""# Golden Model Verification Summary (NIST SP 800-232)
 
 - **Date:** {time.strftime('%Y-%m-%d %H:%M:%S UTC', time.gmtime())}
-- **Status:** `[x] 100% VERIFIED PASS`
+- **Status:** `[x] 2,120/2,120 vectors PASS`
 - **Model:** `reference/pyascon/ascon.py`
 - **Standard:** NIST SP 800-232 (Little-Endian)
 

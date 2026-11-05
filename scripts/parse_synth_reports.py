@@ -49,7 +49,7 @@ VARIANTS = [
     {
         "id": "permutation_1r_espresso",
         "name": "1-Round Espresso (ESPRESSO S-box)",
-        "sbox": "Berkeley ESPRESSO Minimized SOP",
+        "sbox": "ESPRESSO equations (external minimization)",
         "cycles_aead": 8,   # [SPEC] b=8 rounds x 1 cycle/round = 8 cycles per AEAD block
         "cycles_hash": 12,  # [SPEC] same as 1r baseline
         "desc": "ESPRESSO SOP-minimized S-box layer; same round count as 1r baseline."

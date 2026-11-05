@@ -4,8 +4,8 @@
 // Description: Exhaustive 32-vector formal equivalence testbench comparing:
 //   1. Baseline bit-slice algebraic S-box (sbox5.sv)
 //   2. ESPRESSO two-level minimized S-box (sbox5_espresso.sv)
-//   3. Algebraic Kernel factored S-box (sbox5_kernel.sv)
-//   4. Binary Decision Diagram / Shannon Mux S-box (sbox5_bdd.sv)
+//   3. ANF-restatement S-box (sbox5_kernel.sv)
+//   4. 32-entry lookup-table S-box (sbox5_bdd.sv)
 //   5. NIST SP 800-232 Table 6 Normative Golden Truth Table
 // ==============================================================================
 
@@ -31,13 +31,13 @@ module tb_sbox_equiv;
         .out_y (out_espresso)
     );
 
-    // 3. Instantiate Algebraic Kernel S-box
+    // 3. Instantiate ANF-restatement S-box
     sbox5_kernel u_kernel (
         .in_x  (in_x),
         .out_y (out_kernel)
     );
 
-    // 4. Instantiate BDD Shannon Mux S-box
+    // 4. Instantiate lookup-table S-box
     sbox5_bdd u_bdd (
         .in_x  (in_x),
         .out_y (out_bdd)

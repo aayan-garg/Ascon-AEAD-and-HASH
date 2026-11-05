@@ -6,6 +6,13 @@ This document records all architectural improvements, audit remediations, verifi
 
 ## 1. Documentation Consolidation & Cleanup (November 2026)
 
+- **November 5, 2026 audit correction:** Renamed the circular PLA artifact,
+  removed the unexecuted ESPRESSO provenance claim, and documented that the
+  kernel and BDD variants are respectively an ANF restatement and a lookup
+  table. Corrected citation status, removed unsupported reduction claims,
+  fixed the fetch-guard banner and DMA watchdog, and made the board wrapper
+  hard-wire the guard enabled.
+
 ### A. Ownership Map Implementation (Single Source of Truth)
 To eliminate duplicate and contradictory claims across the codebase, a strict single-source-of-truth ownership model was enforced:
 - **Hardware Performance & Implementation Metrics:** [`results/performance/comparison_table.md`](../results/performance/comparison_table.md) and [`results/performance/engine_comparison_table.md`](../results/performance/engine_comparison_table.md) only.
@@ -19,7 +26,7 @@ To eliminate duplicate and contradictory claims across the codebase, a strict si
 ### B. Obsolete Documents Removed
 Four redundant, conflicting documents were retired and removed from version control via `git rm`:
 1. `docs/validation_report.md`:
-   - *Rationale:* Duplicated findings, contained outdated phase summaries and obsolete marketing language ("100% verified", "ZERO DEFECTS"). Fully superseded by `docs/final_report.md` and `docs/requirements_traceability.md`.
+   - *Rationale:* Duplicated findings, contained outdated phase summaries and obsolete absolute verification language. Fully superseded by `docs/final_report.md` and `docs/requirements_traceability.md`.
 2. `docs/ps_reevaluation.md`:
    - *Rationale:* Intermediate audit scratchpad containing unconfirmed estimates and stale negative timing claims. Fully superseded by `docs/AUDIT_RESPONSE.md` and `docs/requirements_traceability.md`.
 3. `docs/research_plan.md`:
@@ -33,9 +40,9 @@ Four redundant, conflicting documents were retired and removed from version cont
 
 ### A. Permutation & S-Box Datapath Fixes
 - **`permutation_serial32.sv` Correctness (T1):** Resolved functional round-indexing and state synchronization bug; verified 100% bit-exact match on 135/135 differential vectors (`tb_diff_perm_serial32.sv`) and 100% PASS on exhaustive NIST KATs (1,089 AEAD, 1,025 Hash). Characterized OOC at 100 MHz (722 LUTs, +3.506 ns WNS, 153.99 MHz).
-- **Algebraic Kernel S-Box (`rtl/ascon/sbox5_kernel.sv`):** Implemented algebraic kernel factorization $(\neg A \wedge B = B \oplus (A \wedge B))$ over $\mathbb{F}_2$. Proved 32/32 equivalence to NIST Table 6. Verified full KATs (1,089 AEAD, 1,025 Hash). Synthesized OOC @ 100 MHz (3,052 LUTs, 4,006 FFs, WNS +1.986 ns, Fmax 124.78 MHz), achieving 4.4% logic reduction vs baseline 1R.
-- **BDD Shannon Mux S-Box (`rtl/ascon/sbox5_bdd.sv`):** Implemented Shannon expansion multiplexer hierarchy targeting 6-LUT / MUXF7 primitives. Proved 32/32 equivalence to NIST Table 6. Verified full KATs (1,089 AEAD, 1,025 Hash). Synthesized OOC @ 100 MHz (3,055 LUTs, 4,006 FFs, WNS +1.826 ns, Fmax 122.34 MHz).
-- **ESPRESSO S-Box Provenance:** Verified Berkeley ESPRESSO two-level logic minimizer output (`scripts/ascon_sbox.pla` $\rightarrow$ `results/synthesis/espresso_sbox_output.pla`).
+- **Algebraic Kernel S-Box (`rtl/ascon/sbox5_kernel.sv`):** Corrected description: ANF restatement of the standard equations; no extraction performed. Existing 32/32 and KAT evidence remains functional evidence only.
+- **BDD S-Box (`rtl/ascon/sbox5_bdd.sv`):** Corrected description: 32-entry lookup table; no BDD decomposition performed. Existing 32/32 and KAT evidence remains functional evidence only.
+- **ESPRESSO S-Box Provenance:** Corrected to state that equations were minimized externally with ESPRESSO; this repository only verifies them against NIST Table 6.
 
 ### B. SoC Timing Closure & Buffer Sizing (T2)
 - **Timing Closure:** Restructured wide barrel-shifts and carry arithmetic in `mode_ctrl.sv` into LUT-based decoders (`byte_mask64` and `pad_bit_word64`). Achieved positive timing closure: $WNS = +1.570\text{ ns}$ at 100 MHz ($F_{max} = 118.62\text{ MHz}$, 0 failing endpoints).

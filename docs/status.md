@@ -15,7 +15,7 @@
 | Field | Value |
 |---|---|
 | **Current Phase** | Complete (Simulation, Synthesis, STA, and Formal Sign-off) |
-| **Last Action** | Concluded documentation consolidation and gap closure: (1) Verified negative fetch-guard test with forced jump testbench (`results/board/boot_matrix/forced_jump_sim.log`); (2) Established self-checking assertions across boot sizing and SVA testbenches; (3) Added and proved ESPRESSO PLA provenance against NIST SP 800-232 Table 6; (4) Implemented Kernel and BDD S-boxes (`sbox5_kernel.sv`, `sbox5_bdd.sv`) passing 32/32 equivalence and 100% full KATs (1,089 AEAD, 1,025 Hash), synthesized OOC at 100 MHz (Kernel: 3,052 LUTs, +1.986 ns WNS; BDD: 3,055 LUTs, +1.826 ns WNS); (5) Cleaned documentation links and synchronized performance figures with tool reports; (6) Full regression passed 39/39 suites in 858.38s (`results/regression.log`). |
+| **Last Action** | Fresh Vivado 2025.1 OOC synthesis completed for five permutation variants and seven engine wrappers. Engine reports now record same-session measurements: baseline 3,191 LUTs/+2.130 ns, ESPRESSO 3,253/+1.879 ns, kernel 3,052/+2.142 ns, and BDD 3,055/+2.086 ns. Kernel and BDD remain documented as ANF restatement and lookup table, not extracted techniques. |
 | **Date** | 2026-11-05 |
 | **Overall Progress** | 100% of Simulation, Formal, RTL, and Synthesis Verification Complete |
 | **Hardware / Board Scope** | On-board physical testing out of scope per rules. Bitstream generation not attempted (implementation stopped at route_design with WNS +1.570 ns). |
