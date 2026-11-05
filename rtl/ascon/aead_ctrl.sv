@@ -12,7 +12,9 @@
 `default_nettype wire
 
 module aead_ctrl #(
-    parameter int BUFFER_DEPTH = 256
+    parameter int BUFFER_DEPTH = 256,
+    parameter int PERM_VARIANT = 1,
+    parameter string SBOX_TYPE = "BASELINE"
 ) (
     input  wire         clk,
     input  wire         rst_n,
@@ -50,7 +52,11 @@ module aead_ctrl #(
     output wire [  3:0] fsm_state
 );
 
-    mode_ctrl #(.BUFFER_DEPTH(BUFFER_DEPTH)) u_mode_ctrl (
+    mode_ctrl #(
+        .BUFFER_DEPTH(BUFFER_DEPTH),
+        .PERM_VARIANT(PERM_VARIANT),
+        .SBOX_TYPE(SBOX_TYPE)
+    ) u_mode_ctrl (
         .clk              (clk),
         .rst_n            (rst_n),
         .start            (start),

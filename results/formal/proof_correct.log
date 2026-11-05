@@ -1,5 +1,5 @@
 ================================================================================
-FORMAL CTL VERIFICATION: CORRECT SPECIFICATION (boot_safety.smv)
+FORMAL CTL VERIFICATION: CORRECT SPECIFICATION (boot_safety_corrected.smv)
 Requirement: [SPEC] R17, Initial Research Section 13.2, Phase 9 Exit Gate
 ================================================================================
 Total State Configurations: 2048

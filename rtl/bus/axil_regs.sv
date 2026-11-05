@@ -17,7 +17,12 @@
 `default_nettype wire
 
 module axil_regs #(
-    parameter int BUFFER_DEPTH = 256
+    parameter int BUFFER_DEPTH = 32,
+    parameter [31:0] DEFAULT_TRUSTED_LEN = 32'd64,
+    parameter [255:0] DEFAULT_TRUSTED_DIGEST = {
+        32'hEDB41305, 32'h12075573, 32'h11B6C8A2, 32'hAFB9E393,
+        32'h7FE61055, 32'hA2267BDC, 32'h433A4F7B, 32'h777BB3DF
+    }
 ) (
     input  wire        clk,
     input  wire        rst_n,
@@ -241,7 +246,10 @@ module axil_regs #(
     assign boot_refuse      = w_boot_refuse;
     assign boot_led_status  = w_boot_led_status;
 
-    boot_ctrl u_boot_ctrl (
+    boot_ctrl #(
+        .DEFAULT_TRUSTED_LEN(DEFAULT_TRUSTED_LEN),
+        .DEFAULT_TRUSTED_DIGEST(DEFAULT_TRUSTED_DIGEST)
+    ) u_boot_ctrl (
         .clk                (clk),
         .rst_n              (rst_n),
         .start              (r_boot_start_pulse),
@@ -250,7 +258,7 @@ module axil_regs #(
         .ascon_digest       (mc_digest_out),
         .tamper_det         (tamper_det || r_boot_tamper_pulse),
         .req_jump           (r_boot_req_jump_pulse),
-        .cfg_trusted_len    (32'd64),
+        .cfg_trusted_len    (DEFAULT_TRUSTED_LEN),
         .cfg_trusted_digest (256'd0),
         .cfg_use_custom_ref (1'b0),
         .jump_enable        (w_boot_jump_enable),

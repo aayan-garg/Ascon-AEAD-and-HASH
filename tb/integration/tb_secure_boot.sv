@@ -173,6 +173,7 @@ module tb_secure_boot;
             end
             begin
                 wait (test_pass == 1'b1);
+                repeat(2) @(posedge clk);
                 disable timeout_case1;
             end
         join

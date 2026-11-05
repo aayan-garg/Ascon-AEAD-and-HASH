@@ -1,8 +1,11 @@
 -- ==============================================================================
--- Formal Specification: Ascon Secure Boot Controller Safety & CTL Model
--- Requirement: [SPEC] R17, docs/research_plan.md R-7, Initial Research.md §13.2
--- Model Checker: nuXmv / NuSMV
--- Target Property: AG (jump -> hash_ok)
+-- [DEPRECATED / BUGGY LEGACY MODEL]
+-- WARNING: DO NOT USE THIS FILE AS A PROOF OF CORRECTNESS!
+-- This is the legacy, flawed SMV model identified during the 2026-11 re-audit.
+-- Flaw: Line 90 used `(hash_verified | hash_match)` in STATE_DECIDE. Because
+-- hash_match was an unlatched free environmental input, NuSMV synthesizes a
+-- 6-step counterexample violating AG (jump -> hash_ok).
+-- The verified, corrected model is: formal/ctl/boot_safety_corrected.smv
 -- ==============================================================================
 
 MODULE main

@@ -1,0 +1,181 @@
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "C:/Users/Aayan/Desktop/RTL_Project/Ascon-AEAD-and-HASH/tb/unit/tb_diff_perm_serial32.sv" into library work
+INFO: [VRFC 10-311] analyzing module tb_diff_perm_serial32
+Vivado Simulator v2025.1.0
+Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.
+Copyright 2022-2025 Advanced Micro Devices, Inc. All Rights Reserved.
+Running: C:/Xilinx/2025.1/Vivado/bin/unwrapped/win64.o/xelab.exe -debug typical tb_diff_perm_serial32 -s tb_diff_perm_serial32_snap 
+Multi-threading is on. Using 10 slave threads.
+Starting static elaboration
+Pass Through NonSizing Optimizer
+Completed static elaboration
+Starting simulation data flow analysis
+Completed simulation data flow analysis
+Time Resolution for simulation is 1ps
+Compiling module work.sbox5
+Compiling module work.diffusion
+Compiling module work.round_core_default
+Compiling module work.permutation_1r
+Compiling module work.permutation_serial32_default
+Compiling module work.tb_diff_perm_serial32
+Built simulation snapshot tb_diff_perm_serial32_snap
+
+****** xsim v2025.1 (64-bit)
+  **** SW Build 6140274 on Thu May 22 00:12:29 MDT 2025
+  **** IP Build 6138677 on Thu May 22 03:10:11 MDT 2025
+  **** SharedData Build 6139179 on Tue May 20 17:58:58 MDT 2025
+  **** Start of session at: Wed Nov  4 15:33:33 2026
+    ** Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.
+    ** Copyright 2022-2025 Advanced Micro Devices, Inc. All Rights Reserved.
+
+source xsim.dir/tb_diff_perm_serial32_snap/xsim_script.tcl
+# xsim {tb_diff_perm_serial32_snap} -autoloadwcfg -runall
+Time resolution is 1 ps
+run -all
+================================================================
+STARTING DIFFERENTIAL TEST: tb_diff_perm_serial32
+Comparing permutation_serial32 vs permutation_1r (golden)
+================================================================
+  [CYC] Directed p^12: cyc_1r=13, cyc_s32=25
+  [CYC] Directed p^8: cyc_1r=9, cyc_s32=17
+  [CYC] Directed p^6: cyc_1r=7, cyc_s32=13
+
+Running 132 random & directed vectors from perm_random_vectors.svh...
+  [CYC] Vector[0]: cyc_1r=7, cyc_s32=13
+  [CYC] Vector[1]: cyc_1r=7, cyc_s32=13
+  [CYC] Vector[2]: cyc_1r=7, cyc_s32=13
+  [CYC] Vector[3]: cyc_1r=7, cyc_s32=13
+  [CYC] Vector[4]: cyc_1r=7, cyc_s32=13
+  [CYC] Vector[5]: cyc_1r=7, cyc_s32=13
+  [CYC] Vector[6]: cyc_1r=7, cyc_s32=13
+  [CYC] Vector[7]: cyc_1r=7, cyc_s32=13
+  [CYC] Vector[8]: cyc_1r=7, cyc_s32=13
+  [CYC] Vector[9]: cyc_1r=7, cyc_s32=13
+  [CYC] Vector[10]: cyc_1r=7, cyc_s32=13
+  [CYC] Vector[11]: cyc_1r=7, cyc_s32=13
+  [CYC] Vector[12]: cyc_1r=7, cyc_s32=13
+  [CYC] Vector[13]: cyc_1r=7, cyc_s32=13
+  [CYC] Vector[14]: cyc_1r=7, cyc_s32=13
+  [CYC] Vector[15]: cyc_1r=7, cyc_s32=13
+  [CYC] Vector[16]: cyc_1r=7, cyc_s32=13
+  [CYC] Vector[17]: cyc_1r=7, cyc_s32=13
+  [CYC] Vector[18]: cyc_1r=7, cyc_s32=13
+  [CYC] Vector[19]: cyc_1r=7, cyc_s32=13
+  [CYC] Vector[20]: cyc_1r=7, cyc_s32=13
+  [CYC] Vector[21]: cyc_1r=7, cyc_s32=13
+  [CYC] Vector[22]: cyc_1r=7, cyc_s32=13
+  [CYC] Vector[23]: cyc_1r=7, cyc_s32=13
+  [CYC] Vector[24]: cyc_1r=7, cyc_s32=13
+  [CYC] Vector[25]: cyc_1r=7, cyc_s32=13
+  [CYC] Vector[26]: cyc_1r=7, cyc_s32=13
+  [CYC] Vector[27]: cyc_1r=7, cyc_s32=13
+  [CYC] Vector[28]: cyc_1r=7, cyc_s32=13
+  [CYC] Vector[29]: cyc_1r=7, cyc_s32=13
+  [CYC] Vector[30]: cyc_1r=7, cyc_s32=13
+  [CYC] Vector[31]: cyc_1r=7, cyc_s32=13
+  [CYC] Vector[32]: cyc_1r=7, cyc_s32=13
+  [CYC] Vector[33]: cyc_1r=7, cyc_s32=13
+  [CYC] Vector[34]: cyc_1r=7, cyc_s32=13
+  [CYC] Vector[35]: cyc_1r=7, cyc_s32=13
+  [CYC] Vector[36]: cyc_1r=7, cyc_s32=13
+  [CYC] Vector[37]: cyc_1r=7, cyc_s32=13
+  [CYC] Vector[38]: cyc_1r=7, cyc_s32=13
+  [CYC] Vector[39]: cyc_1r=7, cyc_s32=13
+  [CYC] Vector[40]: cyc_1r=7, cyc_s32=13
+  [CYC] Vector[41]: cyc_1r=7, cyc_s32=13
+  [CYC] Vector[42]: cyc_1r=7, cyc_s32=13
+  [CYC] Vector[43]: cyc_1r=7, cyc_s32=13
+  [CYC] Vector[44]: cyc_1r=9, cyc_s32=17
+  [CYC] Vector[45]: cyc_1r=9, cyc_s32=17
+  [CYC] Vector[46]: cyc_1r=9, cyc_s32=17
+  [CYC] Vector[47]: cyc_1r=9, cyc_s32=17
+  [CYC] Vector[48]: cyc_1r=9, cyc_s32=17
+  [CYC] Vector[49]: cyc_1r=9, cyc_s32=17
+  [CYC] Vector[50]: cyc_1r=9, cyc_s32=17
+  [CYC] Vector[51]: cyc_1r=9, cyc_s32=17
+  [CYC] Vector[52]: cyc_1r=9, cyc_s32=17
+  [CYC] Vector[53]: cyc_1r=9, cyc_s32=17
+  [CYC] Vector[54]: cyc_1r=9, cyc_s32=17
+  [CYC] Vector[55]: cyc_1r=9, cyc_s32=17
+  [CYC] Vector[56]: cyc_1r=9, cyc_s32=17
+  [CYC] Vector[57]: cyc_1r=9, cyc_s32=17
+  [CYC] Vector[58]: cyc_1r=9, cyc_s32=17
+  [CYC] Vector[59]: cyc_1r=9, cyc_s32=17
+  [CYC] Vector[60]: cyc_1r=9, cyc_s32=17
+  [CYC] Vector[61]: cyc_1r=9, cyc_s32=17
+  [CYC] Vector[62]: cyc_1r=9, cyc_s32=17
+  [CYC] Vector[63]: cyc_1r=9, cyc_s32=17
+  [CYC] Vector[64]: cyc_1r=9, cyc_s32=17
+  [CYC] Vector[65]: cyc_1r=9, cyc_s32=17
+  [CYC] Vector[66]: cyc_1r=9, cyc_s32=17
+  [CYC] Vector[67]: cyc_1r=9, cyc_s32=17
+  [CYC] Vector[68]: cyc_1r=9, cyc_s32=17
+  [CYC] Vector[69]: cyc_1r=9, cyc_s32=17
+  [CYC] Vector[70]: cyc_1r=9, cyc_s32=17
+  [CYC] Vector[71]: cyc_1r=9, cyc_s32=17
+  [CYC] Vector[72]: cyc_1r=9, cyc_s32=17
+  [CYC] Vector[73]: cyc_1r=9, cyc_s32=17
+  [CYC] Vector[74]: cyc_1r=9, cyc_s32=17
+  [CYC] Vector[75]: cyc_1r=9, cyc_s32=17
+  [CYC] Vector[76]: cyc_1r=9, cyc_s32=17
+  [CYC] Vector[77]: cyc_1r=9, cyc_s32=17
+  [CYC] Vector[78]: cyc_1r=9, cyc_s32=17
+  [CYC] Vector[79]: cyc_1r=9, cyc_s32=17
+  [CYC] Vector[80]: cyc_1r=9, cyc_s32=17
+  [CYC] Vector[81]: cyc_1r=9, cyc_s32=17
+  [CYC] Vector[82]: cyc_1r=9, cyc_s32=17
+  [CYC] Vector[83]: cyc_1r=9, cyc_s32=17
+  [CYC] Vector[84]: cyc_1r=9, cyc_s32=17
+  [CYC] Vector[85]: cyc_1r=9, cyc_s32=17
+  [CYC] Vector[86]: cyc_1r=9, cyc_s32=17
+  [CYC] Vector[87]: cyc_1r=9, cyc_s32=17
+  [CYC] Vector[88]: cyc_1r=13, cyc_s32=25
+  [CYC] Vector[89]: cyc_1r=13, cyc_s32=25
+  [CYC] Vector[90]: cyc_1r=13, cyc_s32=25
+  [CYC] Vector[91]: cyc_1r=13, cyc_s32=25
+  [CYC] Vector[92]: cyc_1r=13, cyc_s32=25
+  [CYC] Vector[93]: cyc_1r=13, cyc_s32=25
+  [CYC] Vector[94]: cyc_1r=13, cyc_s32=25
+  [CYC] Vector[95]: cyc_1r=13, cyc_s32=25
+  [CYC] Vector[96]: cyc_1r=13, cyc_s32=25
+  [CYC] Vector[97]: cyc_1r=13, cyc_s32=25
+  [CYC] Vector[98]: cyc_1r=13, cyc_s32=25
+  [CYC] Vector[99]: cyc_1r=13, cyc_s32=25
+  [CYC] Vector[100]: cyc_1r=13, cyc_s32=25
+  [CYC] Vector[101]: cyc_1r=13, cyc_s32=25
+  [CYC] Vector[102]: cyc_1r=13, cyc_s32=25
+  [CYC] Vector[103]: cyc_1r=13, cyc_s32=25
+  [CYC] Vector[104]: cyc_1r=13, cyc_s32=25
+  [CYC] Vector[105]: cyc_1r=13, cyc_s32=25
+  [CYC] Vector[106]: cyc_1r=13, cyc_s32=25
+  [CYC] Vector[107]: cyc_1r=13, cyc_s32=25
+  [CYC] Vector[108]: cyc_1r=13, cyc_s32=25
+  [CYC] Vector[109]: cyc_1r=13, cyc_s32=25
+  [CYC] Vector[110]: cyc_1r=13, cyc_s32=25
+  [CYC] Vector[111]: cyc_1r=13, cyc_s32=25
+  [CYC] Vector[112]: cyc_1r=13, cyc_s32=25
+  [CYC] Vector[113]: cyc_1r=13, cyc_s32=25
+  [CYC] Vector[114]: cyc_1r=13, cyc_s32=25
+  [CYC] Vector[115]: cyc_1r=13, cyc_s32=25
+  [CYC] Vector[116]: cyc_1r=13, cyc_s32=25
+  [CYC] Vector[117]: cyc_1r=13, cyc_s32=25
+  [CYC] Vector[118]: cyc_1r=13, cyc_s32=25
+  [CYC] Vector[119]: cyc_1r=13, cyc_s32=25
+  [CYC] Vector[120]: cyc_1r=13, cyc_s32=25
+  [CYC] Vector[121]: cyc_1r=13, cyc_s32=25
+  [CYC] Vector[122]: cyc_1r=13, cyc_s32=25
+  [CYC] Vector[123]: cyc_1r=13, cyc_s32=25
+  [CYC] Vector[124]: cyc_1r=13, cyc_s32=25
+  [CYC] Vector[125]: cyc_1r=13, cyc_s32=25
+  [CYC] Vector[126]: cyc_1r=13, cyc_s32=25
+  [CYC] Vector[127]: cyc_1r=13, cyc_s32=25
+  [CYC] Vector[128]: cyc_1r=13, cyc_s32=25
+  [CYC] Vector[129]: cyc_1r=13, cyc_s32=25
+  [CYC] Vector[130]: cyc_1r=13, cyc_s32=25
+  [CYC] Vector[131]: cyc_1r=13, cyc_s32=25
+
+================================================================
+DIFFERENTIAL TEST RESULTS: PASS=135, FAIL=0
+[SUCCESS] permutation_serial32 IS 100% BIT-EXACT MATCH TO 1R!
+$finish called at time : 27500 ns
+exit
+INFO: [Common 17-206] Exiting xsim at Wed Nov  4 15:33:37 2026...

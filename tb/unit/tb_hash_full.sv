@@ -28,7 +28,11 @@
 `timescale 1ns / 1ps
 `default_nettype wire
 
-module tb_hash_full;
+module tb_hash_full #(
+    parameter int PERM_VARIANT = 1,
+    parameter string SBOX_TYPE = "BASELINE",
+    parameter string LOG_FILE = "results/kat/rtl_hash_full_pass.log"
+);
 
     // -------------------------------------------------------------------------
     // Parameters
@@ -63,7 +67,10 @@ module tb_hash_full;
     // -------------------------------------------------------------------------
     // DUT
     // -------------------------------------------------------------------------
-    hash_ctrl dut (
+    hash_ctrl #(
+        .PERM_VARIANT(PERM_VARIANT),
+        .SBOX_TYPE(SBOX_TYPE)
+    ) dut (
         .clk           (clk),
         .rst_n         (rst_n),
         .start         (start),
@@ -174,7 +181,7 @@ module tb_hash_full;
 
         $readmemh("tb/vectors/hash_kat.mem", kat_mem);
 
-        log_fd = $fopen("results/kat/rtl_hash_full_pass.log", "w");
+        log_fd = $fopen(LOG_FILE, "w");
         if (log_fd)
             $fdisplay(log_fd, "# tb_hash_full.sv NIST SP 800-232 Hash-256 Exhaustive KAT Log");
 

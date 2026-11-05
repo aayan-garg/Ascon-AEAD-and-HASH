@@ -10,7 +10,10 @@
 `timescale 1ns / 1ps
 `default_nettype wire
 
-module hash_ctrl (
+module hash_ctrl #(
+    parameter int PERM_VARIANT = 1,
+    parameter string SBOX_TYPE = "BASELINE"
+) (
     input  wire         clk,
     input  wire         rst_n,
 
@@ -31,7 +34,10 @@ module hash_ctrl (
     output wire [  3:0] fsm_state
 );
 
-    mode_ctrl u_mode_ctrl (
+    mode_ctrl #(
+        .PERM_VARIANT(PERM_VARIANT),
+        .SBOX_TYPE(SBOX_TYPE)
+    ) u_mode_ctrl (
         .clk              (clk),
         .rst_n            (rst_n),
         .start            (start),

@@ -7,14 +7,26 @@ Capabilities:
   1. Computes 256-bit NIST SP 800-232 Ascon-Hash256 reference digest.
   2. Constructs 64-byte authenticated header.
   3. Emits 'firmware/bootrom/trusted_manifest.h' for bitstream/Boot ROM baking.
-  4. Generates complete test images for all 9 cases of the §12.5 Boot Matrix.
-  5. Merges Boot ROM + Candidate Image into 16 KB BRAM hex for SoC simulation.
+  4. Generates test images for the §12.5 Boot Matrix.
+     NOTE ON BOOT MATRIX DISK IMAGES:
+     Exactly 5 distinct merged hex images are generated on disk:
+       - bram_case1_valid.hex:        Valid untampered candidate image
+       - bram_case2_flipped.hex:      Single-bit flip at byte offset 10
+       - bram_case3_wrong_digest.hex: Mismatched reference digest in manifest
+       - bram_case4_invalid_len.hex:  Invalid declared payload length (0 B)
+       - bram_case5_bad_magic.hex:    Malformed header magic word (0xDEADBEEF)
+     Test cases 6 to 9 do not have separate hex files on disk; they execute
+     runtime fault-injection and reset-injection tests in simulation on the
+     golden Case 1 image (bram_case1_valid.hex).
+  5. Supports multi-size payload generation (--payload-size and --gen-sizes)
+     to provision and measure real boot latency across 64 B, 1 KB, and 4 KB.
 """
 
 import os
 import sys
 import struct
 import argparse
+import subprocess
 from typing import List, Tuple
 
 ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
@@ -120,48 +132,92 @@ def generate_default_app_payload(num_bytes: int = 64) -> bytes:
             while len(data) < num_bytes:
                 data += nop
             data = data[:num_bytes]
-        return data
+        return data[:num_bytes]
     else:
         payload = bytearray([i & 0xFF for i in range(num_bytes)])
         return bytes(payload)
 
-def main():
-    parser = argparse.ArgumentParser(description="Secure Boot Image Provisioning Tool")
-    parser.add_argument("--gen-manifest", action="store_true", help="Generate trusted_manifest.h")
-    parser.add_argument("--gen-matrix", action="store_true", help="Generate all 9 test images for Boot Matrix")
-    args = parser.parse_args()
+def compile_bootrom() -> bool:
+    """Compiles secure_boot.c with current trusted_manifest.h into secure_boot.hex."""
+    build_script = os.path.join(ROOT_DIR, "firmware", "build_firmware.py")
+    res = subprocess.run([sys.executable, build_script, "--bootrom"], capture_output=True, text=True)
+    if res.returncode != 0:
+        print(f"[FAIL] Boot ROM build failed:\n{res.stderr}")
+        return False
+    print(res.stdout.strip())
+    return True
 
-    # Default payload: 64 bytes
-    payload = generate_default_app_payload(64)
+def provision_single_payload(payload_size: int, output_hex_path: str = None) -> Tuple[bytes, bytes, List[int]]:
+    """Provisions a single image of given payload_size, updates manifest, rebuilds bootrom, and merges hex."""
+    payload = generate_default_app_payload(payload_size)
     digest = compute_digest(payload)
     digest_words = digest_to_words(digest)
 
-    print(f"[PROVISION] Default Payload: {len(payload)} bytes")
+    manifest_path = os.path.join(ROOT_DIR, "firmware", "bootrom", "trusted_manifest.h")
+    emit_trusted_manifest_header(manifest_path, len(payload), DEFAULT_ENTRY_ADDR, digest_words)
+    compile_bootrom()
+
+    header = pack_header(len(payload), DEFAULT_ENTRY_ADDR, digest)
+    cand_img = header + payload
+
+    if output_hex_path:
+        bootrom_hex = os.path.join(ROOT_DIR, "firmware", "bootrom", "secure_boot.hex")
+        merge_bram_hex(bootrom_hex, cand_img, output_hex_path)
+
+    return payload, digest, digest_words
+
+def main():
+    parser = argparse.ArgumentParser(
+        description="Secure Boot Image Provisioning Tool (NIST SP 800-232 Ascon-Hash256)",
+        epilog="Note: Exactly 5 hex images exist on disk (Cases 1 to 5). Cases 6-9 are fault-injection cases on Case 1."
+    )
+    parser.add_argument("--payload-size", type=int, default=64, help="Payload size in bytes (default: 64)")
+    parser.add_argument("--gen-manifest", action="store_true", help="Generate trusted_manifest.h for specified payload size")
+    parser.add_argument("--gen-matrix", action="store_true", help="Generate 5 test images for Boot Matrix (Cases 1-5)")
+    parser.add_argument("--gen-sizes", action="store_true", help="Generate images for 64 B, 1 KB, and 4 KB payload sizes")
+    args = parser.parse_args()
+
+    if args.gen_sizes:
+        print("================================================================================")
+        print("PROVISIONING MULTI-SIZE PAYLOAD IMAGES FOR BOOT LATENCY BENCHMARKING")
+        print("================================================================================")
+        sizes = [64, 1024, 4096]
+        matrix_dir = os.path.join(ROOT_DIR, "firmware", "tests", "boot_matrix")
+        os.makedirs(matrix_dir, exist_ok=True)
+        for sz in sizes:
+            out_hex = os.path.join(matrix_dir, f"bram_payload_{sz}b.hex")
+            print(f"\n--- Provisioning {sz} Bytes ({sz/1024:.2f} KB) ---")
+            p, d, dw = provision_single_payload(sz, out_hex)
+            print(f"  Digest Hex: {d.hex()}")
+            print(f"  Target Hex: {out_hex}")
+        # Restore default 64B manifest
+        print("\n--- Restoring default 64-byte manifest ---")
+        provision_single_payload(64)
+        print("\nMulti-size provisioning complete!")
+        return
+
+    # Default flow or specified payload size
+    payload, digest, digest_words = provision_single_payload(args.payload_size)
+    print(f"\n[PROVISION] Payload size: {len(payload)} bytes")
     print(f"[PROVISION] Computed 256-bit Ascon-Hash256: {digest.hex()}")
     for i, w in enumerate(digest_words):
         print(f"  DIGEST_{i}: 0x{w:08X}")
-
-    manifest_path = os.path.join(ROOT_DIR, "firmware", "bootrom", "trusted_manifest.h")
-    emit_trusted_manifest_header(manifest_path, len(payload), DEFAULT_ENTRY_ADDR, digest_words)
 
     if args.gen_matrix:
         matrix_dir = os.path.join(ROOT_DIR, "firmware", "tests", "boot_matrix")
         os.makedirs(matrix_dir, exist_ok=True)
 
-        # Case 1: Valid Untampered Firmware Image
         header_valid = pack_header(len(payload), DEFAULT_ENTRY_ADDR, digest)
         image_valid = header_valid + payload
         with open(os.path.join(matrix_dir, "case1_valid.bin"), "wb") as f:
             f.write(image_valid)
 
-        # Case 2: Byte-Flipped Firmware (1 bit modified at offset 10 of payload)
         payload_flipped = bytearray(payload)
         payload_flipped[10] ^= 0x01
         image_flipped = header_valid + bytes(payload_flipped)
         with open(os.path.join(matrix_dir, "case2_flipped.bin"), "wb") as f:
             f.write(image_flipped)
 
-        # Case 3: Wrong Reference Digest (simulate provisioning error)
         digest_wrong = bytearray(digest)
         digest_wrong[0] ^= 0xFF
         header_wrong_digest = pack_header(len(payload), DEFAULT_ENTRY_ADDR, bytes(digest_wrong))
@@ -169,13 +225,11 @@ def main():
         with open(os.path.join(matrix_dir, "case3_wrong_digest.bin"), "wb") as f:
             f.write(image_wrong_digest)
 
-        # Case 4: Invalid Declared Length (oversized 0x8000 or zero)
         header_bad_len = pack_header(0, DEFAULT_ENTRY_ADDR, digest)
         image_bad_len = header_bad_len + payload
         with open(os.path.join(matrix_dir, "case4_invalid_len.bin"), "wb") as f:
             f.write(image_bad_len)
 
-        # Case 5: Malformed Header Magic (0xDEADBEEF instead of 0x4153434E)
         header_bad_magic = pack_header(len(payload), DEFAULT_ENTRY_ADDR, digest, magic=0xDEADBEEF)
         image_bad_magic = header_bad_magic + payload
         with open(os.path.join(matrix_dir, "case5_bad_magic.bin"), "wb") as f:
@@ -183,14 +237,14 @@ def main():
 
         print(f"[PROVISION] Successfully created all test images in: {matrix_dir}")
 
-        # Generate Merged 16 KB BRAM Hex Files for Simulation
         bootrom_hex = os.path.join(ROOT_DIR, "firmware", "bootrom", "secure_boot.hex")
         merge_bram_hex(bootrom_hex, image_valid, os.path.join(matrix_dir, "bram_case1_valid.hex"))
         merge_bram_hex(bootrom_hex, image_flipped, os.path.join(matrix_dir, "bram_case2_flipped.hex"))
         merge_bram_hex(bootrom_hex, image_wrong_digest, os.path.join(matrix_dir, "bram_case3_wrong_digest.hex"))
         merge_bram_hex(bootrom_hex, image_bad_len, os.path.join(matrix_dir, "bram_case4_invalid_len.hex"))
         merge_bram_hex(bootrom_hex, image_bad_magic, os.path.join(matrix_dir, "bram_case5_bad_magic.hex"))
-        print(f"[PROVISION] Successfully created all merged BRAM hex files in: {matrix_dir}")
+        print(f"[PROVISION] Successfully created all 5 merged BRAM hex files in: {matrix_dir}")
+        print("[PROVISION] Note: Cases 6-9 are fault-injection cases simulated on bram_case1_valid.hex.")
 
 if __name__ == "__main__":
     main()

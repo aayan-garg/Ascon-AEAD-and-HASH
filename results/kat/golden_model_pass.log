@@ -1,7 +1,7 @@
 ================================================================================
 NIST SP 800-232 OFFICIAL KAT VERIFICATION HARNESS
 Ascon Golden Model: reference/pyascon/ascon.py
-Execution Date: 2026-11-03 17:53:19 UTC
+Execution Date: 2026-11-05 00:58:33 UTC
 ================================================================================
 
 [1] Verifying Official KAT File Integrity (SHA-256):
@@ -32,6 +32,6 @@ Execution Date: 2026-11-03 17:53:19 UTC
 
 ================================================================================
 SUMMARY: 100% PASS across all 2,114 official vectors + 6 security edge cases.
-Execution completed in 4.48 seconds.
+Execution completed in 3.73 seconds.
 Hard Exit Gate Phase 0 / Phase 3: PASSED
 ================================================================================

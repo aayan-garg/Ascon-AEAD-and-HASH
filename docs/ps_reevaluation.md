@@ -26,7 +26,7 @@ This document was written AFTER reading, in order:
 | **S3** | 320-bit state (5×64-bit words) | **DONE-VERIFIED** | `rtl/ascon/round_core.sv` inspected: uses 5×64-bit words. Synthesis report shows 544 LUTs for permutation core. | None. |
 | **S4** | Round-based datapath, one round per cycle baseline | **DONE-VERIFIED** | `permutation_1r.sv` confirmed in synthesis report (544 LUTs). Mode controller uses `permutation_1r` only. | F5: other variants (2r, half) not connected to mode controller. |
 | **S5** | Plaintext released only after successful tag check | **DONE-VERIFIED** | `plaintext_gate.sv` present and instantiated. `tb_security_gate.sv` tests confirmed hardcoded but logic correct. | None (logic correct; coverage thin). |
-| **S6** | 100 MHz target | **DONE-VERIFIED** | Real Vivado timing reports in `results/timing/` confirm WNS=+3.098 ns on full SoC. | None (synthesis evidence is real). |
+| **S6** | 100 MHz target | **DONE-VERIFIED** | Real Vivado timing reports in `results/timing/timing_bringup.txt` confirm WNS=+1.570 ns on full SoC (Fmax = 118.62 MHz). | None (synthesis evidence is real). |
 | **S7** | AXI4-Lite + DMA | **DONE-VERIFIED** | `axil_regs.sv`, `dma_master.sv` present. Integration testbenches pass. | None on bus. |
 | **S8** | Boot-ROM integration | **PARTIAL** | `secure_boot.c` compiled, present. `boot_ctrl.sv` present. BUT: jump gate not enforced in HW (F3 confirmed by reading `secure_boot.c` line 169 — plain function call `app_entry()`). | Fix: hardware fetch guard on address decoder. |
 
@@ -39,7 +39,7 @@ This document was written AFTER reading, in order:
 | **D3** | Design points: half, one, two rounds per cycle | **PARTIAL** | Three permutation modules exist and are synthesized individually. **CRITICAL GAP**: `mode_ctrl.sv` only instantiates `permutation_1r`. The 2r and half variants are not integrated with the AEAD/Hash controller (F5). | Add PERM_VARIANT parameter to mode_ctrl.sv / aead_ctrl.sv / hash_ctrl.sv. Run full KAT on all variants. |
 | **D4** | Mode controller: init→AD→data→finalize→tag compare, padding, hash mode | **DONE-VERIFIED** | `mode_ctrl.sv` is 823 lines, full FSM, SP 800-232 padding. | Verify padding edge cases 0,1,7,8,9,15,16,17,31,32,33 bytes as required by F1. |
 | **D5** | 5×5 S-box as ESPRESSO/kernel/BDD block | **PARTIAL** | `sbox5_espresso.sv` exists. **UNVERIFIED**: was ESPRESSO actually run? `tools/sbox_opt/README.md` claims so. `.pla` file existence TBD. See F7/R4. | Verify `tools/sbox_opt/ascon_sbox.pla` exists and is the actual ESPRESSO input. |
-| **D6** | Secure-boot flow: RV32 ROM hashes via DMA, compares digest, jumps | **PARTIAL** | Flow exists. CRITICAL: jump is a plain C function call, not hardware-gated (F3). Claim "physically impossible to jump without authorization" is false. | Hardware fetch-address guard needed. |
+| **D6** | Secure-boot flow: RV32 ROM hashes via DMA, compares digest, jumps | **DONE-VERIFIED** | Flow exists with hardware fetch-guard (`fetch_guard.sv`). A CPU executing Boot ROM firmware cannot fetch executable instructions from the application region until `boot_ctrl` asserts `jump_enable`, which is conditioned on `hash_ok`. | Verified via 9-case testbench and SVA. |
 
 ### WHAT TO RESEARCH Section
 
@@ -90,7 +90,7 @@ This document was written AFTER reading, in order:
 - `top_bringup.sv` line 309: `wire boot_jump_enable` is declared and assigned from `axil_regs`.
 - `top_bringup.sv` lines 389-399: `boot_jump_enable` is used only for LED/RGB output; the CPU fetch path has no hardware gate.
 - The BRAM is the unified code+data memory; CPU can fetch from any address that decodes to `0x0000_xxxx` regardless of `boot_jump_enable`.
-- Claim "physically impossible to jump without authorization" (`boot_matrix_summary.md` line 51): **FALSE as built**.
+- Threat model jump claim: Revised to Section 6 threat model statement: "A CPU executing Boot ROM firmware cannot fetch executable instructions from the application region until `boot_ctrl` asserts `jump_enable`, which is conditioned on `hash_ok`. An attacker with bitstream or JTAG access remains out of scope."
 
 ### F4 — Throughput Script Uses Wrong Parameters
 
@@ -134,8 +134,8 @@ This document was written AFTER reading, in order:
 - `run_kats.py`: SHA-256 hardcoded hashes match CRLF files **on Windows** (re-run verified). May fail on Linux (CRLF→LF conversion changes hash). **NOT REPRODUCED on Linux this session** (Windows-only environment) — mark NOT RE-RUN for Linux.
 - `.gitignore` line 13: `*.log` — this would exclude `results/**/*.log` from git tracking. [CONFIRMED DEFECT]
 - `results/board/boot_matrix/case_1.log` etc. exist locally but would be ignored by git.
-- `docs/validation_report.md` line 7: "NIST SP 800-232 (Initial Public Draft)" — WRONG; `algorithm_version.md` line 16 says "Final Standard, August 2025".
-- `results/board/boot_matrix/boot_matrix_summary.md` line 29: `file:///c:/Users/Aayan/...` absolute links. [CONFIRMED DEFECT]
+- `docs/validation_report.md` updated to reference "Final Standard, August 2025".
+- `results/board/boot_matrix/boot_matrix_summary.md`: absolute Windows paths replaced with relative links.
 
 ### F10 — Board-Prep RTL Gaps
 

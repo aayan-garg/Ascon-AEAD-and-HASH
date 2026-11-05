@@ -1,7 +1,7 @@
 # Phase 7 — Direct Memory Access (DMA) Integration Summary
 
 - **Date:** 2026-10-21 15:07:00 UTC
-- **Status:** `[x] 100% VERIFIED PASS`
+- **Status:** `[x] VERIFIED PASS (40/40 boundary assertions passed)`
 - **Architecture:** Dedicated Dual-Port BRAM Master Engine (Port B) & Valid/Ready Stream Coprocessor Bridge
 - **Base Address:** DMA Registers mapped at `0x4000_0060` – `0x4000_006C`
 - **Target Platform:** Zybo Z7-10 (Xilinx XC7Z010-1CLG400C) + PicoRV32 RV32I Core
@@ -66,7 +66,7 @@ The DMA engine is controlled via memory-mapped registers integrated within `rtl/
 
 ## 3. Boundary & Functional Verification Results (`tb_dma.sv`)
 
-A comprehensive boundary testbench ([`tb/integration/tb_dma.sv`](file:///c:/Users/Aayan/Desktop/RTL_Project/Ascon-AEAD-and-HASH/tb/integration/tb_dma.sv)) was executed in Vivado XSim covering 10 distinct test scenarios and 40 individual assertions:
+A comprehensive boundary testbench ([`tb/integration/tb_dma.sv`](../../tb/integration/tb_dma.sv)) was executed in Vivado XSim covering 10 distinct test scenarios and 40 individual assertions:
 
 | Test ID | Test Scenario | Description / Stimulus | Result | Assertions |
 |:---:|---|---|:---:|:---:|
@@ -81,14 +81,14 @@ A comprehensive boundary testbench ([`tb/integration/tb_dma.sv`](file:///c:/User
 | **9** | **Active Transfer Abort**| Mid-transfer abort via `cfg_abort`; verified immediate pipeline flush, busy cleared, error set | `PASS` | 4/4 |
 | **10** | **Closed-Loop Hash256** | 64-byte payload streamed into live Ascon core; verified 256-bit digest against Python golden model | `PASS` | 4/4 |
 
-**Summary:** 40 executed, 40 passed, 0 failed (100% PASS). Verification artifact: [`results/board/dma_boundary.log`](file:///c:/Users/Aayan/Desktop/RTL_Project/Ascon-AEAD-and-HASH/results/board/dma_boundary.log).
+**Summary:** 40 executed, 40 passed, 0 failed (100% PASS). Verification artifact: [`results/board/dma_boundary.log`](dma_boundary.log).
 
 ---
 
 ## 4. Bare-Metal SoC Integration (`tb_soc_dma.sv`)
 
 - **Host Core:** PicoRV32 RV32I RISC-V processor executing from 16 KB dual-port BRAM.
-- **Firmware Driver:** [`firmware/tests/accel_dma_test.c`](file:///c:/Users/Aayan/Desktop/RTL_Project/Ascon-AEAD-and-HASH/firmware/tests/accel_dma_test.c) compiled via `riscv64-unknown-elf-gcc`.
+- **Firmware Driver:** [`firmware/tests/accel_dma_test.c`](../../firmware/tests/accel_dma_test.c) compiled via `riscv64-unknown-elf-gcc`.
 - **System Execution Sequence:**
   1. CPU initializes 64-byte payload at BRAM address `0x0000_1000` with incremental pattern `0x00, 0x01, ..., 0x3F`.
   2. CPU configures Ascon coprocessor for Hash-256 (`ASCON_CTRL = 0x02` for MODE=1).

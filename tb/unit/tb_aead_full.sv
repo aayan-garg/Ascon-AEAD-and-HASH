@@ -42,7 +42,11 @@
 `timescale 1ns / 1ps
 `default_nettype wire
 
-module tb_aead_full;
+module tb_aead_full #(
+    parameter int PERM_VARIANT = 1,
+    parameter string SBOX_TYPE = "BASELINE",
+    parameter string LOG_FILE = "results/kat/rtl_aead_full_pass.log"
+);
 
     // -------------------------------------------------------------------------
     // Parameters
@@ -111,7 +115,11 @@ module tb_aead_full;
         automatic reg [63:0] hi64 = bswap64_from_be32(kat_mem[base_word+2], kat_mem[base_word+3]);
         be_words_to_rtl128 = {hi64, lo64};
     endfunction
-    aead_ctrl #(.BUFFER_DEPTH(256)) dut (
+    aead_ctrl #(
+        .BUFFER_DEPTH(256),
+        .PERM_VARIANT(PERM_VARIANT),
+        .SBOX_TYPE(SBOX_TYPE)
+    ) dut (
         .clk             (clk),
         .rst_n           (rst_n),
         .start           (start),
@@ -286,7 +294,7 @@ module tb_aead_full;
         $readmemh("tb/vectors/aead_kat.mem", kat_mem);
 
         // Open log file
-        log_fd = $fopen("results/kat/rtl_aead_full_pass.log", "w");
+        log_fd = $fopen(LOG_FILE, "w");
         if (log_fd == 0) begin
             $display("[WARNING] Cannot open results/kat/rtl_aead_full_pass.log");
         end else begin

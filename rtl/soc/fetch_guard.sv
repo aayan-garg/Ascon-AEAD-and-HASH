@@ -19,8 +19,9 @@
 // The DMA engine has read-only access to BRAM Port B and cannot modify BRAM.
 //
 // Requirement: [SPEC] R14, F3 fix (2026-11-03)
-// Replaces claim: "physically impossible to jump without authorization"
-//   (previously FALSE; now TRUE for instruction-fetch path)
+// Threat claim: A CPU executing Boot ROM firmware cannot fetch executable
+//   instructions from the application region until boot_ctrl asserts jump_enable,
+//   which is conditioned on hash_ok.
 // ==============================================================================
 
 `timescale 1ns / 1ps

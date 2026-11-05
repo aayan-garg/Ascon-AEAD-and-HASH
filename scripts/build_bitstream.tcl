@@ -24,6 +24,7 @@ set rtl_files [list \
     "$ROOT_DIR/rtl/ascon/permutation_1r_espresso.sv" \
     "$ROOT_DIR/rtl/ascon/permutation_2r.sv" \
     "$ROOT_DIR/rtl/ascon/permutation_half.sv" \
+    "$ROOT_DIR/rtl/ascon/permutation_serial32.sv" \
     "$ROOT_DIR/rtl/ascon/plaintext_gate.sv" \
     "$ROOT_DIR/rtl/ascon/round_core.sv" \
     "$ROOT_DIR/rtl/ascon/sbox5.sv" \
@@ -31,6 +32,7 @@ set rtl_files [list \
     "$ROOT_DIR/rtl/bus/axil_regs.sv" \
     "$ROOT_DIR/rtl/dma/dma_master.sv" \
     "$ROOT_DIR/rtl/soc/boot_ctrl.sv" \
+    "$ROOT_DIR/rtl/soc/fetch_guard.sv" \
     "$ROOT_DIR/rtl/soc/picorv32.v" \
     "$ROOT_DIR/rtl/soc/top_bringup.sv" \
     "$ROOT_DIR/rtl/soc/top_bringup_board.sv" \

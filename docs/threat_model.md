@@ -70,7 +70,7 @@ To maintain rigorous engineering honesty (§12.3), the following threat vectors 
 - The TOCTOU risk (image modified between hash completion and fetch) is LOW: the DMA engine uses a read-only port (Port B) and the boot ROM does not write to the application region after hashing.
 - This does not prevent an attacker who can modify the bitstream or BRAM init data from bypassing the gate entirely (see §4 limitations).
 
-**Updated threat claim:** The claim "physically impossible to jump without authorization" is revised to: "A CPU executing Boot ROM firmware cannot fetch executable instructions from the application region until `boot_ctrl` asserts `jump_enable`, which is conditioned on `hash_ok`. An attacker with bitstream or JTAG access remains out of scope."
+**Updated threat claim:** Threat Claim: "A CPU executing Boot ROM firmware cannot fetch executable instructions from the application region until `boot_ctrl` asserts `jump_enable`, which is conditioned on `hash_ok`. An attacker with bitstream or JTAG access remains out of scope."
 
 
 ---

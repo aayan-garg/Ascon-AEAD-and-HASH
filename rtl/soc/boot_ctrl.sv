@@ -87,14 +87,14 @@ module boot_ctrl #(
         end
     end
 
-    // Monitor flag: latches high when hash_ok is valid, persists until reset
+    // Monitor flag: latches high when hash_ok is valid, immediately cleared on tamper detection
     always @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
             verified_before_jump_q <= 1'b0;
-        end else begin
-            if (hash_verified_q && !tamper_latched_q) begin
-                verified_before_jump_q <= 1'b1;
-            end
+        end else if (tamper_latched_q || tamper_det) begin
+            verified_before_jump_q <= 1'b0;
+        end else if (hash_verified_q) begin
+            verified_before_jump_q <= 1'b1;
         end
     end
 

@@ -1,7 +1,7 @@
 # Phase 6 — Accelerator Bus Integration (AXI4-Lite) Summary
 
 - **Date:** 2026-10-21 14:34:00 UTC
-- **Status:** `[x] 100% VERIFIED PASS`
+- **Status:** `[x] VERIFIED PASS (all BFM and SoC tests passed)`
 - **Bus Standard:** ARM AMBA AXI4-Lite (ARM IHI 0022E)
 - **Base Address:** `0x4000_0000` (4 KB Window: `0x4000_0000` – `0x4000_0FFF`)
 - **Target CPU:** PicoRV32 RV32I AXI Core
@@ -14,13 +14,13 @@ Phase 6 implements the memory-mapped control plane and bus interface bridging th
 
 | Module / File | Purpose | Verification Artifact |
 |---|---|---|
-| [`rtl/bus/axil_regs.sv`](file:///c:/Users/Aayan/Desktop/RTL_Project/Ascon-AEAD-and-HASH/rtl/bus/axil_regs.sv) | Full AXI4-Lite Slave Register File & Coprocessor Bridge | BFM Testbench [`tb_axil_regs.sv`](file:///c:/Users/Aayan/Desktop/RTL_Project/Ascon-AEAD-and-HASH/tb/integration/tb_axil_regs.sv) (**100% PASS**) |
-| [`rtl/soc/top_bringup.sv`](file:///c:/Users/Aayan/Desktop/RTL_Project/Ascon-AEAD-and-HASH/rtl/soc/top_bringup.sv) | SoC Top-Level: PicoRV32 + 16 KB BRAM + GPIO + Ascon Coprocessor | SoC Integration Testbench [`tb_soc_ascon.sv`](file:///c:/Users/Aayan/Desktop/RTL_Project/Ascon-AEAD-and-HASH/tb/integration/tb_soc_ascon.sv) (**100% PASS**) |
-| [`firmware/tests/accel_hash_test.c`](file:///c:/Users/Aayan/Desktop/RTL_Project/Ascon-AEAD-and-HASH/firmware/tests/accel_hash_test.c) | Bare-Metal C RISC-V Firmware Driver & KAT Validator | Executed in SoC simulation; elapsed 1,027 cycles |
+| [`rtl/bus/axil_regs.sv`](../../rtl/bus/axil_regs.sv) | Full AXI4-Lite Slave Register File & Coprocessor Bridge | BFM Testbench [`tb_axil_regs.sv`](../../tb/integration/tb_axil_regs.sv) (**100% PASS**) |
+| [`rtl/soc/top_bringup.sv`](../../rtl/soc/top_bringup.sv) | SoC Top-Level: PicoRV32 + 16 KB BRAM + GPIO + Ascon Coprocessor | SoC Integration Testbench [`tb_soc_ascon.sv`](../../tb/integration/tb_soc_ascon.sv) (**100% PASS**) |
+| [`firmware/tests/accel_hash_test.c`](../../firmware/tests/accel_hash_test.c) | Bare-Metal C RISC-V Firmware Driver & KAT Validator | Executed in SoC simulation; elapsed 1,027 cycles |
 
 ---
 
-## 2. Register Map Implementation ([`docs/register_map.md`](file:///c:/Users/Aayan/Desktop/RTL_Project/Ascon-AEAD-and-HASH/docs/register_map.md))
+## 2. Register Map Implementation ([`docs/register_map.md`](../../docs/register_map.md))
 
 All 32-bit registers were implemented and verified with strict protocol compliance:
 
@@ -42,7 +42,7 @@ All 32-bit registers were implemented and verified with strict protocol complian
 
 ---
 
-## 3. Bus-Functional-Model (BFM) Verification Results ([`tb_axil_regs.sv`](file:///c:/Users/Aayan/Desktop/RTL_Project/Ascon-AEAD-and-HASH/tb/integration/tb_axil_regs.sv))
+## 3. Bus-Functional-Model (BFM) Verification Results ([`tb_axil_regs.sv`](../../tb/integration/tb_axil_regs.sv))
 
 | Test ID | Objective | Stimulus / Access | Result | Status |
 |---|---|---|---|---|
@@ -55,10 +55,10 @@ All 32-bit registers were implemented and verified with strict protocol complian
 
 ---
 
-## 4. Bare-Metal SoC Integration Verification ([`tb_soc_ascon.sv`](file:///c:/Users/Aayan/Desktop/RTL_Project/Ascon-AEAD-and-HASH/tb/integration/tb_soc_ascon.sv))
+## 4. Bare-Metal SoC Integration Verification ([`tb_soc_ascon.sv`](../../tb/integration/tb_soc_ascon.sv))
 
 - **CPU Core:** PicoRV32 RV32I executing instructions from 16 KB BRAM.
-- **Firmware:** Compiled C binary [`accel_hash_test.c`](file:///c:/Users/Aayan/Desktop/RTL_Project/Ascon-AEAD-and-HASH/firmware/tests/accel_hash_test.c) via `riscv64-unknown-elf-gcc`.
+- **Firmware:** Compiled C binary [`accel_hash_test.c`](../../firmware/tests/accel_hash_test.c) via `riscv64-unknown-elf-gcc`.
 - **Observed Flow:**
   1. CPU initialized BRAM and peripheral bus.
   2. CPU validated `CORE_ID == 0x4153_4331`.

@@ -39,7 +39,8 @@ SECTIONS
         _ebss = .;
     } > RAM
 
-    /* Stack begins at end of 16 KB RAM (0x3FF0) and grows downward */
+    /* Stack begins at end of Boot ROM area (0x0FE0) and grows downward.
+       Must remain below CANDIDATE_HDR_ADDR (0x1000) so fetch_guard does not gate stack reads. */
     . = ALIGN(16);
-    _stack_top = 0x00003FF0;
+    _stack_top = 0x00000FE0;
 }

@@ -4,7 +4,7 @@ Explicit CTL Model Checker for Ascon Secure Boot Controller Safety
 Requirements: [SPEC] R17, docs/research_plan.md R-7, Phase 9 Exit Gate
 
 Constructs the finite Kripke structure (S, S0, R, L) for both:
-  1. Correct Model (formal/ctl/boot_safety.smv)
+  1. Correct Model (formal/ctl/boot_safety_corrected.smv)
   2. Broken Model (formal/ctl/boot_safety_broken.smv)
 
 Evaluates CTL fixed-point operators:
@@ -222,7 +222,7 @@ def format_trace(trace: List[Tuple]) -> str:
     return "\n".join(lines)
 
 def verify_model(is_broken: bool = False) -> Tuple[bool, str]:
-    tag = "BROKEN MODEL (VULNERABILITY INJECTION)" if is_broken else "CORRECT SPECIFICATION (boot_safety.smv)"
+    tag = "BROKEN MODEL (VULNERABILITY INJECTION)" if is_broken else "CORRECT SPECIFICATION (boot_safety_corrected.smv)"
     kripke = KripkeStructure(is_broken=is_broken)
     reachable = kripke.reachable_states()
     
@@ -342,7 +342,7 @@ def main():
     print("\n" + "=" * 80)
     print("PHASE 9 FORMAL CTL VERIFICATION EXIT GATE")
     print("=" * 80)
-    print(f"Correct Model (boot_safety.smv):        {'[PASS - PROVED]' if pass_correct else '[FAIL]'}")
+    print(f"Correct Model (boot_safety_corrected.smv): {'[PASS - PROVED]' if pass_correct else '[FAIL]'}")
     print(f"Broken Model  (boot_safety_broken.smv): {'[FAIL - DETECTED COUNTEREXAMPLE]' if not pass_broken else '[UNEXPECTED PASS]'}")
     print(f"Artifact Logs Generated:                results/formal/proof_correct.log")
     print(f"                                        results/formal/counterexample_broken.log")

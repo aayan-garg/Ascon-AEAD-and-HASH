@@ -42,32 +42,38 @@ To achieve mathematical tractability:
 
 ---
 
-## 4. Formal CTL Specification Suite (`boot_safety.smv`)
+## 4. Formal CTL Specification Suite (`boot_safety_corrected.smv`)
 
 | ID | CTL Formula | Natural Language Specification |
 |---|---|---|
 | **SPEC-CTL-1** | `AG (jump -> hash_ok)` | **Mandatory Safety:** Along all execution paths at all times, code jump implies hash verification was successful. |
-| **SPEC-CTL-2** | `AG (tamper_det -> !EF jump)` | **Tamper Resilience:** Detection of hardware tampering permanently prevents any future state from reaching `JUMP`. |
-| **SPEC-CTL-3** | `AG (state = STATE_DECIDE & !hash_ok -> AX (state = STATE_HALT_REFUSE))` | **Strict Lockout:** If verification fails at the decision barrier, transition to `HALT_REFUSE` occurs immediately on the next clock cycle. |
-| **SPEC-CTL-4** | `AG (start -> AF (jump \| refuse \| !start))` | **Termination / Liveness:** Starting boot guarantees eventual termination into an authenticated boot or defensive lockout. |
+| **SPEC-CTL-2** | `AG (jump -> verified_before_jump)` | **Monitor Invariant:** If in STATE_JUMP, verified_before_jump monitor register is TRUE, meaning hash verification strictly preceded the jump. |
+| **SPEC-CTL-3** | `AG (tamper_latched -> !EF jump)` | **Tamper Resilience:** Once tamper is latched, it is globally impossible on any future path to reach `JUMP`. |
+| **SPEC-CTL-4** | `AG (state = STATE_DECIDE & !hash_verified -> AX (state = STATE_HALT_REFUSE))` | **Strict Lockout:** If verification fails at the decision barrier, transition to `HALT_REFUSE` occurs immediately on the next clock cycle. |
 | **SPEC-CTL-5** | `AG (refuse -> AG refuse)` | **Terminal State Invariance:** Once locked in `HALT_REFUSE`, escape without hardware reset is mathematically impossible. |
+
+> [!NOTE]
+> The legacy file `boot_safety_BROKEN_legacy.smv` contained a flaw where `(hash_verified | hash_match)` was checked in `STATE_DECIDE`, allowing an unlatched `hash_match` input to trigger a jump without prior verification. This was identified and corrected in `boot_safety_corrected.smv`, which strictly samples only the latched register `hash_verified_q`.
 
 ---
 
 ## 5. Verification Execution Instructions
 
-When running on Linux / WSL2 with nuXmv installed:
+Run with NuSMV (or nuXmv):
 
 ```bash
-# Run batch verification
-nuXmv formal/ctl/boot_safety.smv
+# Verify corrected model (All 5 properties PASS)
+NuSMV formal/ctl/boot_safety_corrected.smv
+
+# Demonstrate counterexample on broken legacy model
+NuSMV formal/ctl/boot_safety_BROKEN_legacy.smv
 ```
 
-Expected nuXmv output:
+Expected NuSMV output on `boot_safety_corrected.smv`:
 ```text
--- specification AG (jump -> hash_ok) is true
--- specification AG (tamper_det -> !EF jump) is true
--- specification AG ((state = STATE_DECIDE & !hash_ok) -> AX state = STATE_HALT_REFUSE) is true
--- specification AG (start -> AF ((jump | refuse) | !start)) is true
--- specification AG (refuse -> AG refuse) is true
+-- specification AG (jump -> hash_ok)  is true
+-- specification AG (tamper_latched -> !(EF jump))  is true
+-- specification AG ((state = STATE_DECIDE & !hash_verified) -> AX state = STATE_HALT_REFUSE)  is true
+-- specification AG (refuse -> AG refuse)  is true
+-- specification AG (jump -> verified_before_jump)  is true
 ```

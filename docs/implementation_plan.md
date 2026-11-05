@@ -103,7 +103,7 @@ Phase 11 ──→ Phase 12 (Final Documentation & Handoff)
   - 125 MHz clock on pin K17 → MMCM → 100 MHz
   - LED pin assignments
   - Switch pin assignments
-- [x] Synthesize and generate bitstream for Zybo Z7-10 (`build/top_bringup.bit` generated, 0 timing errors, WNS = +3.098 ns)
+- [x] Synthesize and generate bitstream for Zybo Z7-10 (`build/top_bringup.bit` generated, 0 timing errors, WNS = +1.570 ns)
 - [ ] **HARD GATE:** Demonstrate LED toggling on the actual physical board (JTAG programming ready via `scripts/program_board.tcl`)
 
 ### Exit Gate (HARD — no proceeding without this)

@@ -13,7 +13,7 @@
 | 2-Rounds Unrolled (High Throughput) | `permutation_2r` | 939 | 335 | 0 | 0 | +2.639 | **MET** | **135.85** | 7.361 |
 | 1/2-Round Folded (Low Area / Pipelined) | `permutation_half` | 546 | 655 | 0 | 0 | +6.225 | **MET** | **264.90** | 3.775 |
 | 1-Round Espresso (ESPRESSO S-box) | `permutation_1r_espresso` | 605 | 335 | 0 | 0 | +3.654 | **MET** | **157.58** | 6.346 |
-| 32-bit Serialised (Paper Design Point) | `permutation_serial32` | 546 | 495 | 0 | 0 | +4.668 | **MET** | **187.55** | 5.332 |
+| 32-bit Serialised (Paper Design Point) | `permutation_serial32` | 722 | 497 | 0 | 0 | +3.506 | **MET** | **153.99** | 6.494 |
 | **Full SoC System (PicoRV32 + Ascon Engine)** | `top_bringup_board` | **9232** | **19937** | **4** | **0** | **-2.657** | **VIOLATED** | **79.01** | **12.657** |
 
 ## 2. Cryptographic Throughput & Hardware Efficiency
@@ -24,7 +24,7 @@
 | 2-Rounds Unrolled (High Throughput) | 4 | 6 | 3200.00 | **4347.24** | 1066.67 | **1449.08** | 3.408 |
 | 1/2-Round Folded (Low Area / Pipelined) | 16 | 24 | 800.00 | **2119.21** | 266.67 | **706.40** | 1.465 |
 | 1-Round Espresso (ESPRESSO S-box) | 8 | 12 | 1600.00 | **2521.27** | 533.33 | **840.42** | 2.645 |
-| 32-bit Serialised (Paper Design Point) | 16 | 24 | 800.00 | **1500.38** | 266.67 | **500.13** | 1.465 |
+| 32-bit Serialised (Paper Design Point) | 16 | 24 | 800.00 | **1231.91** | 266.67 | **410.64** | 1.108 |
 
 ## 3. Architectural Analysis & Trade-offs
 
@@ -54,9 +54,9 @@
 
 ### 32-bit Serialised (Paper Design Point) (`permutation_serial32`)
 - **Implementation Strategy:** Serialised 32-bit datapath: processes 32 columns of the 5x64-bit state per cycle, requiring 2 clock cycles per Ascon round. Reduces area vs 1r at cost of 2x cycle count. Based on serial architecture from Graz University ascon-hardware repository. [SOURCE]
-- **Resource Footprint:** Consumes 546 LUTs and 495 Flip-Flops on XC7Z010.
-- **Timing Margin:** Worst Negative Slack is +4.668 ns at 100 MHz, achieving maximum frequency $F_{max} = 187.55$ MHz.
-- **Throughput Characteristics:** Delivers 800.00 Mbit/s AEAD-128 throughput at 100 MHz, scaling to 1500.38 Mbit/s at peak frequency.
+- **Resource Footprint:** Consumes 722 LUTs and 497 Flip-Flops on XC7Z010.
+- **Timing Margin:** Worst Negative Slack is +3.506 ns at 100 MHz, achieving maximum frequency $F_{max} = 153.99$ MHz.
+- **Throughput Characteristics:** Delivers 800.00 Mbit/s AEAD-128 throughput at 100 MHz, scaling to 1231.91 Mbit/s at peak frequency.
 
 ## 4. Verification & Audit Trail
 

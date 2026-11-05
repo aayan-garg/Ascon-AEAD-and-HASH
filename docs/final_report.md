@@ -14,7 +14,7 @@
 
 This report documents the complete, independent re-audit and remediation of the `Ascon-AEAD-and-HASH` repository against the original Problem Statement (`Project_PS.md`). 
 
-The previous assertion in `docs/validation_report.md` claiming "100% verified, zero defects" was found during independent review to contain critical discrepancies: testbenches hardcoded only 4 vectors rather than running exhaustive NIST KATs; the CTL proof was executed by a Python script rather than a formal model checker; `jump_enable` was an unwired signal with no hardware gating; throughput calculations used pre-standardization 64-bit parameters; and boot-time matrix logs were hand-written narratives.
+The previous assertion in `docs/validation_report.md` claiming complete verification was found during independent review to contain critical discrepancies: testbenches hardcoded only 4 vectors rather than running exhaustive NIST KATs; the CTL proof was executed by a Python script rather than a formal model checker; `jump_enable` was an unwired signal with no hardware gating; throughput calculations used pre-standardization 64-bit parameters; and boot-time matrix logs were hand-written narratives.
 
 All 10 findings (F1–F10) have been confirmed, resolved, and verified using live tool executions (AMD-Xilinx Vivado 2025.1 XSim & Synthesis, NuSMV 2.6.0, and Python 3.14). Every claim in this document is labeled with strict evidentiary tags: `[SPEC]`, `[SOURCE]`, `[MEASURE]`, `[REC]`, or `[ASSUME]`.
 
@@ -31,7 +31,7 @@ Every requirement from `Project_PS.md` has been evaluated. Hardware-on-board ste
 | **PS-SPEC-3** | 320-bit permutation state ($5 \times 64$-bit words: $x_0..x_4$) | `DONE-VERIFIED` [MEASURE] | `tb_round_core.sv`, `tb_permutation_1r.sv` bit-exact match | `rtl/ascon/round_core.sv` |
 | **PS-SPEC-4** | Round-based datapath, 1 round/cycle baseline | `DONE-VERIFIED` [MEASURE] | Vivado OOC routed: 544 LUTs, 335 FFs, $F_{max} = 206.36$ MHz | `rtl/ascon/permutation_1r.sv` |
 | **PS-SPEC-5** | Plaintext never released before tag verification (`tag_ok == 1`) | `DONE-VERIFIED` [MEASURE] | `tb_aead_full.sv` Tests C & D (zero plaintext leakage on corrupt tag/CT) | `rtl/ascon/plaintext_gate.sv` |
-| **PS-SPEC-6** | 100 MHz target frequency on Digilent Zybo Z7-10 (XC7Z010) | `DONE-VERIFIED` [MEASURE] | WNS = +5.154 ns (core), WNS = +3.098 ns (SoC top bringup); $F_{max} > 100$ MHz | `board/timing_ooc.xdc`, `board/zybo_z7_10.xdc` |
+| **PS-SPEC-6** | 100 MHz target frequency on Digilent Zybo Z7-10 (XC7Z010) | `DONE-VERIFIED` [MEASURE] | WNS = +5.154 ns (core), WNS = +1.570 ns (SoC top bringup, Fmax = 118.62 MHz); $F_{max} > 100$ MHz | `board/timing_ooc.xdc`, `board/zybo_z7_10.xdc` |
 | **PS-SPEC-7** | AXI4-Lite register interface + DMA streaming data plane | `DONE-VERIFIED` [MEASURE] | `tb_axil_regs.sv` (100% PASS), `tb_dma.sv` (40/40 boundary assertions PASS) | `rtl/bus/axil_regs.sv`, `rtl/dma/dma_master.sv` |
 | **PS-SPEC-8** | Secure boot: Boot ROM verifies firmware hash before execution | `DONE-VERIFIED` [MEASURE] | `tb_secure_boot.sv` 9-case boot matrix (31/31 assertions PASS) | `rtl/soc/boot_ctrl.sv`, `firmware/bootrom/secure_boot.c` |
 | **PS-SPEC-9** | Golden software model matching NIST KATs | `DONE-VERIFIED` [MEASURE] | `python reference/run_kats.py` (2,114 official vectors + 6 edge cases PASS) | `reference/pyascon/ascon.py` |
@@ -62,7 +62,7 @@ Every requirement from `Project_PS.md` has been evaluated. Hardware-on-board ste
 | **F6** | Permutation testbenches lacked random differential vectors | Testbenches tested only fixed expected values ($p^{12}$ and $p^6$) | Created `scripts/gen_perm_vectors.py` generating 72 directed & random vectors across rounds 6, 8, 12 using `pyascon`; included in `tb_permutation_1r/2r/half.sv` | All 3 permutation testbenches simulate and pass 100% bit-exact in Vivado XSim & Icarus |
 | **F7** | No genuine "paper design" implemented | ESPRESSO was an S-box logic minimization tool, not an architectural technique from literature | Implemented `rtl/ascon/permutation_serial32.sv` (32-bit datapath from Graz Univ. `ascon-hardware`); synthesized OOC on XC7Z010; written ADR in `docs/decisions/paper_design_technique.md` | `results/synthesis/permutation_serial32_util.rpt`, `results/timing/permutation_serial32_timing.rpt` (546 LUTs, 495 FFs, 187.55 MHz) |
 | **F8** | Boot time not measured; boot matrix logs hand-written | 2,122 cycle claim was from `tb_soc_dma.sv`, not bootloader; logs had identical timestamps | Added cycle counter to `tb_secure_boot.sv`; testbench writes `results/board/boot_matrix/case_*_sim.log` via `$fdisplay`; measured 906 cycles for 64B payload | `results/board/boot_matrix/boot_timing_sim.log` (906 cycles = 9.06 µs @ 100 MHz) |
-| **F9** | Reproducibility defects across repo | CRLF line endings broke `run_kats.py` SHA check; .gitignore suppressed logs; docs had absolute paths | Normalized CRLF→LF in `run_kats.py`; added `.gitattributes`; fixed `.gitignore`; replaced all `file:///c:/Users/Aayan/...` with relative paths; updated standard label to Final (Aug 2025) | `python reference/run_kats.py` 100% PASS; regression scripts cross-platform |
+| **F9** | Reproducibility defects across repo | CRLF line endings broke `run_kats.py` SHA check; .gitignore suppressed logs; docs had absolute paths | Normalized CRLF→LF in `run_kats.py`; added `.gitattributes`; fixed `.gitignore`; replaced all absolute Windows file links with relative paths; updated standard label to Final (Aug 2025) | `python reference/run_kats.py` 100% PASS; regression scripts cross-platform |
 | **F10** | Board top RTL gaps (tamper_det unconnected, sw missing) | `top_bringup_board.sv` tied `.tamper_det(1'b0)` and had no demo path | Connected `sw[1]` to `tamper_det` in `top_bringup_board.sv`; documented LED patterns; created comprehensive step-by-step `results/board/HARDWARE_RUNBOOK.md` | `results/board/HARDWARE_RUNBOOK.md` ready for user execution on physical board |
 
 ---
@@ -78,7 +78,7 @@ All permutation datapath variants were synthesized and routed out-of-context (OO
 | **1/2-Round Folded (Low Area)** | `permutation_half` | 546 | 655 | 0 | 0 | +6.225 | **264.90** | 800.00 | **2119.21** | 266.67 | 1.465 |
 | **1-Round Espresso (ESPRESSO)** | `permutation_1r_espresso` | 605 | 335 | 0 | 0 | +3.654 | **157.58** | 1600.00 | **2521.27** | 533.33 | 2.645 |
 | **32-bit Serialised (Paper Point)** | `permutation_serial32` | 546 | 495 | 0 | 0 | +4.668 | **187.55** | 800.00 | **1500.38** | 266.67 | 1.465 |
-| **Full SoC System (PicoRV32+Ascon)** | `top_bringup` | 9,232 | 19,937 | 4 | 0 | +3.098 | **144.89** | 1600.00 | **2318.24** | 533.33 | 0.173 |
+| **Full SoC System (PicoRV32+Ascon)** | `top_bringup` | 5,088 | 5,486 | 4 | 0 | +1.570 | **118.62** | 1600.00 | **1897.92** | 533.33 | 0.173 |
 
 ### Key Architectural Findings:
 1. **Optimal Throughput-to-Area:** The 2-round unrolled engine (`permutation_2r`) achieves the highest hardware efficiency (**3.408 Mbit/s per LUT** for AEAD), retiring 128 bits of ciphertext every 4 clock cycles while easily meeting the 100 MHz target timing ($F_{max} = 135.85$ MHz).
@@ -129,20 +129,30 @@ To eliminate reliance on purely software jumps, `rtl/soc/fetch_guard.sv` sits di
 Boot-time cycle count was measured cycle-accurately in `tb_secure_boot.sv` in Vivado 2025.1 XSim:
 
 | Measurement Point | Description | Cycle Count (100 MHz) | Boot Time | Evidence File |
+| Measurement Point | Description | Cycle Count (100 MHz) | Boot Time | Evidence File |
 |---|---|:---:|:---:|---|
-| **Reset Release $\rightarrow$ `jump_enable`** | DMA streaming + Ascon-Hash256 + digest comparison | **906 cycles** | **9.06 µs** | `results/board/boot_matrix/boot_timing_sim.log` |
-| **Reset Release $\rightarrow$ `test_pass`** | Full secure boot including candidate app execution | **928 cycles** | **9.28 µs** | `results/board/boot_matrix/sim_secure_boot_run.log` |
+| **Reset Release $\rightarrow$ oot_jump_enable** | DMA streaming + Ascon-Hash256 + digest comparison (64 B) | **906 cycles** | **9.06 µs** | 
+esults/board/boot_matrix/boot_timing_sim.log |
+| **Reset Release $\rightarrow$ 	est_pass** | Full secure boot including candidate app execution (64 B) | **1,342 cycles** | **13.42 µs** | 
+esults/board/boot_matrix/boot_timing_sim.log |
 
-**Scaling Formula for Stated Firmware Sizes ($F_{clk} = 100\text{ MHz}$):**
-$$\text{Boot Cycles}(L) \approx 650 + \left\lceil \frac{L}{8} \right\rceil \times 12 + 150$$
+**Empirical Boot Latency Benchmark Across Staged Firmware Payload Sizes ({clk} = 100\text{ MHz}$):**
 
-| Payload Size | Blocks (64-bit) | Estimated Hash Cycles | Total Simulated Boot Cycles | Boot Time @ 100 MHz |
-|---|:---:|:---:|:---:|:---:|
-| **64 Bytes** (Provisioned Baseline) | 8 | 96 | 906 [MEASURE] | 9.06 µs |
-| **256 Bytes** | 32 | 384 | 1,220 [ESTIMATE] | 12.20 µs |
-| **1,024 Bytes (1 KB)** | 128 | 1,536 | 2,420 [ESTIMATE] | 24.20 µs |
-| **4,096 Bytes (4 KB)** | 512 | 6,144 | 7,180 [ESTIMATE] | 71.80 µs |
+Simulated via 	b/integration/tb_payload_sizes.sv in Vivado 2025.1 XSim across 3 provisioned payload images generated by scripts/provision_image.py --gen-sizes:
 
+| Payload Size | Reset $\rightarrow$ jump_enable [MEASURE] | Time to Jump | Reset $\rightarrow$ 	est_pass [MEASURE] | Total Boot Time | Evidence Log |
+|---|:---:|:---:|:---:|:---:|---|
+| **64 Bytes** | **906 cycles** | 9.06 µs | **1,343 cycles** | 13.43 µs | 
+esults/board/boot_matrix/boot_scaling_benchmark.log |
+| **1,024 Bytes (1 KB)** | **2,706 cycles** | 27.06 µs | **3,156 cycles** | 31.56 µs | 
+esults/board/boot_matrix/boot_scaling_benchmark.log |
+| **4,096 Bytes (4 KB)** | **8,462 cycles** | 84.62 µs | **8,934 cycles** | 89.34 µs | 
+esults/board/boot_matrix/boot_scaling_benchmark.log |
+
+**Empirical Linear Regression Fit:**
+\text{Cycles to Jump}(L) = 1.8739 \times L + 786.5\text{ cycles}\quad (18.74\text{ ns/byte} + 7.87\text{ }\mu\text{s})
+\text{Cycles to Pass}(L) = 1.8822 \times L + 1225.2\text{ cycles}\quad (18.82\text{ ns/byte} + 12.25\text{ }\mu\text{s})
+Where $ is candidate firmware payload length in bytes. Base overhead accounts for Boot ROM initialization, header parsing, BRAM bus contention, and post-jump CPU execution.
 ---
 
 ## 6. Board Demonstration & User Next Steps

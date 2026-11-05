@@ -9,7 +9,13 @@
 
 module top_bringup #(
     parameter string FIRMWARE_HEX = "firmware/tests/gpio_toggle.hex",
-    parameter int    RAM_WORDS    = 4096 // 16 KB = 4096 x 32-bit words
+    parameter int    RAM_WORDS    = 4096, // 16 KB = 4096 x 32-bit words
+    parameter int    BUFFER_DEPTH = 32,   // 32 x 64-bit words = 256 B (sufficient for KAT & SoC boot)
+    parameter [31:0] TRUSTED_PAYLOAD_LEN = 32'd64,
+    parameter [255:0] TRUSTED_DIGEST = {
+        32'hEDB41305, 32'h12075573, 32'h11B6C8A2, 32'hAFB9E393,
+        32'h7FE61055, 32'hA2267BDC, 32'h433A4F7B, 32'h777BB3DF
+    }
 ) (
     input  wire        clk,        // 100 MHz clock
     input  wire        rst_n,      // Active-low asynchronous reset
@@ -188,8 +194,9 @@ module top_bringup #(
     // =========================================================================
     // 4b. Fetch Guard: hardware gate blocking CPU instruction fetch from the
     //     application region (>= 0x1040) until boot_jump_enable=1.
-    //     [SPEC] R14, F3 fix — replaces the previous "physically impossible"
-    //     claim that was FALSE (jump was a plain C function call).
+    //     [SPEC] R14, F3 fix — enforces that a CPU executing Boot ROM firmware cannot
+//     fetch executable instructions from the application region until boot_ctrl
+//     asserts jump_enable, which is conditioned on hash_ok.
     //
     //     Implementation: when a fetch targets [APP_BASE, BRAM_TOP) and
     //     boot_jump_enable=0, the read data mux returns RISC-V NOP (0x0000_0013)
@@ -209,11 +216,21 @@ module top_bringup #(
             bram_araddr_q <= axi_araddr;
     end
 
-    wire in_app_region = (bram_araddr_q >= APP_BASE) && (bram_araddr_q < BRAM_END);
-    wire fetch_blocked = in_app_region && !boot_jump_enable;
-
-    // Gated read data: return NOP when fetch is blocked
-    assign bram_rdata = fetch_blocked ? RISCV_NOP : bram_rdata_raw;
+    // Hardware Fetch Guard instance (R14, F3 fix)
+    fetch_guard #(
+        .APP_BASE (APP_BASE),
+        .BRAM_TOP (BRAM_END)
+    ) u_fetch_guard (
+        .s_axi_arvalid (axi_arvalid && sel_bram_ar),
+        .s_axi_araddr  (bram_araddr_q),
+        .jump_enable   (boot_jump_enable),
+        .m_axi_arvalid (),
+        .m_axi_araddr  (),
+        .bram_rdata    (bram_rdata_raw),
+        .bram_rvalid   (bram_rvalid),
+        .gated_rdata   (bram_rdata),
+        .gated_rvalid  ()
+    );
 
     always @(posedge clk) begin
         if (!rst_n) begin
@@ -340,7 +357,11 @@ module top_bringup #(
     wire        boot_refuse;
     wire [3:0]  boot_led_status;
 
-    axil_regs #(.BUFFER_DEPTH(256)) u_ascon (
+    axil_regs #(
+        .BUFFER_DEPTH(BUFFER_DEPTH),
+        .DEFAULT_TRUSTED_LEN(TRUSTED_PAYLOAD_LEN),
+        .DEFAULT_TRUSTED_DIGEST(TRUSTED_DIGEST)
+    ) u_ascon (
         .clk                (clk),
         .rst_n              (rst_n),
         .s_axil_awaddr      (axi_awaddr),

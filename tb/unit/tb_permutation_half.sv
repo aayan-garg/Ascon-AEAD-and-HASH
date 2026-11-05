@@ -21,6 +21,8 @@ module tb_permutation_half;
     logic [63:0] in_x0, in_x1, in_x2, in_x3, in_x4;
     wire  [63:0] out_x0, out_x1, out_x2, out_x3, out_x4;
 
+    `include "tb/vectors/perm_random_vectors.svh"
+
     // Instantiate Unit Under Test
     permutation_half dut (
         .clk     (clk),
@@ -168,6 +170,39 @@ module tb_permutation_half;
             $display("[PASS] 6-round permutation (p^6) bit-exact match!");
         end
 
+        // ---------------------------------------------------------------------
+        // TEST 3: Random + Directed Vector Testing (gen_perm_vectors.py)
+        // ---------------------------------------------------------------------
+        $display("\n--- tb_permutation_half: Random/Directed Vector Test (%0d vectors) ---", PERM_N_VECS);
+        begin
+            automatic int rpass = 0, rfail = 0;
+            for (int i = 0; i < PERM_N_VECS; i++) begin
+                @(negedge clk);
+                rounds = PERM_ROUNDS[i];
+                in_x0 = PERM_IN_X0[i]; in_x1 = PERM_IN_X1[i]; in_x2 = PERM_IN_X2[i];
+                in_x3 = PERM_IN_X3[i]; in_x4 = PERM_IN_X4[i];
+                start = 1'b1;
+                @(negedge clk); start = 1'b0;
+                wait (done == 1'b1); @(negedge clk);
+
+                if (out_x0===PERM_OUT_X0[i] && out_x1===PERM_OUT_X1[i] &&
+                    out_x2===PERM_OUT_X2[i] && out_x3===PERM_OUT_X3[i] &&
+                    out_x4===PERM_OUT_X4[i]) begin
+                    rpass++;
+                end else begin
+                    rfail++;
+                    $display("  [RAND FAIL] vec=%0d rounds=%0d", i, PERM_ROUNDS[i]);
+                    $display("    got  x0=%h x1=%h", out_x0, out_x1);
+                    $display("    exp  x0=%h x1=%h", PERM_OUT_X0[i], PERM_OUT_X1[i]);
+                end
+            end
+            $display("Random test: PASS=%0d FAIL=%0d", rpass, rfail);
+            if (rfail > 0) begin
+                errors += rfail;
+                $display("[FATAL] Random permutation test FAILED with %0d errors", rfail);
+            end
+        end
+
         $display("================================================================");
         if (errors == 0) begin
             $display("[SUCCESS] ALL PERMUTATION HALF-ROUND TESTS PASSED (100% BIT-EXACT)!");
@@ -176,42 +211,6 @@ module tb_permutation_half;
             $display("[FATAL] Permutation Half-Round test failed with %0d errors!", errors);
             $fatal(1, "Permutation Half-Round mismatch!");
         end
-    end
-
-    // =========================================================================
-    // F6 — Random + Directed Vector Testing (gen_perm_vectors.py)
-    // =========================================================================
-    `include "tb/vectors/perm_random_vectors.svh"
-
-    initial begin : rand_test
-        automatic int rpass = 0, rfail = 0;
-        @(posedge rst_n); // wait for first test to finish
-        #200;
-
-        $display("\n--- tb_permutation_1r: Random/Directed Vector Test (%0d vectors) ---", PERM_N_VECS);
-
-        for (int i = 0; i < PERM_N_VECS; i++) begin
-            @(negedge clk);
-            rounds = PERM_ROUNDS[i];
-            in_x0 = PERM_IN_X0[i]; in_x1 = PERM_IN_X1[i]; in_x2 = PERM_IN_X2[i];
-            in_x3 = PERM_IN_X3[i]; in_x4 = PERM_IN_X4[i];
-            start = 1'b1;
-            @(negedge clk); start = 1'b0;
-            wait (done == 1'b1); @(negedge clk);
-
-            if (out_x0===PERM_OUT_X0[i] && out_x1===PERM_OUT_X1[i] &&
-                out_x2===PERM_OUT_X2[i] && out_x3===PERM_OUT_X3[i] &&
-                out_x4===PERM_OUT_X4[i]) begin
-                rpass++;
-            end else begin
-                rfail++;
-                $display("  [RAND FAIL] vec=%0d rounds=%0d", i, PERM_ROUNDS[i]);
-                $display("    got  x0=%h x1=%h", out_x0, out_x1);
-                $display("    exp  x0=%h x1=%h", PERM_OUT_X0[i], PERM_OUT_X1[i]);
-            end
-        end
-        $display("Random test: PASS=%0d FAIL=%0d", rpass, rfail);
-        if (rfail > 0) $fatal(1, "Random permutation test FAILED");
     end
 
 endmodule

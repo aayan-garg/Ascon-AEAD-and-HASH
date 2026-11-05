@@ -5,7 +5,7 @@ Phase 9 achieves the formal verification exit gate for the **Secure Boot Control
 
 Using **Computation Tree Logic (CTL)** model checking on finite Kripke structures $(S, S_0, R, L)$, we formally prove that the processor instruction jump enable (`jump`) cannot be asserted under any sequence of events without prior valid cryptographic authentication (`hash_ok` / `verified_before_jump`). In addition, we prove that hardware tamper events permanently prevent entering the `JUMP` state, and failure transitions are deterministic terminal lockouts.
 
-To validate the soundness of the verification toolchain, we constructed both a **sound, correct model** ([`formal/ctl/boot_safety.smv`](file:///c:/Users/Aayan/Desktop/RTL_Project/Ascon-AEAD-and-HASH/formal/ctl/boot_safety.smv)) and a **deliberately broken model** ([`formal/ctl/boot_safety_broken.smv`](file:///c:/Users/Aayan/Desktop/RTL_Project/Ascon-AEAD-and-HASH/formal/ctl/boot_safety_broken.smv)). The model checker proved all properties true on the correct model and synthesized a concrete counterexample trace exposing the authentication bypass on the broken model.
+To validate the soundness of the verification toolchain, we constructed both a **sound, correct model** ([`formal/ctl/boot_safety.smv`](../../formal/ctl/boot_safety.smv)) and a **deliberately broken model** ([`formal/ctl/boot_safety_broken.smv`](../../formal/ctl/boot_safety_broken.smv)). The model checker proved all properties true on the correct model and synthesized a concrete counterexample trace exposing the authentication bypass on the broken model.
 
 ---
 
@@ -48,7 +48,7 @@ The model checker evaluates fixed-point characterizations of branching-time temp
 
 ## 3. Negative Verification & Counterexample Demonstration
 
-In [`formal/ctl/boot_safety_broken.smv`](file:///c:/Users/Aayan/Desktop/RTL_Project/Ascon-AEAD-and-HASH/formal/ctl/boot_safety_broken.smv), an authentication bypass flaw was introduced in `STATE_DECIDE`:
+In [`formal/ctl/boot_safety_broken.smv`](../../formal/ctl/boot_safety_broken.smv), an authentication bypass flaw was introduced in `STATE_DECIDE`:
 ```smv
 state = STATE_DECIDE :
     case
@@ -76,7 +76,7 @@ At Step 4 (`STATE_CHECK_TAG`), `hash_match` is 0 (unauthenticated payload), so `
 
 ## 4. Hardware Realization Alignment
 
-The proven model is in 1-to-1 isomorphism with the synthesis-ready RTL in [`rtl/soc/boot_ctrl.sv`](file:///c:/Users/Aayan/Desktop/RTL_Project/Ascon-AEAD-and-HASH/rtl/soc/boot_ctrl.sv):
+The proven model is in 1-to-1 isomorphism with the synthesis-ready RTL in [`rtl/soc/boot_ctrl.sv`](../../rtl/soc/boot_ctrl.sv):
 1. **Decision Gate:**
    ```verilog
    STATE_DECIDE: begin
@@ -103,6 +103,6 @@ The proven model is in 1-to-1 isomorphism with the synthesis-ready RTL in [`rtl/
 
 ## 5. Exit Gate Artifacts
 
-- **Correct Model Proof Log:** [`results/formal/proof_correct.log`](file:///c:/Users/Aayan/Desktop/RTL_Project/Ascon-AEAD-and-HASH/results/formal/proof_correct.log) (All 5 properties PROVED TRUE)
-- **Broken Model Counterexample Log:** [`results/formal/counterexample_broken.log`](file:///c:/Users/Aayan/Desktop/RTL_Project/Ascon-AEAD-and-HASH/results/formal/counterexample_broken.log) (Counterexample generated)
-- **Verification Script:** [`formal/ctl/verify_smv.py`](file:///c:/Users/Aayan/Desktop/RTL_Project/Ascon-AEAD-and-HASH/formal/ctl/verify_smv.py)
+- **Correct Model Proof Log:** [`results/formal/proof_correct.log`](proof_correct.log) (All 5 properties PROVED TRUE)
+- **Broken Model Counterexample Log:** [`results/formal/counterexample_broken.log`](counterexample_broken.log) (Counterexample generated)
+- **Verification Script:** [`formal/ctl/verify_smv.py`](../../formal/ctl/verify_smv.py)

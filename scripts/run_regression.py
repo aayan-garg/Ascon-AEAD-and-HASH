@@ -116,13 +116,27 @@ def run_simulation_test(tb_file: str) -> tuple[bool, float, str]:
             for f in os.listdir(src_dir):
                 if f.endswith(".hex") or f.endswith(".bin"):
                     shutil.copy2(os.path.join(src_dir, f), os.path.join(dst_dir, f))
+
+    # Sync tb/vectors into sim_build
+    dst_vec = os.path.join(SIM_BUILD_DIR, "tb", "vectors")
+    os.makedirs(dst_vec, exist_ok=True)
+    src_vec = os.path.join(ROOT_DIR, "tb", "vectors")
+    if os.path.exists(src_vec):
+        for f in os.listdir(src_vec):
+            shutil.copy2(os.path.join(src_vec, f), os.path.join(dst_vec, f))
+
+    # Ensure results directories exist in sim_build so $fopen does not fail
+    for res_sub in ["kat", os.path.join("board", "boot_matrix"), "formal", "timing", "synthesis"]:
+        os.makedirs(os.path.join(SIM_BUILD_DIR, "results", res_sub), exist_ok=True)
     
-    # Collect all RTL source files
+    # Collect all RTL and SVA source files
     rtl_files = []
-    for root, _, files in os.walk(os.path.join(ROOT_DIR, "rtl")):
-        for f in files:
-            if f.endswith(".v") or f.endswith(".sv"):
-                rtl_files.append(os.path.join(root, f))
+    for d in [os.path.join(ROOT_DIR, "rtl"), os.path.join(ROOT_DIR, "formal", "sva")]:
+        if os.path.exists(d):
+            for root, _, files in os.walk(d):
+                for f in files:
+                    if f.endswith(".v") or f.endswith(".sv"):
+                        rtl_files.append(os.path.join(root, f))
 
     # 1. xvlog
     xvlog_cmd = [XVLOG, "-sv", "-i", ROOT_DIR] + rtl_files + [os.path.abspath(tb_file)]
@@ -140,6 +154,17 @@ def run_simulation_test(tb_file: str) -> tuple[bool, float, str]:
     # 3. xsim
     xsim_cmd = [XSIM, snap_name, "-R"]
     pass_sim, dur_sim, out_sim = run_step(f"Execute {tb_name} (xsim)", xsim_cmd, cwd=SIM_BUILD_DIR)
+    
+    # Copy any generated results back to ROOT_DIR/results
+    sim_results = os.path.join(SIM_BUILD_DIR, "results")
+    if os.path.exists(sim_results):
+        for root, _, files in os.walk(sim_results):
+            rel = os.path.relpath(root, sim_results)
+            target_dir = os.path.join(ROOT_DIR, "results", rel)
+            os.makedirs(target_dir, exist_ok=True)
+            for f in files:
+                shutil.copy2(os.path.join(root, f), os.path.join(target_dir, f))
+
     total_dur = dur_vlog + dur_elab + dur_sim
     if not pass_sim or "TEST FAILED" in out_sim or "Fatal:" in out_sim:
         return False, total_dur, f"Simulation failed:\n{out_sim}"

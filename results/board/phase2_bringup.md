@@ -52,9 +52,9 @@
 
 - **Compiler:** GNU RISC-V Cross-Compiler (`riscv64-unknown-elf-gcc` v13.2.0 via WSL2 Ubuntu)
 - **Target Flags:** `-march=rv32i -mabi=ilp32 -Os -nostdlib -Wl,-Bstatic`
-- **Linker Script:** [`firmware/linker/bringup.ld`](file:///c:/Users/Aayan/Desktop/RTL_Project/Ascon-AEAD-and-HASH/firmware/linker/bringup.ld)
-- **Startup Code:** [`firmware/startup/crt0.S`](file:///c:/Users/Aayan/Desktop/RTL_Project/Ascon-AEAD-and-HASH/firmware/startup/crt0.S)
-- **Binary Image:** 384 bytes (96 words) generated into [`firmware/tests/gpio_toggle.hex`](file:///c:/Users/Aayan/Desktop/RTL_Project/Ascon-AEAD-and-HASH/firmware/tests/gpio_toggle.hex)
+- **Linker Script:** [`firmware/linker/bringup.ld`](../../firmware/linker/bringup.ld)
+- **Startup Code:** [`firmware/startup/crt0.S`](../../firmware/startup/crt0.S)
+- **Binary Image:** 384 bytes (96 words) generated into [`firmware/tests/gpio_toggle.hex`](../../firmware/tests/gpio_toggle.hex)
 
 ---
 
@@ -105,7 +105,7 @@ Synthesized and placed/routed with AMD-Xilinx Vivado v2025.1.0 (`scripts/build_b
 | **Clock Primitives (MMCM)** | **1** | 2 | **50.00%** |
 | **Global Clock Buffers (BUFG)**| **2** | 32 | **6.25%** |
 
-Full report: [`results/synthesis/utilization_bringup.txt`](file:///c:/Users/Aayan/Desktop/RTL_Project/Ascon-AEAD-and-HASH/results/synthesis/utilization_bringup.txt)
+Full report: [`results/synthesis/utilization_bringup.txt`](../synthesis/utilization_bringup.txt)
 
 ---
 
@@ -113,23 +113,23 @@ Full report: [`results/synthesis/utilization_bringup.txt`](file:///c:/Users/Aaya
 
 | Metric | Target | Measured | Timing Margin / Status |
 |---|---|---|---|
-| **Worst Negative Slack (WNS)** | $\ge 0.000\text{ ns}$ | **+3.098 ns** | **MET (3.098 ns positive setup slack)** |
+| **Worst Negative Slack (WNS)** | $\ge 0.000\text{ ns}$ | **+1.570 ns** | **MET (1.570 ns positive setup slack)** |
 | **Total Negative Slack (TNS)** | $0.000\text{ ns}$ | **0.000 ns** | **MET (0 failing endpoints)** |
 | **Worst Hold Slack (WHS)** | $\ge 0.000\text{ ns}$ | **+0.036 ns** | **MET (No hold violations)** |
 | **Total Hold Slack (THS)** | $0.000\text{ ns}$ | **0.000 ns** | **MET (0 failing endpoints)** |
 | **Primary Clock (`sys_clk_pin`)**| 125 MHz (8.000 ns) | 125.000 MHz | **MET** |
 | **CPU System Clock (`clk_100mhz`)**| 100 MHz (10.000 ns)| 100.000 MHz | **MET** |
 
-Full report: [`results/timing/timing_bringup.txt`](file:///c:/Users/Aayan/Desktop/RTL_Project/Ascon-AEAD-and-HASH/results/timing/timing_bringup.txt)
+Full report: [`results/timing/timing_bringup.txt`](../timing/timing_bringup.txt)
 
 ---
 
 ## 7. Bitstream Generation & Hardware Programming
 
 - **Generated Bitstream:** `build/top_bringup.bit` (MD5 / bitgen completed successfully with 0 errors).
-- **Physical Board Top-Level:** [`rtl/soc/top_bringup_board.sv`](file:///c:/Users/Aayan/Desktop/RTL_Project/Ascon-AEAD-and-HASH/rtl/soc/top_bringup_board.sv)
-- **Board Firmware:** [`firmware/tests/gpio_toggle_board.c`](file:///c:/Users/Aayan/Desktop/RTL_Project/Ascon-AEAD-and-HASH/firmware/tests/gpio_toggle_board.c) with calibrated 0.25-second delays per step.
-- **Automated JTAG Programming Script:** [`scripts/program_board.tcl`](file:///c:/Users/Aayan/Desktop/RTL_Project/Ascon-AEAD-and-HASH/scripts/program_board.tcl)
+- **Physical Board Top-Level:** [`rtl/soc/top_bringup_board.sv`](../../rtl/soc/top_bringup_board.sv)
+- **Board Firmware:** [`firmware/tests/gpio_toggle_board.c`](../../firmware/tests/gpio_toggle_board.c) with calibrated 0.25-second delays per step.
+- **Automated JTAG Programming Script:** [`scripts/program_board.tcl`](../../scripts/program_board.tcl)
   ```powershell
   & "C:\Xilinx\2025.1\Vivado\bin\vivado.bat" -mode batch -source scripts/program_board.tcl
   ```

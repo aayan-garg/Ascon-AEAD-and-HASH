@@ -72,40 +72,40 @@ module mode_ctrl #(
     localparam [63:0] IV_HASH256 = 64'h0000080100cc0002;
 
     // -------------------------------------------------------------------------
-    // Helper function for 64-bit Little-Endian padding
+    // Helper functions for 64-bit Little-Endian padding & masking
     // -------------------------------------------------------------------------
+    function automatic [63:0] byte_mask64(input [2:0] rem);
+        case (rem)
+            3'd0: byte_mask64 = 64'h00000000_00000000;
+            3'd1: byte_mask64 = 64'h00000000_000000FF;
+            3'd2: byte_mask64 = 64'h00000000_0000FFFF;
+            3'd3: byte_mask64 = 64'h00000000_00FFFFFF;
+            3'd4: byte_mask64 = 64'h00000000_FFFFFFFF;
+            3'd5: byte_mask64 = 64'h000000FF_FFFFFFFF;
+            3'd6: byte_mask64 = 64'h0000FFFF_FFFFFFFF;
+            3'd7: byte_mask64 = 64'h00FFFFFF_FFFFFFFF;
+        endcase
+    endfunction
+
+    function automatic [63:0] pad_bit_word64(input [2:0] rem);
+        case (rem)
+            3'd0: pad_bit_word64 = 64'h00000000_00000001;
+            3'd1: pad_bit_word64 = 64'h00000000_00000100;
+            3'd2: pad_bit_word64 = 64'h00000000_00010000;
+            3'd3: pad_bit_word64 = 64'h00000000_01000000;
+            3'd4: pad_bit_word64 = 64'h00000001_00000000;
+            3'd5: pad_bit_word64 = 64'h00000100_00000000;
+            3'd6: pad_bit_word64 = 64'h00010000_00000000;
+            3'd7: pad_bit_word64 = 64'h01000000_00000000;
+        endcase
+    endfunction
+
     function automatic [63:0] pad_word64(input [63:0] raw_data, input [2:0] rem);
-        logic [63:0] mask;
-        logic [63:0] pad_bit;
-        begin
-            case (rem)
-                3'd0: mask = 64'h00000000_00000000;
-                3'd1: mask = 64'h00000000_000000FF;
-                3'd2: mask = 64'h00000000_0000FFFF;
-                3'd3: mask = 64'h00000000_00FFFFFF;
-                3'd4: mask = 64'h00000000_FFFFFFFF;
-                3'd5: mask = 64'h000000FF_FFFFFFFF;
-                3'd6: mask = 64'h0000FFFF_FFFFFFFF;
-                3'd7: mask = 64'h00FFFFFF_FFFFFFFF;
-            endcase
-            pad_bit = 64'h01 << (rem * 8);
-            pad_word64 = (raw_data & mask) | pad_bit;
-        end
+        pad_word64 = (raw_data & byte_mask64(rem)) | pad_bit_word64(rem);
     endfunction
 
     function automatic [63:0] mask_word64(input [63:0] raw_data, input [2:0] rem);
-        begin
-            case (rem)
-                3'd0: mask_word64 = 64'h0;
-                3'd1: mask_word64 = raw_data & 64'h00000000_000000FF;
-                3'd2: mask_word64 = raw_data & 64'h00000000_0000FFFF;
-                3'd3: mask_word64 = raw_data & 64'h00000000_00FFFFFF;
-                3'd4: mask_word64 = raw_data & 64'h00000000_FFFFFFFF;
-                3'd5: mask_word64 = raw_data & 64'h000000FF_FFFFFFFF;
-                3'd6: mask_word64 = raw_data & 64'h0000FFFF_FFFFFFFF;
-                3'd7: mask_word64 = raw_data & 64'h00FFFFFF_FFFFFFFF;
-            endcase
-        end
+        mask_word64 = raw_data & byte_mask64(rem);
     endfunction
 
     // -------------------------------------------------------------------------
@@ -147,6 +147,14 @@ module mode_ctrl #(
     reg [31:0] r_ad_len, r_msg_len;
     reg        r_mode;
     reg        r_decrypt;
+
+    // Timing optimization wires: precomputed byte decoding and masks
+    wire        bytes_is_zero  = (r_bytes_left == 32'd0);
+    wire        bytes_is_eight = (r_bytes_left == 32'd8);
+    wire        bytes_gt_eight = (r_bytes_left > 32'd8);
+    wire        bytes_ge_eight = (r_bytes_left >= 32'd8);
+    wire [63:0] cur_byte_mask  = byte_mask64(r_bytes_left[2:0]);
+    wire [63:0] cur_pad_bit    = pad_bit_word64(r_bytes_left[2:0]);
 
     reg [63:0] r_w0_buf;
     reg        r_beat;
@@ -634,15 +642,13 @@ module mode_ctrl #(
                                     // Final partial beat (1..7 bytes)
                                     data_in_ready <= 1'b0;
                                     if (!r_decrypt) begin
-                                        data_out       <= mask_word64(s0 ^ data_in, r_bytes_left[2:0]);
+                                        data_out       <= (s0 ^ data_in) & cur_byte_mask;
                                         data_out_valid <= 1'b1;
-                                        s0             <= s0 ^ pad_word64(data_in, r_bytes_left[2:0]);
+                                        s0             <= s0 ^ ((data_in & cur_byte_mask) | cur_pad_bit);
                                     end else begin
                                         gate_wr_en    <= 1'b1;
-                                        gate_wr_data  <= mask_word64(s0 ^ data_in, r_bytes_left[2:0]);
-                                        s0 <= (s0 & ~((64'h01 << (r_bytes_left[2:0] * 8)) - 1)) ^
-                                              (mask_word64(data_in, r_bytes_left[2:0])) ^
-                                              (64'h01 << (r_bytes_left[2:0] * 8));
+                                        gate_wr_data  <= (s0 ^ data_in) & cur_byte_mask;
+                                        s0            <= (s0 & ~cur_byte_mask) ^ (data_in & cur_byte_mask) ^ cur_pad_bit;
                                     end
                                     r_bytes_left <= 32'd0;
                                     state_reg    <= ST_FINALIZE;
@@ -673,15 +679,13 @@ module mode_ctrl #(
                                     data_in_ready <= 1'b0;
                                     s0            <= r_w0_buf;
                                     if (!r_decrypt) begin
-                                        data_out       <= mask_word64(s1 ^ data_in, r_bytes_left[2:0]);
+                                        data_out       <= (s1 ^ data_in) & cur_byte_mask;
                                         data_out_valid <= 1'b1;
-                                        s1             <= s1 ^ pad_word64(data_in, r_bytes_left[2:0]);
+                                        s1             <= s1 ^ ((data_in & cur_byte_mask) | cur_pad_bit);
                                     end else begin
                                         gate_wr_en   <= 1'b1;
-                                        gate_wr_data <= mask_word64(s1 ^ data_in, r_bytes_left[2:0]);
-                                        s1 <= (s1 & ~((64'h01 << (r_bytes_left[2:0] * 8)) - 1)) ^
-                                              (mask_word64(data_in, r_bytes_left[2:0])) ^
-                                              (64'h01 << (r_bytes_left[2:0] * 8));
+                                        gate_wr_data <= (s1 ^ data_in) & cur_byte_mask;
+                                        s1           <= (s1 & ~cur_byte_mask) ^ (data_in & cur_byte_mask) ^ cur_pad_bit;
                                     end
                                     r_bytes_left <= 32'd0;
                                     state_reg    <= ST_FINALIZE;

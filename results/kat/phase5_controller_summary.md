@@ -1,7 +1,7 @@
 # Phase 5 — AEAD & Hash Mode Controller Verification Summary
 
 - **Date:** 2026-10-21 14:04:00 UTC
-- **Status:** `[x] 100% VERIFIED PASS`
+- **Status:** `[x] VERIFIED PASS (all unit tests passed)`
 - **Standard:** NIST SP 800-232 (Little-Endian, revised IVs)
 - **Target FPGA:** Xilinx Zynq-7000 (XC7Z010-1CLG400C)
 
@@ -13,10 +13,10 @@ Phase 5 delivers the unified master sponge control plane and security gateway co
 
 | Module | Purpose | Key Specifications |
 |---|---|---|
-| [`rtl/ascon/plaintext_gate.sv`](file:///c:/Users/Aayan/Desktop/RTL_Project/Ascon-AEAD-and-HASH/rtl/ascon/plaintext_gate.sv) | Hardware Plaintext Release Gate & Shadow Buffer | 256x64-bit BRAM shadow buffer; actively zeroizes on `auth_fail`; outputs `0x0` whenever `tag_ok == 0` (§10.3) |
-| [`rtl/ascon/mode_ctrl.sv`](file:///c:/Users/Aayan/Desktop/RTL_Project/Ascon-AEAD-and-HASH/rtl/ascon/mode_ctrl.sv) | Master Sponge Mode Controller FSM | Unified 9-state FSM supporting Ascon-AEAD128 and Ascon-Hash256; handles Little-Endian padding, 1-bit domain separation ($S_4[63]$), rate absorption, tag verification, and squeeze sequence |
-| [`rtl/ascon/aead_ctrl.sv`](file:///c:/Users/Aayan/Desktop/RTL_Project/Ascon-AEAD-and-HASH/rtl/ascon/aead_ctrl.sv) | Dedicated AEAD128 Mode Wrapper | Parameterized AEAD128 interface with 128-bit key, 128-bit nonce, 128-bit tag, 128-bit rate streaming |
-| [`rtl/ascon/hash_ctrl.sv`](file:///c:/Users/Aayan/Desktop/RTL_Project/Ascon-AEAD-and-HASH/rtl/ascon/hash_ctrl.sv) | Dedicated Hash256 Mode Wrapper | 64-bit streaming rate interface; 256-bit output digest |
+| [`rtl/ascon/plaintext_gate.sv`](../../rtl/ascon/plaintext_gate.sv) | Hardware Plaintext Release Gate & Shadow Buffer | 256x64-bit BRAM shadow buffer; actively zeroizes on `auth_fail`; outputs `0x0` whenever `tag_ok == 0` (§10.3) |
+| [`rtl/ascon/mode_ctrl.sv`](../../rtl/ascon/mode_ctrl.sv) | Master Sponge Mode Controller FSM | Unified 9-state FSM supporting Ascon-AEAD128 and Ascon-Hash256; handles Little-Endian padding, 1-bit domain separation ($S_4[63]$), rate absorption, tag verification, and squeeze sequence |
+| [`rtl/ascon/aead_ctrl.sv`](../../rtl/ascon/aead_ctrl.sv) | Dedicated AEAD128 Mode Wrapper | Parameterized AEAD128 interface with 128-bit key, 128-bit nonce, 128-bit tag, 128-bit rate streaming |
+| [`rtl/ascon/hash_ctrl.sv`](../../rtl/ascon/hash_ctrl.sv) | Dedicated Hash256 Mode Wrapper | 64-bit streaming rate interface; 256-bit output digest |
 
 ---
 
@@ -52,9 +52,9 @@ The plaintext release gate was rigorously tested against all 5 security test sce
 
 | Testbench | Component Tested | Vectors / Scenarios | Pass Rate | Duration | Log Artifact |
 |---|---|---|---|---|---|
-| [`tb_security_gate.sv`](file:///c:/Users/Aayan/Desktop/RTL_Project/Ascon-AEAD-and-HASH/tb/unit/tb_security_gate.sv) | `plaintext_gate.sv` | 5 Security Tests (§12.2) | **100%** | 4.33s | [`results/kat/security_gate_pass.log`](file:///c:/Users/Aayan/Desktop/RTL_Project/Ascon-AEAD-and-HASH/results/kat/security_gate_pass.log) |
-| [`tb_mode_ctrl.sv`](file:///c:/Users/Aayan/Desktop/RTL_Project/Ascon-AEAD-and-HASH/tb/unit/tb_mode_ctrl.sv) | `mode_ctrl.sv` | 5 FSM Directed Transitions | **100%** | 5.11s | [`results/kat/fsm_coverage.log`](file:///c:/Users/Aayan/Desktop/RTL_Project/Ascon-AEAD-and-HASH/results/kat/fsm_coverage.log) |
-| [`tb_hash.sv`](file:///c:/Users/Aayan/Desktop/RTL_Project/Ascon-AEAD-and-HASH/tb/unit/tb_hash.sv) | `hash_ctrl.sv` | NIST Counts 1, 2, 9, 17 | **100%** | 5.22s | [`results/kat/rtl_hash_pass.log`](file:///c:/Users/Aayan/Desktop/RTL_Project/Ascon-AEAD-and-HASH/results/kat/rtl_hash_pass.log) |
-| [`tb_aead.sv`](file:///c:/Users/Aayan/Desktop/RTL_Project/Ascon-AEAD-and-HASH/tb/unit/tb_aead.sv) | `aead_ctrl.sv` | NIST Counts 1, 2, 17, 35 (Enc/Dec/Tamper) | **100%** | 5.21s | [`results/kat/rtl_aead_pass.log`](file:///c:/Users/Aayan/Desktop/RTL_Project/Ascon-AEAD-and-HASH/results/kat/rtl_aead_pass.log) |
+| [`tb_security_gate.sv`](../../tb/unit/tb_security_gate.sv) | `plaintext_gate.sv` | 5 Security Tests (§12.2) | **100%** | 4.33s | [`results/kat/security_gate_pass.log`](security_gate_pass.log) |
+| [`tb_mode_ctrl.sv`](../../tb/unit/tb_mode_ctrl.sv) | `mode_ctrl.sv` | 5 FSM Directed Transitions | **100%** | 5.11s | [`results/kat/fsm_coverage.log`](fsm_coverage.log) |
+| [`tb_hash.sv`](../../tb/unit/tb_hash.sv) | `hash_ctrl.sv` | NIST Counts 1, 2, 9, 17 | **100%** | 5.22s | [`results/kat/rtl_hash_pass.log`](rtl_hash_pass.log) |
+| [`tb_aead.sv`](../../tb/unit/tb_aead.sv) | `aead_ctrl.sv` | NIST Counts 1, 2, 17, 35 (Enc/Dec/Tamper) | **100%** | 5.21s | [`results/kat/rtl_aead_pass.log`](rtl_aead_pass.log) |
 
 **Overall Full Regression Suite:** 15/15 passing (Golden Model KATs, Formal CTL, and 13 SystemVerilog Unit Suites in 68.88s).

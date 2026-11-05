@@ -26,19 +26,19 @@ Each candidate image staged at `0x0000_1000` contains a strictly structured 64-b
 
 ## Complete 9-Case Boot Matrix (§12.5)
 
-Verification was executed via the end-to-end integration testbench [`tb/integration/tb_secure_boot.sv`](file:///c:/Users/Aayan/Desktop/RTL_Project/Ascon-AEAD-and-HASH/tb/integration/tb_secure_boot.sv). All 9 cases completed deterministically with zero hung states:
+Verification was executed via the end-to-end integration testbench [`tb/integration/tb_secure_boot.sv`](../../../tb/integration/tb_secure_boot.sv). All 9 cases completed deterministically with zero hung states:
 
 | Case | Scenario Tested | Stimulus / Fault Mechanism | Hardware LED | `test_pass` | `jump_enable` | Verdict | Artifact Log |
 | :---: | :--- | :--- | :---: | :---: | :---: | :---: | :--- |
-| **1** | Valid Untampered Firmware | Untampered candidate image + matching digest | `4'b1111` | `1` | `1` | **PASS** | [`case_1.log`](file:///c:/Users/Aayan/Desktop/RTL_Project/Ascon-AEAD-and-HASH/results/board/boot_matrix/case_1.log) |
-| **2** | Byte-Flipped Firmware | 1-bit modified in candidate payload byte 10 | `4'b1010` | `0` | `0` | **PASS** | [`case_2.log`](file:///c:/Users/Aayan/Desktop/RTL_Project/Ascon-AEAD-and-HASH/results/board/boot_matrix/case_2.log) |
-| **3** | Wrong Reference Digest | Header contains altered expected digest | `4'b1010` | `0` | `0` | **PASS** | [`case_3.log`](file:///c:/Users/Aayan/Desktop/RTL_Project/Ascon-AEAD-and-HASH/results/board/boot_matrix/case_3.log) |
-| **4** | Invalid Declared Length | Header declares `payload_len = 0` | `4'b1010` | `0` | `0` | **PASS** | [`case_4.log`](file:///c:/Users/Aayan/Desktop/RTL_Project/Ascon-AEAD-and-HASH/results/board/boot_matrix/case_4.log) |
-| **5** | Malformed Header Magic | Header magic is `0xDEADBEEF` | `4'b1010` | `0` | `0` | **PASS** | [`case_5.log`](file:///c:/Users/Aayan/Desktop/RTL_Project/Ascon-AEAD-and-HASH/results/board/boot_matrix/case_5.log) |
-| **6** | Injected DMA Error | DMA abort / error injected during stream | `4'b1010` | `0` | `0` | **PASS** | [`case_6.log`](file:///c:/Users/Aayan/Desktop/RTL_Project/Ascon-AEAD-and-HASH/results/board/boot_matrix/case_6.log) |
-| **7** | Injected Accelerator Error | Accelerator reset/error injected during hash | `4'b1010` | `0` | `0` | **PASS** | [`case_7.log`](file:///c:/Users/Aayan/Desktop/RTL_Project/Ascon-AEAD-and-HASH/results/board/boot_matrix/case_7.log) |
-| **8** | Reset Mid-Verification | Asynchronous reset asserted mid-flight | `4'b0000` | `0` | `0` | **PASS** | [`case_8.log`](file:///c:/Users/Aayan/Desktop/RTL_Project/Ascon-AEAD-and-HASH/results/board/boot_matrix/case_8.log) |
-| **9** | Repeated Boot Attempt | Re-trigger start after refusal lockout | `4'b1010` | `0` | `0` | **PASS** | [`case_9.log`](file:///c:/Users/Aayan/Desktop/RTL_Project/Ascon-AEAD-and-HASH/results/board/boot_matrix/case_9.log) |
+| **1** | Valid Untampered Firmware | Untampered candidate image + matching digest | `4'b1111` | `1` | `1` | **PASS** | [`case_1_sim.log`](case_1_sim.log) |
+| **2** | Byte-Flipped Firmware | 1-bit modified in candidate payload byte 10 | `4'b1010` | `0` | `0` | **PASS** | [`case_2_sim.log`](case_2_sim.log) |
+| **3** | Wrong Reference Digest | Header contains altered expected digest | `4'b1010` | `0` | `0` | **PASS** | [`case_3_sim.log`](case_3_sim.log) |
+| **4** | Invalid Declared Length | Header declares `payload_len = 0` | `4'b1010` | `0` | `0` | **PASS** | [`case_4_sim.log`](case_4_sim.log) |
+| **5** | Malformed Header Magic | Header magic is `0xDEADBEEF` | `4'b1010` | `0` | `0` | **PASS** | [`case_5_sim.log`](case_5_sim.log) |
+| **6** | Injected DMA Error | DMA abort / error injected during stream | `4'b1010` | `0` | `0` | **PASS** | [`case_6_sim.log`](case_6_sim.log) |
+| **7** | Injected Accelerator Error | Accelerator reset/error injected during hash | `4'b1010` | `0` | `0` | **PASS** | [`case_7_sim.log`](case_7_sim.log) |
+| **8** | Reset Mid-Verification | Asynchronous reset asserted mid-flight | `4'b0000` | `0` | `0` | **PASS** | [`case_8_sim.log`](case_8_sim.log) |
+| **9** | Repeated Boot Attempt | Re-trigger start after refusal lockout | `4'b1010` | `0` | `0` | **PASS** | [`case_9_sim.log`](case_9_sim.log) |
 
 **Total Assertions:** 31 / 31 passed (100% success rate).
 
@@ -48,4 +48,21 @@ Verification was executed via the end-to-end integration testbench [`tb/integrat
 
 1. **Deterministic Refusal:** Any error condition (magic mismatch, version mismatch, out-of-bounds length, corrupted reference digest, payload hash mismatch, DMA fault, accelerator fault, or tamper signal) immediately forces the system into `STATE_HALT_REFUSE`. Discrete LEDs drive `4'b1010` and execution enters an infinite dead-loop.
 2. **Sticky Tamper Lockout:** The physical tamper latch register (`tamper_latched_q`) cannot be cleared by software or register writes; once set, exit from `STATE_HALT_REFUSE` requires an external hardware power-on reset.
-3. **Hardware Jump Permission Gate:** `boot_jump_enable` is exclusively driven by `(state_q == STATE_JUMP)` which requires `hash_verified_q == 1` and `tamper_latched_q == 0`. Speculative execution or soft jump into candidate memory without hardware authorization is physically impossible.
+3. **Hardware Jump Permission Gate:** `boot_jump_enable` is exclusively driven by `(state_q == STATE_JUMP)` which requires `hash_verified_q == 1` and `tamper_latched_q == 0`. A CPU executing Boot ROM firmware cannot fetch executable instructions from the application region until `boot_ctrl` asserts `jump_enable`, which is conditioned on `hash_ok`. An attacker with bitstream or JTAG access remains out of scope.
+
+---
+
+## Firmware Image Manifest on Disk (§12.4 vs §12.5)
+
+The boot matrix comprises **5 pre-compiled candidate hex images** stored on disk in `firmware/tests/boot_matrix/`:
+1. `bram_case1_valid.hex`: Valid, untampered 64-byte payload with authentic NIST SP 800-232 hash digest.
+2. `bram_case2_byte_flip.hex`: Payload bit-flip fault injection (byte 10 altered).
+3. `bram_case3_wrong_digest.hex`: Header altered with corrupt expected digest.
+4. `bram_case4_invalid_len.hex`: Header declares invalid 0-byte payload length.
+5. `bram_case5_bad_magic.hex`: Corrupted magic word (`0xDEADBEEF` instead of `"ASCN"`).
+
+**Test Cases 6 through 9** are simulation-driven hardware fault and state-machine injection scenarios executed dynamically against the Case 1 image by the test harness (`tb_secure_boot.sv`):
+- **Case 6:** DMA busy abort injection during payload streaming.
+- **Case 7:** Accelerator reset/error signal assertion mid-hash computation.
+- **Case 8:** Asynchronous system reset asserted mid-verification.
+- **Case 9:** Repeated boot start trigger re-assertion following refusal lockout.
