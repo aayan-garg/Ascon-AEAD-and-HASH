@@ -65,13 +65,21 @@ def run_espresso_minimization():
 
     espresso_cmd = find_espresso_binary()
     if not espresso_cmd:
-        print("[-] UC Berkeley Espresso binary not found. Attempting pyeda fallback...")
+        # Check pyeda fallback
         try:
             import pyeda.inter as eda
             print("[+] Using pyeda.inter.espresso_tts (bundles Berkeley ESPRESSO C source).")
             return run_pyeda_minimization(root_dir, pla_input, raw_output_pla, run_log_path, rtl_out_path)
         except ImportError:
-            print("[-] Neither espresso binary nor pyeda is available!")
+            print("\n" + "=" * 80)
+            print("[ERROR] Berkeley ESPRESSO binary not found and pyeda is not installed.")
+            print("Please refer to the 'Building ESPRESSO' guide in tools/sbox_opt/README.md:")
+            print("  tools/sbox_opt/README.md#5-building-espresso")
+            print("\nNote: Committed minimizer evidence already exists in:")
+            print(f"  - {raw_output_pla}")
+            print(f"  - {run_log_path}")
+            print("You do not need to rebuild ESPRESSO to inspect or verify the project evidence.")
+            print("=" * 80)
             sys.exit(1)
 
     # Convert pla_input to WSL path if calling via WSL
@@ -107,6 +115,8 @@ def run_espresso_minimization():
             cubes.append((parts[0], parts[1]))
 
     total_product_terms = len(cubes)
+    input_literals = sum(sum(1 for c in in_p if c in ("0", "1")) for in_p, _ in cubes)
+    output_connections = sum(sum(1 for c in out_p if c == "1") for _, out_p in cubes)
 
     log_entry = (
         f"Tool Name: UC Berkeley Espresso\n"
@@ -115,6 +125,9 @@ def run_espresso_minimization():
         f"Input File: scripts/ascon_sbox.pla\n"
         f"Exit Code: {res.returncode}\n"
         f"Minimized Product Terms: {total_product_terms}\n"
+        f"Input Literals (non-dash in input plane): {input_literals}\n"
+        f"Output Connections (1s in output plane): {output_connections}\n"
+        f"Total Grid Connections: {input_literals + output_connections}\n"
         f"Raw Output Saved To: results/synthesis/espresso_raw_output.pla\n"
     )
     with open(run_log_path, "w", encoding="utf-8") as f:
@@ -123,13 +136,16 @@ def run_espresso_minimization():
     print(f"\n[+] Raw minimizer output saved to: {raw_output_pla}")
     print(f"[+] Execution log saved to:        {run_log_path}")
     print(f"[+] Total shared product terms:    {total_product_terms}")
+    print(f"[+] Input literals (non-dash):     {input_literals}")
+    print(f"[+] Output connections (1s):       {output_connections}")
+    print(f"[+] Total grid connections:        {input_literals + output_connections}")
 
     # Calculate terms and literals per output
     print("\nPer-Output Breakdown:")
     for out_idx in range(5):
         active = [c[0] for c in cubes if c[1][out_idx] == "1"]
-        lits = sum(5 - c.count("-") for c in active)
-        print(f"  y{out_idx}: {len(active):2d} terms, {lits:2d} literals")
+        lits = sum(sum(1 for c in c_in if c in ("0", "1")) for c_in in active)
+        print(f"  y{out_idx}: {len(active):2d} terms, {lits:2d} input literals")
 
     # Verify against NIST Table 6 across all 32 inputs
     print("\nVerifying minimized PLA cover against NIST Table 6 (32 vectors)...")

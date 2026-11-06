@@ -11,7 +11,7 @@ The three required Boolean optimization techniques from `Project_PS.md` are full
    - Tool: [`tools/sbox_opt/espresso_runner.py`](../../tools/sbox_opt/espresso_runner.py)
    - Provenance: UC Berkeley Espresso Version #2.3 (Release date 01/31/88), executed with `-Dexact` on truth table `scripts/ascon_sbox.pla`. Raw output saved to `results/synthesis/espresso_raw_output.pla`, run log to `results/synthesis/espresso_run.log`. SymPy `SOPform` is retained as an independent cross-check.
    - RTL: [`rtl/ascon/sbox5_espresso.sv`](../../rtl/ascon/sbox5_espresso.sv)
-   - Results: Derived exact minimal 30-product-term multi-output Boolean cover (or 36 product terms, 140 literals in single-output mode).
+   - Results: Derived exact minimal 30-product-term multi-output Boolean cover containing 130 input literals (non-dash input plane characters) and 57 output connections (187 total grid connections); or 36 product terms, 140 literals in unshared single-output mode. Verified via [`tools/sbox_opt/count_pla_literals.py`](../../tools/sbox_opt/count_pla_literals.py).
 
 2. **Multi-Level Logic Synthesis & Kernel Extraction:**
    - Tool: [`tools/sbox_opt/kernel_extractor.py`](../../tools/sbox_opt/kernel_extractor.py)

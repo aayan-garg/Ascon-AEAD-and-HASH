@@ -4,4 +4,7 @@ Command Line: wsl /mnt/c/Users/Aayan/Desktop/RTL_Project/Ascon-AEAD-and-HASH/too
 Input File: scripts/ascon_sbox.pla
 Exit Code: 0
 Minimized Product Terms: 30
+Input Literals (non-dash in input plane): 130
+Output Connections (1s in output plane): 57
+Total Grid Connections: 187
 Raw Output Saved To: results/synthesis/espresso_raw_output.pla

@@ -1,9 +1,10 @@
 # Bitstream Build Log
+# Summary written after the build from the Vivado reports; the raw Vivado log is results/board/bitstream_build_raw.log
 # Project: Ascon AEAD and Hash Engine Secure Boot SoC
 # Target Hardware: Digilent Zybo Z7-10 (xc7z010clg400-1)
 
 Tool: AMD-Xilinx Vivado v2025.1 (win64) Build 6140274
-Command Line: vivado -mode batch -source scripts/build_bitstream.tcl
+Command Line: vivado.exe -mode batch -nojournal -log build/vivado_bringup.log -source scripts/build_bitstream.tcl
 Synthesis Target: top_bringup_board
 Target Clock Frequency: 100.000 MHz (10.000 ns period)
 
@@ -24,4 +25,3 @@ Bitstream Generation:
   File Size:   2,083,869 bytes
   SHA256:      79cef83aa8ec05081a92359999da7ca5b3f13d77ae5bee70073c39f3b8862c86
   DRC Status:  0 Errors, 0 Warnings, 0 Critical Warnings
-

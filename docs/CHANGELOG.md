@@ -4,12 +4,56 @@ This document records all architectural improvements, audit remediations, verifi
 
 ---
 
-## 1. Final Audit Remediation & Evidence Closure (November 6, 2026)
+## 1. Final Pre-Hardware Polish & Hygiene Pass (November 6, 2026)
+
+### T1: Clean-Clone Link Resolution
+- **What ran:** Scanned all markdown links across the repository using `scripts/check_doc_links.py`. Replaced uncommitted links pointing to gitignored bitstreams (`build/top_bringup.bit`) in `docs/requirements_traceability.md` with inline code formatting referencing the generation script `scripts/build_bitstream.tcl`.
+- **Command:** `python scripts/check_doc_links.py`.
+- **Results:** 341/341 relative links verified to exist on disk; 0 broken links in clean clones.
+- **Evidence Paths:** [`docs/requirements_traceability.md`](requirements_traceability.md), [`scripts/check_doc_links.py`](../scripts/check_doc_links.py).
+
+### T2: Bitstream Build Transparency & Raw Batch Log
+- **What ran:** Preserved the authentic raw Vivado batch log from the bitstream run (`build/vivado_bringup.log`) into version control as `results/board/bitstream_build_raw.log`.
+- **Command:** Verified against Vivado batch run `vivado -mode batch -source scripts/build_bitstream.tcl` and `Get-FileHash build/top_bringup.bit`.
+- **Results:** Updated `results/board/bitstream_build.log` header stating it is a summary derived from Vivado reports and pointing to `results/board/bitstream_build_raw.log`. Verified every figure matches reports: 5,088 LUTs (28.91%), 5,486 FFs (15.59%), WNS = +1.510 ns, 0 DRC violations, SHA256 `79cef83aa8ec05081a92359999da7ca5b3f13d77ae5bee70073c39f3b8862c86` (2,083,869 bytes).
+- **Evidence Paths:** [`results/board/bitstream_build_raw.log`](../results/board/bitstream_build_raw.log), [`results/board/bitstream_build.log`](../results/board/bitstream_build.log).
+
+### T3: ESPRESSO Reproduction & Graceful Environment Fallback
+- **What ran:** Documented exact compilation steps for classic Berkeley ESPRESSO (`classabbyamp/espresso-logic`) under WSL/Linux in `tools/sbox_opt/README.md#5-building-espresso`.
+- **Command:** `python tools/sbox_opt/espresso_runner.py`.
+- **Results:** Enhanced `tools/sbox_opt/espresso_runner.py` to catch missing binary/`pyeda` environments gracefully, printing an actionable user error without Python stack traces. Emphasized that committed raw evidence files (`results/synthesis/espresso_raw_output.pla` and `results/synthesis/espresso_run.log`) guarantee reproducibility without re-compilation.
+- **Evidence Paths:** [`tools/sbox_opt/README.md`](../tools/sbox_opt/README.md), [`tools/sbox_opt/espresso_runner.py`](../tools/sbox_opt/espresso_runner.py).
+
+### T4: PLA Literal & Connection Count Resolution
+- **What ran:** Authored authoritative PLA analysis tool `tools/sbox_opt/count_pla_literals.py` to resolve discrepancies between input-plane literals and total grid connections.
+- **Command:** `python tools/sbox_opt/count_pla_literals.py results/synthesis/espresso_raw_output.pla`.
+- **Results:** Authoritatively determined: 30 product terms, 130 input literals (non-dash input positions), 57 output connections (1s in output plane), and 187 total grid connections (unshared single-output SOP contains 36 terms and 140 literals). Reconciled all documentation (`docs/decisions/sbox_optimization.md`, `docs/final_report.md`, `tools/sbox_opt/README.md`, `results/synthesis/espresso_run.log`).
+- **Evidence Paths:** [`tools/sbox_opt/count_pla_literals.py`](../tools/sbox_opt/count_pla_literals.py), [`results/synthesis/espresso_run.log`](../results/synthesis/espresso_run.log), [`docs/decisions/sbox_optimization.md`](decisions/sbox_optimization.md).
+
+### T5: Payload Scaling Benchmark & Simulator Neutrality
+- **What ran:** Removed hard-coded simulator name in `tb/integration/tb_payload_sizes.sv` in favor of generic `(simulator log)`. Added self-checking assertions tracking 5/5 monotonicity checks (`total_pass=5`, `total_fail=0`), standard summary line `PAYLOAD SIZE BENCH: 5/5 checks passed`, and standard log footer `TOTAL_PASS=5 TOTAL_FAIL=0 RESULT=PASS`.
+- **Command:** Vivado XSim simulation of `tb_payload_sizes.sv`.
+- **Results:** Verified monotonic cycle counts: 64 B (906 / 1,342 cyc), 1 KB (2,706 / 3,155 cyc), 4 KB (8,462 / 8,933 cyc). Regenerated simulation evidence log.
+- **Evidence Paths:** [`tb/integration/tb_payload_sizes.sv`](../tb/integration/tb_payload_sizes.sv), [`results/board/boot_matrix/boot_scaling_benchmark.log`](../results/board/boot_matrix/boot_scaling_benchmark.log).
+
+### T6: Physical Hardware Runbook Overhaul
+- **What ran:** Comprehensively restructured `results/board/HARDWARE_RUNBOOK.md` to establish complete pre-hardware verification readiness.
+- **Results:**
+  - Prefaced with explicit status: `"No on-board result has been recorded yet"`.
+  - Cross-verified all Zybo Z7-10 pin mappings against `board/zybo_z7_10.xdc` and `rtl/soc/top_bringup_board.sv`.
+  - Defined step-by-step bench testing instructions: bitstream programming (`scripts/program_board.tcl`), normal boot observation (LEDs `4'b1111`, LD6 Green), SW0 live byte flip demo (LEDs `4'b1010`, LD6 Red), SW1 tamper sensor trigger (sticky LD6 Red).
+  - Outlined exact bench data collection artifacts (oscilloscope captures, photos, serial console logs marked `TO BE CONFIRMED ON BOARD`).
+  - Added comprehensive 9-case boot matrix table distinguishing switch-injectable scenarios from hex re-synthesis scenarios.
+- **Evidence Path:** [`results/board/HARDWARE_RUNBOOK.md`](../results/board/HARDWARE_RUNBOOK.md).
+
+---
+
+## 2. Audit Remediation & Evidence Closure (November 6, 2026)
 
 ### T1: Real UC Berkeley ESPRESSO Minimization
 - **What ran:** Built classic UC Berkeley Espresso Version 2.3 and installed `pyeda` 0.29.0. Executed `espresso -Dexact scripts/ascon_sbox.pla` directly on the NIST SP 800-232 Table 6 truth table.
 - **Commands:** `espresso -Dexact scripts/ascon_sbox.pla` and `python tools/sbox_opt/espresso_runner.py`.
-- **Results:** Derived exact minimal 30-product-term multi-output Boolean cover (126 unique literals across 30 shared products). Rewrote `tools/sbox_opt/espresso_runner.py` to invoke the real minimizer, verify 32/32 truth table compliance, print term/literal counts, and emit `rtl/ascon/sbox5_espresso.sv`. Retained SymPy `SOPform` as an independent cross-check.
+- **Results:** Derived exact minimal 30-product-term multi-output Boolean cover (130 input literals, 57 output connections, 187 grid connections; verified via `tools/sbox_opt/count_pla_literals.py`). Rewrote `tools/sbox_opt/espresso_runner.py` to invoke the real minimizer, verify 32/32 truth table compliance, print term/literal counts, and emit `rtl/ascon/sbox5_espresso.sv`. Retained SymPy `SOPform` as an independent cross-check.
 - **Evidence Paths:** [`results/synthesis/espresso_raw_output.pla`](../results/synthesis/espresso_raw_output.pla), [`results/synthesis/espresso_run.log`](../results/synthesis/espresso_run.log), [`rtl/ascon/sbox5_espresso.sv`](../rtl/ascon/sbox5_espresso.sv).
 
 ### T2: Real Brayton-McMullen Algebraic Kernel/Co-Kernel Extraction
