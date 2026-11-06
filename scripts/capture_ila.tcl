@@ -28,7 +28,28 @@ puts "==========================================================================
 open_hw_manager
 connect_hw_server -allow_non_jtag
 puts "Searching for JTAG targets..."
-open_hw_target
+
+# Allow hw_server to enumerate Digilent USB-JTAG cable
+catch { refresh_hw_server }
+after 1000
+set targets [get_hw_targets -quiet]
+if {[llength $targets] == 0} {
+    puts "Retrying target scan..."
+    after 2000
+    catch { refresh_hw_server }
+    set targets [get_hw_targets -quiet]
+}
+
+if {[llength $targets] == 0} {
+    puts "Error: No JTAG targets found! Ensure Zybo Z7-10 is powered ON (SW4) and connected via USB."
+    close_hw_manager
+    exit 1
+}
+
+set target [lindex $targets 0]
+puts "Selecting JTAG target: $target"
+current_hw_target $target
+open_hw_target $target
 
 set hw_device [lindex [get_hw_devices xc7z010*] 0]
 if {$hw_device eq ""} {
@@ -62,18 +83,37 @@ if {$hw_ila eq ""} {
 puts "Configuring ILA Core: $hw_ila"
 set_property CONTROL.TRIGGER_POSITION 512 $hw_ila
 
-if {$MODE eq "fault"} {
+if {$MODE eq "now"} {
+    puts "Trigger mode: IMMEDIATE (capturing currently running hardware state)..."
+    run_hw_ila $hw_ila -trigger_now
+    wait_on_hw_ila -timeout 10 $hw_ila
+} elseif {$MODE eq "fault"} {
     puts "Setting trigger: Trigger on boot_refuse == 1 (SW0 byte-flip or tamper refusal)"
-    set_property TRIGGER_COMPARE_VALUE eq1'b1 [get_hw_probes u_soc/boot_refuse -of_objects $hw_ila]
+    set probe [get_hw_probes *boot_refuse* -of_objects $hw_ila]
+    puts "Trigger Probe: $probe"
+    set_property TRIGGER_COMPARE_VALUE eq1'b1 $probe
+
+    puts "\n================================================================================"
+    puts ">>> ILA TRIGGER ARMED FOR FAULT INJECTION! <<<"
+    puts "ACTION REQUIRED: Set SW0=1 (Slide Switch 0 ON), then press and release BTN0"
+    puts "================================================================================\n"
+
+    arm_hw_ila $hw_ila
+    wait_on_hw_ila -timeout 60 $hw_ila
 } else {
     puts "Setting trigger: Trigger on dma_start == 1 (Normal boot authentication)"
-    set_property TRIGGER_COMPARE_VALUE eq1'b1 [get_hw_probes u_soc/dma_start -of_objects $hw_ila]
-}
+    set probe [get_hw_probes *dma_start* -of_objects $hw_ila]
+    puts "Trigger Probe: $probe"
+    set_property TRIGGER_COMPARE_VALUE eq1'b1 $probe
 
-# Arm ILA trigger
-puts "Arming ILA trigger... Waiting for trigger condition..."
-arm_hw_ila $hw_ila
-wait_on_hw_ila $hw_ila
+    puts "\n================================================================================"
+    puts ">>> ILA TRIGGER ARMED FOR NORMAL BOOT! <<<"
+    puts "ACTION REQUIRED: Ensure SW0=0 (all switches OFF), then press and release BTN0"
+    puts "================================================================================\n"
+
+    arm_hw_ila $hw_ila
+    wait_on_hw_ila -timeout 60 $hw_ila
+}
 
 # Upload and export trace data
 puts "Trigger captured! Uploading ILA trace buffer..."
@@ -91,3 +131,4 @@ puts "==========================================================================
 puts "ILA HARDWARE CAPTURE COMPLETE!"
 puts "================================================================================"
 exit 0
+

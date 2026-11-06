@@ -100,17 +100,17 @@ connect_debug_port u_ila_0/probe7 [get_nets u_soc/dma_stream_ready]
 # Probe 8: discrete LEDs (led_OBUF)
 create_debug_port u_ila_0 probe
 set_property port_width 4 [get_debug_ports u_ila_0/probe8]
-connect_debug_port u_ila_0/probe8 [get_nets [list led_OBUF[0] led_OBUF[1] led_OBUF[2] led_OBUF[3]]]
+connect_debug_port u_ila_0/probe8 [get_nets {led_OBUF[0] led_OBUF[1] led_OBUF[2] led_OBUF[3]}]
 
 # Probe 9: slide switches (sw_IBUF)
 create_debug_port u_ila_0 probe
 set_property port_width 2 [get_debug_ports u_ila_0/probe9]
-connect_debug_port u_ila_0/probe9 [get_nets [list sw_IBUF[0] sw_IBUF[1]]]
+connect_debug_port u_ila_0/probe9 [get_nets {sw_IBUF[0] sw_IBUF[1]}]
 
 # Probe 10: RGB LED LD6 (rgb_led)
 create_debug_port u_ila_0 probe
 set_property port_width 3 [get_debug_ports u_ila_0/probe10]
-connect_debug_port u_ila_0/probe10 [get_nets [list u_soc/rgb_led[0] u_soc/rgb_led[1] u_soc/rgb_led[2]]]
+connect_debug_port u_ila_0/probe10 [get_nets {u_soc/rgb_led[0] u_soc/rgb_led[1] u_soc/rgb_led[2]}]
 
 # 6. Logic Optimization
 puts "\n--- STEP 3/6: Running logic optimization (opt_design) ---"
@@ -146,3 +146,4 @@ puts "Bitstream: $ROOT_DIR/build/top_bringup_ila.bit"
 puts "Probes:    $ROOT_DIR/build/top_bringup_ila.ltx"
 puts "================================================================================"
 exit 0
+
