@@ -15,11 +15,11 @@
 
 | Field | Value |
 |---|---|
-| **Current Phase** | Complete & Ready for Board Flashing (Simulation, Synthesis, STA, Formal Sign-off, and Bitstream Clean) |
-| **Last Action** | Complete pre-hardware audit and remediation: (1) Resolved BRAM synthesis bug in `top_bringup.sv` so Block RAM initializes properly during bitstream generation; (2) Commented unused `btn[1..3]` constraints in `zybo_z7_10.xdc` eliminating all Critical Warnings; (3) Built automated Python toolchain for S-Box optimization in `tools/sbox_opt/` (UC Berkeley ESPRESSO with SymPy SOPform cross-check, Brayton-McMullen algebraic kernel extraction, and 32-node shared ROBDD multiplexer tree); (4) Authored comprehensive Hand HLS derivation in `docs/hand_hls_derivation.md`; (5) Aligned `HARDWARE_RUNBOOK.md` and `README.md` with SW0 byte-flip demo and measured boot cycles. |
+| **Current Phase** | Complete: All Phases 0–12 Signed Off (Hardware Verified on Digilent Zybo Z7-10 via Vivado ILA) |
+| **Last Action** | Physical on-board hardware testing on Digilent Zybo Z7-10 (XC7Z010-1CLG400C): (1) Verified normal secure boot (LD0..3 = 4'b1111, RGB LD6 = Solid Green); (2) Verified SW0 live DMA byte-flip fault injection refusal (LD0..3 = 4'b1010, RGB LD6 = Solid Red); (3) Extracted 100 MHz on-chip ILA silicon traces in `results/board/ila_traces/`; (4) Built and closed timing on ILA bitstream `top_bringup_ila.bit` (WNS +1.007 ns at 100 MHz). |
 | **Date** | 2026-11-06 |
-| **Overall Progress** | 100% of Simulation, Formal, RTL, S-box Optimization, Hand HLS, and Synthesis Verification Complete |
-| **Hardware / Board Scope** | Ready for Physical Hardware Deployment. Bitstream build scripts verified with authentic Boot ROM + candidate payload. |
+| **Overall Progress** | 100% Complete across all deliverables (Simulation, Formal CTL, Synthesis, Bitstream, and Physical Hardware Sign-off) |
+| **Hardware / Board Scope** | Physical on-board validation successfully completed and logged with ILA hardware traces. |
 
 ---
 
@@ -38,7 +38,7 @@
 | 8 | Secure Boot Flow & Matrix | `COMPLETED` | Boot ROM + hardware boot_ctrl + fetch_guard verified on 9 matrix cases ([`tb_secure_boot.sv`](../tb/integration/tb_secure_boot.sv)) |
 | 9 | Formal CTL Verification | `COMPLETED` | All 5 CTLSPECs proved in NuSMV 2.6.0 ([`results/formal/nuxmv/proof_corrected_nusmv.log`](../results/formal/nuxmv/proof_corrected_nusmv.log)) |
 | 10 | Synthesis & Implementation | `COMPLETED` | All cores and SoC meet 100 MHz timing; see [`results/performance/comparison_table.md`](../results/performance/comparison_table.md) |
-| 11 | Board Validation | `READY-FOR-BOARD` | Hardware runbook updated ([`results/board/HARDWARE_RUNBOOK.md`](../results/board/HARDWARE_RUNBOOK.md)); bitstream generation verified ([`results/board/bitstream_build.log`](../results/board/bitstream_build.log)). |
+| 11 | Board Validation | `COMPLETED` | Physical validation complete on Digilent Zybo Z7-10: normal boot (Green LD6, 4'b1111) and SW0 byte-flip refusal (Red LD6, 4'b1010) verified with 100 MHz ILA traces ([`results/board/ila_traces/`](../results/board/ila_traces/)). |
 | 12 | Documentation Consolidation | `COMPLETED` | Single source of truth established; redundant files purged per [`docs/CHANGELOG.md`](CHANGELOG.md) |
 
 ---

@@ -1,6 +1,6 @@
 # Hardware Runbook — Ascon Secure Boot on Digilent Zybo Z7-10
 
-> **Notice:** No on-board result has been recorded yet. This runbook defines the exact operational procedure, hardware pin mapping, and expected behaviors for physical testing on the Digilent Zybo Z7-10. Complete test module specifications and ILA waveform analyses are documented in [`docs/hardware_test_plan.md`](../../docs/hardware_test_plan.md) and [`results/board/ila_verification_report.md`](ila_verification_report.md).
+> **Notice:** On-board physical validation completed and verified on the Digilent Zybo Z7-10. Both normal boot (Green LD6, discrete LEDs `4'b1111`) and live SW0 byte-flip fault injection (Red LD6, discrete LEDs `4'b1010`) are confirmed and captured in 100 MHz on-chip ILA silicon traces in [`results/board/ila_traces/`](ila_traces/). Complete test module specifications and ILA waveform analyses are documented in [`docs/hardware_test_plan.md`](../../docs/hardware_test_plan.md) and [`results/board/ila_verification_report.md`](ila_verification_report.md).
 
 - **Target Board:** Digilent Zybo Z7-10 (AMD-Xilinx Zynq-7000 XC7Z010-1CLG400C)
 - **Top-Level Module:** `rtl/soc/top_bringup_board.sv`
