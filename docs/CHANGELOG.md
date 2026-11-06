@@ -4,7 +4,47 @@ This document records all architectural improvements, audit remediations, verifi
 
 ---
 
-## 1. Documentation Consolidation & Cleanup (November 2026)
+## 1. Final Audit Remediation & Evidence Closure (November 6, 2026)
+
+### T1: Real UC Berkeley ESPRESSO Minimization
+- **What ran:** Built classic UC Berkeley Espresso Version 2.3 and installed `pyeda` 0.29.0. Executed `espresso -Dexact scripts/ascon_sbox.pla` directly on the NIST SP 800-232 Table 6 truth table.
+- **Commands:** `espresso -Dexact scripts/ascon_sbox.pla` and `python tools/sbox_opt/espresso_runner.py`.
+- **Results:** Derived exact minimal 30-product-term multi-output Boolean cover (126 unique literals across 30 shared products). Rewrote `tools/sbox_opt/espresso_runner.py` to invoke the real minimizer, verify 32/32 truth table compliance, print term/literal counts, and emit `rtl/ascon/sbox5_espresso.sv`. Retained SymPy `SOPform` as an independent cross-check.
+- **Evidence Paths:** [`results/synthesis/espresso_raw_output.pla`](../results/synthesis/espresso_raw_output.pla), [`results/synthesis/espresso_run.log`](../results/synthesis/espresso_run.log), [`rtl/ascon/sbox5_espresso.sv`](../rtl/ascon/sbox5_espresso.sv).
+
+### T2: Real Brayton-McMullen Algebraic Kernel/Co-Kernel Extraction
+- **What ran:** Implemented recursive Brayton-McMullen algebraic division and greedy literal savings factorization in `tools/sbox_opt/kernel_extractor.py`.
+- **Command:** `python tools/sbox_opt/kernel_extractor.py`.
+- **Results:** Extracted 6 common algebraic kernels ($k_0..k_5$) across output functions, reducing flat literal count from 140 to 83 (57 literals saved, 40.7% reduction). Emitted `rtl/ascon/sbox5_kernel.sv` entirely from data structures (zero hardcoded strings/equations) and verified 32/32 against NIST Table 6.
+- **Evidence Paths:** [`results/synthesis/sbox_kernel_report.log`](../results/synthesis/sbox_kernel_report.log), [`rtl/ascon/sbox5_kernel.sv`](../rtl/ascon/sbox5_kernel.sv), [`docs/decisions/sbox_optimization.md`](decisions/sbox_optimization.md).
+
+### T3: Re-verification and Out-of-Context Synthesis of all 4 S-Box Engine Variants
+- **What ran:** Executed `tb_sbox_equiv` and all 6 full KAT suites (`tb_{aead,hash}_full_{espresso,kernel,bdd}`) in Vivado XSim; executed Vivado batch out-of-context synthesis and implementation for all four S-box engine variants in the same session (`xc7z010clg400-1` @ 100 MHz OOC).
+- **Commands:** `vivado -mode batch -source scripts/synth_engine_variants.tcl -tclargs sbox`, `python scripts/parse_synth_reports.py`, `python scripts/generate_engine_table.py`.
+- **Results:** All 7 S-box test suites passed cleanly with 100% bit-exact NIST compliance (1,089 AEAD and 1,025 Hash vectors each). Fresh utilization and timing reports generated for `mode_ctrl_1r_wrap` (3,191 LUTs, +1.925 ns WNS), `mode_ctrl_1r_espresso_wrap` (3,258 LUTs, +1.621 ns WNS), `mode_ctrl_1r_kernel_wrap` (3,192 LUTs, +2.226 ns WNS), and `mode_ctrl_1r_bdd_wrap` (3,225 LUTs, +1.856 ns WNS), all using exactly 4,015 FFs. Documented that small differences (~2%) reflect synthesis mapping variation into native LUT6 primitives rather than fundamental architecture benefits.
+- **Evidence Paths:** [`results/kat/rtl_aead_full_espresso_pass.log`](../results/kat/rtl_aead_full_espresso_pass.log), [`results/kat/rtl_hash_full_espresso_pass.log`](../results/kat/rtl_hash_full_espresso_pass.log), [`results/kat/rtl_aead_full_kernel_pass.log`](../results/kat/rtl_aead_full_kernel_pass.log), [`results/kat/rtl_hash_full_kernel_pass.log`](../results/kat/rtl_hash_full_kernel_pass.log), [`results/kat/rtl_aead_full_bdd_pass.log`](../results/kat/rtl_aead_full_bdd_pass.log), [`results/kat/rtl_hash_full_bdd_pass.log`](../results/kat/rtl_hash_full_bdd_pass.log), [`results/performance/engine_comparison_table.md`](../results/performance/engine_comparison_table.md).
+
+### T4: Full Regression Suite Verification
+- **What ran:** Diagnosed and resolved premature timeout on `tb_hash_full_2r.sv` (verified standalone pass in 149.73s; increased step timeout to 600s in `scripts/run_regression.py`). Executed full 39-suite automated regression harness.
+- **Command:** `python -u scripts/run_regression.py 2>&1 | Tee-Object -FilePath results/regression.log`.
+- **Results:** 39/39 suites passed cleanly ("Overall Result: SUCCESS - ALL SUITES PASSED").
+- **Evidence Path:** [`results/regression.log`](../results/regression.log).
+
+### T5: Elimination of Secure Boot Timing Race
+- **What ran:** Refactored `tb/integration/tb_secure_boot.sv` to eliminate the simulator-dependent race between testbench reset deassertion and the cycle counter sampling block.
+- **Command:** `xvlog -sv ... && xelab ... && xsim tb_secure_boot_sim -R`.
+- **Results:** Replaced racy blocking assignments in the reset task with synchronous `timing_measure_en` gating and nonblocking assignments. Added self-checking assertions ensuring `delta_jump == 906`, `delta_pass == 1342`, `delta_jump > 0`, and `delta_pass > delta_jump`. Verified that `tb_payload_sizes.sv` strictly enforces positive, monotonically increasing latency across payload sizes.
+- **Evidence Paths:** [`tb/integration/tb_secure_boot.sv`](../tb/integration/tb_secure_boot.sv), [`results/board/boot_matrix/boot_timing_sim.log`](../results/board/boot_matrix/boot_timing_sim.log).
+
+### T6: Bitstream Generation & Documentation Reconciliation
+- **What ran:** Reconciled conflicting statements between `docs/status.md` and `docs/AUDIT_RESPONSE.md`. Documented the completed Vivado physical bitstream implementation.
+- **Command:** `vivado -mode batch -source scripts/build_bitstream.tcl`.
+- **Results:** Documented synthesis and implementation of `build/top_bringup.bit` under Vivado v2025.1 with target device `xc7z010clg400-1`, achieved routed timing closure with WNS = +1.510 ns (0 failing endpoints), and recorded the cryptographic SHA256 checksum (`79cef83aa8ec05081a92359999da7ca5b3f13d77ae5bee70073c39f3b8862c86`).
+- **Evidence Paths:** [`results/board/bitstream_build.log`](../results/board/bitstream_build.log), [`docs/status.md`](status.md), [`docs/AUDIT_RESPONSE.md`](AUDIT_RESPONSE.md).
+
+---
+
+## 2. Documentation Consolidation & Cleanup (November 2026)
 
 - Regenerated `results/board/dma_boundary.log` by running `tb/integration/tb_dma.sv` with Vivado XSim; the testbench now writes the evidence log itself.
 - Rewrote the stale T6.3 row in `docs/AUDIT_RESPONSE.md` to identify external ESPRESSO minimization, RTL-to-PLA conversion, and the NOT DONE extraction/decomposition status.

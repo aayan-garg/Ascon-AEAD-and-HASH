@@ -1,0 +1,31 @@
+================================================================================
+ASCON 5x5 S-BOX: BRAYTON-MCMULLEN ALGEBRAIC KERNEL EXTRACTION REPORT
+================================================================================
+Algorithm: Brayton-McMullen Recursive Kernel/Co-Kernel Factorization
+Tool Runner: tools/sbox_opt/kernel_extractor.py
+Input Cover: Minimal Two-Level SOP from UC Berkeley Espresso (-Dso)
+--------------------------------------------------------------------------------
+Initial Flat SOP Literals:  140
+Multi-Level Network Literals:  83
+Net Literal Savings:          57 (40.7% reduction)
+Extracted Algebraic Kernels:   6
+--------------------------------------------------------------------------------
+
+Extracted Common Algebraic Kernels (Shared Multi-Level Sub-Expressions):
+  k0 = (~x1 & ~x2) | (x1 & x2)  [net saving: 18 literals]
+  k1 = (~x1 & x2) | (x1 & ~x2)  [net saving: 13 literals]
+  k2 = (~x1 & x2) | (x1 & ~x3) | (~x2 & x3)  [net saving: 12 literals]
+  k3 = (~x1 & ~x2 & ~x3) | (x1 & x2 & x3)  [net saving:  8 literals]
+  k4 = (~x0 & ~x3) | (x0 & x3)  [net saving:  5 literals]
+  k5 = (~x0 & x3) | (x0 & ~x3)  [net saving:  1 literals]
+
+Factorized Output Equations:
+  y0 = (~x1 & x2 & k4) | (~x1 & ~x2 & k5) | (x1 & ~x3 & ~x4) | (x1 & x3 & x4)
+  y1 = (~x0 & ~x4 & k2) | (x0 & x4 & k2) | (~x0 & x4 & k3) | (x0 & ~x4 & k3)
+  y2 = (x3 & k0) | (~x4 & k0) | (~x3 & x4 & k1)
+  y3 = (x0 & k0) | (~x3 & x4 & k0) | (x3 & ~x4 & k0) | (~x0 & ~x3 & ~x4 & k1) | (~x0 & x3 & x4 & k1)
+  y4 = (x1 & k4) | (~x1 & ~x3 & x4) | (~x1 & x3 & ~x4)
+
+--------------------------------------------------------------------------------
+Verifying factorized kernel network against NIST Table 6 (all 32 inputs)...
+[SUCCESS] 100% equivalence verified (32/32 vectors bit-exact match).

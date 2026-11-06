@@ -4,7 +4,7 @@
 # [SPEC] Payload: 64 bytes (TRUSTED_PAYLOAD_LEN)
 # Formula: boot_time_us = cycles * 10.0 / 1000.0
 Case 1 (64B payload): reset_to_jump=906 cycles = 9.06 us
-Case 1 (64B payload): reset_to_test_pass=-10 cycles = -0.10 us
+Case 1 (64B payload): reset_to_test_pass=1342 cycles = 13.42 us
 
-TOTAL_PASS=31 TOTAL_FAIL=0
+TOTAL_PASS=35 TOTAL_FAIL=0
 RESULT=PASS

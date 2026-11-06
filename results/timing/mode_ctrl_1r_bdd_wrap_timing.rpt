@@ -1,7 +1,7 @@
 Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2025 Advanced Micro Devices, Inc. All Rights Reserved.
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------
 | Tool Version : Vivado v.2025.1 (win64) Build 6140274 Thu May 22 00:12:29 MDT 2025
-| Date         : Thu Nov  5 17:24:23 2026
+| Date         : Fri Nov  6 09:29:13 2026
 | Host         : LAPTOP-9H0QSNOD running 64-bit major release  (build 9200)
 | Command      : report_timing_summary -file C:/Users/Aayan/Desktop/RTL_Project/Ascon-AEAD-and-HASH/results/timing/mode_ctrl_1r_bdd_wrap_timing.rpt -max_paths 10
 | Design       : mode_ctrl_1r_bdd_wrap
@@ -138,7 +138,7 @@ Table of Contents
 
     WNS(ns)      TNS(ns)  TNS Failing Endpoints  TNS Total Endpoints      WHS(ns)      THS(ns)  THS Failing Endpoints  THS Total Endpoints     WPWS(ns)     TPWS(ns)  TPWS Failing Endpoints  TPWS Total Endpoints  
     -------      -------  ---------------------  -------------------      -------      -------  ---------------------  -------------------     --------     --------  ----------------------  --------------------  
-      1.826        0.000                      0                 7663        0.098        0.000                      0                 7663        4.500        0.000                       0                  4006  
+      1.856        0.000                      0                 7679        0.109        0.000                      0                 7679        4.500        0.000                       0                  4015  
 
 
 All user specified timing constraints are met.
@@ -161,7 +161,7 @@ clk    {0.000 5.000}      10.000          100.000
 
 Clock             WNS(ns)      TNS(ns)  TNS Failing Endpoints  TNS Total Endpoints      WHS(ns)      THS(ns)  THS Failing Endpoints  THS Total Endpoints     WPWS(ns)     TPWS(ns)  TPWS Failing Endpoints  TPWS Total Endpoints  
 -----             -------      -------  ---------------------  -------------------      -------      -------  ---------------------  -------------------     --------     --------  ----------------------  --------------------  
-clk                 1.826        0.000                      0                 7663        0.098        0.000                      0                 7663        4.500        0.000                       0                  4006  
+clk                 1.856        0.000                      0                 7679        0.109        0.000                      0                 7679        4.500        0.000                       0                  4015  
 
 
 ------------------------------------------------------------------------------------------------
@@ -192,24 +192,24 @@ Path Group    From Clock    To Clock          WNS(ns)      TNS(ns)  TNS Failing 
 From Clock:  clk
   To Clock:  clk
 
-Setup :            0  Failing Endpoints,  Worst Slack        1.826ns,  Total Violation        0.000ns
-Hold  :            0  Failing Endpoints,  Worst Slack        0.098ns,  Total Violation        0.000ns
+Setup :            0  Failing Endpoints,  Worst Slack        1.856ns,  Total Violation        0.000ns
+Hold  :            0  Failing Endpoints,  Worst Slack        0.109ns,  Total Violation        0.000ns
 PW    :            0  Failing Endpoints,  Worst Slack        4.500ns,  Total Violation        0.000ns
 ---------------------------------------------------------------------------------------------------
 
 
 Max Delay Paths
 --------------------------------------------------------------------------------------
-Slack (MET) :             1.826ns  (required time - arrival time)
-  Source:                 u_engine/state_reg_reg[0]_rep/C
+Slack (MET) :             1.856ns  (required time - arrival time)
+  Source:                 u_engine/gate_wr_clear_reg/C
                             (rising edge-triggered cell FDCE clocked by clk  {rise@0.000ns fall@5.000ns period=10.000ns})
-  Destination:            u_engine/s4_reg[56]/D
+  Destination:            u_engine/u_pt_gate/mem_reg[29][22]/CE
                             (rising edge-triggered cell FDCE clocked by clk  {rise@0.000ns fall@5.000ns period=10.000ns})
   Path Group:             clk
   Path Type:              Setup (Max at Slow Process Corner)
   Requirement:            10.000ns  (clk rise@10.000ns - clk rise@0.000ns)
-  Data Path Delay:        8.122ns  (logic 0.704ns (8.668%)  route 7.418ns (91.332%))
-  Logic Levels:           2  (LUT5=1 LUT6=1)
+  Data Path Delay:        7.855ns  (logic 0.580ns (7.384%)  route 7.275ns (92.616%))
+  Logic Levels:           1  (LUT6=1)
   Clock Path Skew:        -0.049ns (DCD - SCD + CPR)
     Destination Clock Delay (DCD):    0.924ns = ( 10.924 - 10.000 ) 
     Source Clock Delay      (SCD):    0.973ns
@@ -224,41 +224,39 @@ Slack (MET) :             1.826ns  (required time - arrival time)
   -------------------------------------------------------------------    -------------------
                          (clock clk rise edge)        0.000     0.000 r  
                                                       0.000     0.000 r  clk (IN)
-                         net (fo=4005, unset)         0.973     0.973    u_engine/clk
-    SLICE_X31Y24         FDCE                                         r  u_engine/state_reg_reg[0]_rep/C
+                         net (fo=4014, unset)         0.973     0.973    u_engine/clk
+    SLICE_X31Y36         FDCE                                         r  u_engine/gate_wr_clear_reg/C
   -------------------------------------------------------------------    -------------------
-    SLICE_X31Y24         FDCE (Prop_fdce_C_Q)         0.456     1.429 r  u_engine/state_reg_reg[0]_rep/Q
-                         net (fo=102, routed)         4.416     5.845    u_engine/state_reg_reg[0]_rep_n_0
-    SLICE_X11Y6          LUT5 (Prop_lut5_I1_O)        0.124     5.969 f  u_engine/s4[63]_i_3/O
-                         net (fo=64, routed)          3.002     8.971    u_engine/gen_perm_1r.u_perm/s4_reg[0]_0
-    SLICE_X7Y21          LUT6 (Prop_lut6_I0_O)        0.124     9.095 r  u_engine/gen_perm_1r.u_perm/s4[56]_i_1/O
-                         net (fo=1, routed)           0.000     9.095    u_engine/s4[56]
-    SLICE_X7Y21          FDCE                                         r  u_engine/s4_reg[56]/D
+    SLICE_X31Y36         FDCE (Prop_fdce_C_Q)         0.456     1.429 r  u_engine/gate_wr_clear_reg/Q
+                         net (fo=114, routed)         4.189     5.618    u_engine/u_pt_gate/gate_wr_clear
+    SLICE_X26Y8          LUT6 (Prop_lut6_I5_O)        0.124     5.742 r  u_engine/u_pt_gate/mem[29][63]_i_1/O
+                         net (fo=64, routed)          3.086     8.828    u_engine/u_pt_gate/mem[29][63]_i_1_n_0
+    SLICE_X40Y42         FDCE                                         r  u_engine/u_pt_gate/mem_reg[29][22]/CE
   -------------------------------------------------------------------    -------------------
 
                          (clock clk rise edge)       10.000    10.000 r  
                                                       0.000    10.000 r  clk (IN)
-                         net (fo=4005, unset)         0.924    10.924    u_engine/clk
-    SLICE_X7Y21          FDCE                                         r  u_engine/s4_reg[56]/C
+                         net (fo=4014, unset)         0.924    10.924    u_engine/u_pt_gate/clk
+    SLICE_X40Y42         FDCE                                         r  u_engine/u_pt_gate/mem_reg[29][22]/C
                          clock pessimism              0.000    10.924    
                          clock uncertainty           -0.035    10.889    
-    SLICE_X7Y21          FDCE (Setup_fdce_C_D)        0.032    10.921    u_engine/s4_reg[56]
+    SLICE_X40Y42         FDCE (Setup_fdce_C_CE)      -0.205    10.684    u_engine/u_pt_gate/mem_reg[29][22]
   -------------------------------------------------------------------
-                         required time                         10.921    
-                         arrival time                          -9.095    
+                         required time                         10.684    
+                         arrival time                          -8.828    
   -------------------------------------------------------------------
-                         slack                                  1.826    
+                         slack                                  1.856    
 
-Slack (MET) :             2.036ns  (required time - arrival time)
-  Source:                 u_engine/state_reg_reg[0]_rep/C
+Slack (MET) :             1.856ns  (required time - arrival time)
+  Source:                 u_engine/gate_wr_clear_reg/C
                             (rising edge-triggered cell FDCE clocked by clk  {rise@0.000ns fall@5.000ns period=10.000ns})
-  Destination:            u_engine/s4_reg[55]/D
+  Destination:            u_engine/u_pt_gate/mem_reg[29][58]/CE
                             (rising edge-triggered cell FDCE clocked by clk  {rise@0.000ns fall@5.000ns period=10.000ns})
   Path Group:             clk
   Path Type:              Setup (Max at Slow Process Corner)
   Requirement:            10.000ns  (clk rise@10.000ns - clk rise@0.000ns)
-  Data Path Delay:        7.911ns  (logic 0.704ns (8.899%)  route 7.207ns (91.101%))
-  Logic Levels:           2  (LUT5=1 LUT6=1)
+  Data Path Delay:        7.855ns  (logic 0.580ns (7.384%)  route 7.275ns (92.616%))
+  Logic Levels:           1  (LUT6=1)
   Clock Path Skew:        -0.049ns (DCD - SCD + CPR)
     Destination Clock Delay (DCD):    0.924ns = ( 10.924 - 10.000 ) 
     Source Clock Delay      (SCD):    0.973ns
@@ -273,41 +271,39 @@ Slack (MET) :             2.036ns  (required time - arrival time)
   -------------------------------------------------------------------    -------------------
                          (clock clk rise edge)        0.000     0.000 r  
                                                       0.000     0.000 r  clk (IN)
-                         net (fo=4005, unset)         0.973     0.973    u_engine/clk
-    SLICE_X31Y24         FDCE                                         r  u_engine/state_reg_reg[0]_rep/C
+                         net (fo=4014, unset)         0.973     0.973    u_engine/clk
+    SLICE_X31Y36         FDCE                                         r  u_engine/gate_wr_clear_reg/C
   -------------------------------------------------------------------    -------------------
-    SLICE_X31Y24         FDCE (Prop_fdce_C_Q)         0.456     1.429 r  u_engine/state_reg_reg[0]_rep/Q
-                         net (fo=102, routed)         4.416     5.845    u_engine/state_reg_reg[0]_rep_n_0
-    SLICE_X11Y6          LUT5 (Prop_lut5_I1_O)        0.124     5.969 f  u_engine/s4[63]_i_3/O
-                         net (fo=64, routed)          2.791     8.760    u_engine/gen_perm_1r.u_perm/s4_reg[0]_0
-    SLICE_X7Y19          LUT6 (Prop_lut6_I1_O)        0.124     8.884 r  u_engine/gen_perm_1r.u_perm/s4[55]_i_1/O
-                         net (fo=1, routed)           0.000     8.884    u_engine/s4[55]
-    SLICE_X7Y19          FDCE                                         r  u_engine/s4_reg[55]/D
+    SLICE_X31Y36         FDCE (Prop_fdce_C_Q)         0.456     1.429 r  u_engine/gate_wr_clear_reg/Q
+                         net (fo=114, routed)         4.189     5.618    u_engine/u_pt_gate/gate_wr_clear
+    SLICE_X26Y8          LUT6 (Prop_lut6_I5_O)        0.124     5.742 r  u_engine/u_pt_gate/mem[29][63]_i_1/O
+                         net (fo=64, routed)          3.086     8.828    u_engine/u_pt_gate/mem[29][63]_i_1_n_0
+    SLICE_X40Y42         FDCE                                         r  u_engine/u_pt_gate/mem_reg[29][58]/CE
   -------------------------------------------------------------------    -------------------
 
                          (clock clk rise edge)       10.000    10.000 r  
                                                       0.000    10.000 r  clk (IN)
-                         net (fo=4005, unset)         0.924    10.924    u_engine/clk
-    SLICE_X7Y19          FDCE                                         r  u_engine/s4_reg[55]/C
+                         net (fo=4014, unset)         0.924    10.924    u_engine/u_pt_gate/clk
+    SLICE_X40Y42         FDCE                                         r  u_engine/u_pt_gate/mem_reg[29][58]/C
                          clock pessimism              0.000    10.924    
                          clock uncertainty           -0.035    10.889    
-    SLICE_X7Y19          FDCE (Setup_fdce_C_D)        0.031    10.920    u_engine/s4_reg[55]
+    SLICE_X40Y42         FDCE (Setup_fdce_C_CE)      -0.205    10.684    u_engine/u_pt_gate/mem_reg[29][58]
   -------------------------------------------------------------------
-                         required time                         10.920    
-                         arrival time                          -8.884    
+                         required time                         10.684    
+                         arrival time                          -8.828    
   -------------------------------------------------------------------
-                         slack                                  2.036    
+                         slack                                  1.856    
 
-Slack (MET) :             2.061ns  (required time - arrival time)
-  Source:                 u_engine/state_reg_reg[0]_rep/C
+Slack (MET) :             1.856ns  (required time - arrival time)
+  Source:                 u_engine/gate_wr_clear_reg/C
                             (rising edge-triggered cell FDCE clocked by clk  {rise@0.000ns fall@5.000ns period=10.000ns})
-  Destination:            u_engine/s4_reg[50]/D
+  Destination:            u_engine/u_pt_gate/mem_reg[29][62]/CE
                             (rising edge-triggered cell FDCE clocked by clk  {rise@0.000ns fall@5.000ns period=10.000ns})
   Path Group:             clk
   Path Type:              Setup (Max at Slow Process Corner)
   Requirement:            10.000ns  (clk rise@10.000ns - clk rise@0.000ns)
-  Data Path Delay:        7.884ns  (logic 0.704ns (8.929%)  route 7.180ns (91.071%))
-  Logic Levels:           2  (LUT5=1 LUT6=1)
+  Data Path Delay:        7.855ns  (logic 0.580ns (7.384%)  route 7.275ns (92.616%))
+  Logic Levels:           1  (LUT6=1)
   Clock Path Skew:        -0.049ns (DCD - SCD + CPR)
     Destination Clock Delay (DCD):    0.924ns = ( 10.924 - 10.000 ) 
     Source Clock Delay      (SCD):    0.973ns
@@ -322,41 +318,39 @@ Slack (MET) :             2.061ns  (required time - arrival time)
   -------------------------------------------------------------------    -------------------
                          (clock clk rise edge)        0.000     0.000 r  
                                                       0.000     0.000 r  clk (IN)
-                         net (fo=4005, unset)         0.973     0.973    u_engine/clk
-    SLICE_X31Y24         FDCE                                         r  u_engine/state_reg_reg[0]_rep/C
+                         net (fo=4014, unset)         0.973     0.973    u_engine/clk
+    SLICE_X31Y36         FDCE                                         r  u_engine/gate_wr_clear_reg/C
   -------------------------------------------------------------------    -------------------
-    SLICE_X31Y24         FDCE (Prop_fdce_C_Q)         0.456     1.429 r  u_engine/state_reg_reg[0]_rep/Q
-                         net (fo=102, routed)         4.416     5.845    u_engine/state_reg_reg[0]_rep_n_0
-    SLICE_X11Y6          LUT5 (Prop_lut5_I1_O)        0.124     5.969 f  u_engine/s4[63]_i_3/O
-                         net (fo=64, routed)          2.764     8.733    u_engine/gen_perm_1r.u_perm/s4_reg[0]_0
-    SLICE_X7Y21          LUT6 (Prop_lut6_I0_O)        0.124     8.857 r  u_engine/gen_perm_1r.u_perm/s4[50]_i_1/O
-                         net (fo=1, routed)           0.000     8.857    u_engine/s4[50]
-    SLICE_X7Y21          FDCE                                         r  u_engine/s4_reg[50]/D
+    SLICE_X31Y36         FDCE (Prop_fdce_C_Q)         0.456     1.429 r  u_engine/gate_wr_clear_reg/Q
+                         net (fo=114, routed)         4.189     5.618    u_engine/u_pt_gate/gate_wr_clear
+    SLICE_X26Y8          LUT6 (Prop_lut6_I5_O)        0.124     5.742 r  u_engine/u_pt_gate/mem[29][63]_i_1/O
+                         net (fo=64, routed)          3.086     8.828    u_engine/u_pt_gate/mem[29][63]_i_1_n_0
+    SLICE_X40Y42         FDCE                                         r  u_engine/u_pt_gate/mem_reg[29][62]/CE
   -------------------------------------------------------------------    -------------------
 
                          (clock clk rise edge)       10.000    10.000 r  
                                                       0.000    10.000 r  clk (IN)
-                         net (fo=4005, unset)         0.924    10.924    u_engine/clk
-    SLICE_X7Y21          FDCE                                         r  u_engine/s4_reg[50]/C
+                         net (fo=4014, unset)         0.924    10.924    u_engine/u_pt_gate/clk
+    SLICE_X40Y42         FDCE                                         r  u_engine/u_pt_gate/mem_reg[29][62]/C
                          clock pessimism              0.000    10.924    
                          clock uncertainty           -0.035    10.889    
-    SLICE_X7Y21          FDCE (Setup_fdce_C_D)        0.029    10.918    u_engine/s4_reg[50]
+    SLICE_X40Y42         FDCE (Setup_fdce_C_CE)      -0.205    10.684    u_engine/u_pt_gate/mem_reg[29][62]
   -------------------------------------------------------------------
-                         required time                         10.918    
-                         arrival time                          -8.857    
+                         required time                         10.684    
+                         arrival time                          -8.828    
   -------------------------------------------------------------------
-                         slack                                  2.061    
+                         slack                                  1.856    
 
-Slack (MET) :             2.086ns  (required time - arrival time)
-  Source:                 u_engine/state_reg_reg[0]_rep/C
+Slack (MET) :             1.894ns  (required time - arrival time)
+  Source:                 u_engine/r_bytes_left_reg[7]/C
                             (rising edge-triggered cell FDCE clocked by clk  {rise@0.000ns fall@5.000ns period=10.000ns})
-  Destination:            u_engine/s4_reg[49]/D
+  Destination:            u_engine/s0_reg[28]/CE
                             (rising edge-triggered cell FDCE clocked by clk  {rise@0.000ns fall@5.000ns period=10.000ns})
   Path Group:             clk
   Path Type:              Setup (Max at Slow Process Corner)
   Requirement:            10.000ns  (clk rise@10.000ns - clk rise@0.000ns)
-  Data Path Delay:        7.911ns  (logic 0.704ns (8.899%)  route 7.207ns (91.101%))
-  Logic Levels:           2  (LUT5=1 LUT6=1)
+  Data Path Delay:        7.817ns  (logic 1.782ns (22.797%)  route 6.035ns (77.203%))
+  Logic Levels:           5  (LUT3=1 LUT4=2 LUT6=2)
   Clock Path Skew:        -0.049ns (DCD - SCD + CPR)
     Destination Clock Delay (DCD):    0.924ns = ( 10.924 - 10.000 ) 
     Source Clock Delay      (SCD):    0.973ns
@@ -371,41 +365,47 @@ Slack (MET) :             2.086ns  (required time - arrival time)
   -------------------------------------------------------------------    -------------------
                          (clock clk rise edge)        0.000     0.000 r  
                                                       0.000     0.000 r  clk (IN)
-                         net (fo=4005, unset)         0.973     0.973    u_engine/clk
-    SLICE_X31Y24         FDCE                                         r  u_engine/state_reg_reg[0]_rep/C
+                         net (fo=4014, unset)         0.973     0.973    u_engine/clk
+    SLICE_X13Y38         FDCE                                         r  u_engine/r_bytes_left_reg[7]/C
   -------------------------------------------------------------------    -------------------
-    SLICE_X31Y24         FDCE (Prop_fdce_C_Q)         0.456     1.429 r  u_engine/state_reg_reg[0]_rep/Q
-                         net (fo=102, routed)         4.416     5.845    u_engine/state_reg_reg[0]_rep_n_0
-    SLICE_X11Y6          LUT5 (Prop_lut5_I1_O)        0.124     5.969 f  u_engine/s4[63]_i_3/O
-                         net (fo=64, routed)          2.791     8.760    u_engine/gen_perm_1r.u_perm/s4_reg[0]_0
-    SLICE_X8Y20          LUT6 (Prop_lut6_I0_O)        0.124     8.884 r  u_engine/gen_perm_1r.u_perm/s4[49]_i_1/O
-                         net (fo=1, routed)           0.000     8.884    u_engine/s4[49]
-    SLICE_X8Y20          FDCE                                         r  u_engine/s4_reg[49]/D
+    SLICE_X13Y38         FDCE (Prop_fdce_C_Q)         0.456     1.429 f  u_engine/r_bytes_left_reg[7]/Q
+                         net (fo=6, routed)           1.114     2.543    u_engine/r_bytes_left_reg_n_0_[7]
+    SLICE_X14Y37         LUT4 (Prop_lut4_I2_O)        0.152     2.695 f  u_engine/data_out[63]_i_7/O
+                         net (fo=3, routed)           0.869     3.564    u_engine/data_out[63]_i_7_n_0
+    SLICE_X15Y38         LUT6 (Prop_lut6_I0_O)        0.332     3.896 r  u_engine/data_out[63]_i_6/O
+                         net (fo=7, routed)           0.975     4.871    u_engine/data_out[63]_i_6_n_0
+    SLICE_X20Y38         LUT3 (Prop_lut3_I2_O)        0.153     5.024 f  u_engine/data_out[63]_i_4/O
+                         net (fo=175, routed)         0.721     5.745    u_engine/data_out[63]_i_4_n_0
+    SLICE_X17Y38         LUT4 (Prop_lut4_I2_O)        0.357     6.102 f  u_engine/state_reg[3]_i_3/O
+                         net (fo=3, routed)           0.586     6.688    u_engine/gen_perm_1r.u_perm/s0_reg[63]_1
+    SLICE_X21Y36         LUT6 (Prop_lut6_I5_O)        0.332     7.020 r  u_engine/gen_perm_1r.u_perm/s0[63]_i_1/O
+                         net (fo=64, routed)          1.770     8.790    u_engine/gen_perm_1r.u_perm_n_0
+    SLICE_X29Y15         FDCE                                         r  u_engine/s0_reg[28]/CE
   -------------------------------------------------------------------    -------------------
 
                          (clock clk rise edge)       10.000    10.000 r  
                                                       0.000    10.000 r  clk (IN)
-                         net (fo=4005, unset)         0.924    10.924    u_engine/clk
-    SLICE_X8Y20          FDCE                                         r  u_engine/s4_reg[49]/C
+                         net (fo=4014, unset)         0.924    10.924    u_engine/clk
+    SLICE_X29Y15         FDCE                                         r  u_engine/s0_reg[28]/C
                          clock pessimism              0.000    10.924    
                          clock uncertainty           -0.035    10.889    
-    SLICE_X8Y20          FDCE (Setup_fdce_C_D)        0.081    10.970    u_engine/s4_reg[49]
+    SLICE_X29Y15         FDCE (Setup_fdce_C_CE)      -0.205    10.684    u_engine/s0_reg[28]
   -------------------------------------------------------------------
-                         required time                         10.970    
-                         arrival time                          -8.884    
+                         required time                         10.684    
+                         arrival time                          -8.790    
   -------------------------------------------------------------------
-                         slack                                  2.086    
+                         slack                                  1.894    
 
-Slack (MET) :             2.097ns  (required time - arrival time)
-  Source:                 u_engine/state_reg_reg[0]_rep/C
+Slack (MET) :             1.930ns  (required time - arrival time)
+  Source:                 u_engine/r_bytes_left_reg[7]/C
                             (rising edge-triggered cell FDCE clocked by clk  {rise@0.000ns fall@5.000ns period=10.000ns})
-  Destination:            u_engine/s4_reg[44]/D
+  Destination:            u_engine/s0_reg[13]/CE
                             (rising edge-triggered cell FDCE clocked by clk  {rise@0.000ns fall@5.000ns period=10.000ns})
   Path Group:             clk
   Path Type:              Setup (Max at Slow Process Corner)
   Requirement:            10.000ns  (clk rise@10.000ns - clk rise@0.000ns)
-  Data Path Delay:        7.848ns  (logic 0.704ns (8.971%)  route 7.144ns (91.029%))
-  Logic Levels:           2  (LUT5=1 LUT6=1)
+  Data Path Delay:        7.817ns  (logic 1.782ns (22.797%)  route 6.035ns (77.203%))
+  Logic Levels:           5  (LUT3=1 LUT4=2 LUT6=2)
   Clock Path Skew:        -0.049ns (DCD - SCD + CPR)
     Destination Clock Delay (DCD):    0.924ns = ( 10.924 - 10.000 ) 
     Source Clock Delay      (SCD):    0.973ns
@@ -420,41 +420,47 @@ Slack (MET) :             2.097ns  (required time - arrival time)
   -------------------------------------------------------------------    -------------------
                          (clock clk rise edge)        0.000     0.000 r  
                                                       0.000     0.000 r  clk (IN)
-                         net (fo=4005, unset)         0.973     0.973    u_engine/clk
-    SLICE_X31Y24         FDCE                                         r  u_engine/state_reg_reg[0]_rep/C
+                         net (fo=4014, unset)         0.973     0.973    u_engine/clk
+    SLICE_X13Y38         FDCE                                         r  u_engine/r_bytes_left_reg[7]/C
   -------------------------------------------------------------------    -------------------
-    SLICE_X31Y24         FDCE (Prop_fdce_C_Q)         0.456     1.429 r  u_engine/state_reg_reg[0]_rep/Q
-                         net (fo=102, routed)         4.416     5.845    u_engine/state_reg_reg[0]_rep_n_0
-    SLICE_X11Y6          LUT5 (Prop_lut5_I1_O)        0.124     5.969 f  u_engine/s4[63]_i_3/O
-                         net (fo=64, routed)          2.728     8.697    u_engine/gen_perm_1r.u_perm/s4_reg[0]_0
-    SLICE_X7Y19          LUT6 (Prop_lut6_I0_O)        0.124     8.821 r  u_engine/gen_perm_1r.u_perm/s4[44]_i_1/O
-                         net (fo=1, routed)           0.000     8.821    u_engine/s4[44]
-    SLICE_X7Y19          FDCE                                         r  u_engine/s4_reg[44]/D
+    SLICE_X13Y38         FDCE (Prop_fdce_C_Q)         0.456     1.429 f  u_engine/r_bytes_left_reg[7]/Q
+                         net (fo=6, routed)           1.114     2.543    u_engine/r_bytes_left_reg_n_0_[7]
+    SLICE_X14Y37         LUT4 (Prop_lut4_I2_O)        0.152     2.695 f  u_engine/data_out[63]_i_7/O
+                         net (fo=3, routed)           0.869     3.564    u_engine/data_out[63]_i_7_n_0
+    SLICE_X15Y38         LUT6 (Prop_lut6_I0_O)        0.332     3.896 r  u_engine/data_out[63]_i_6/O
+                         net (fo=7, routed)           0.975     4.871    u_engine/data_out[63]_i_6_n_0
+    SLICE_X20Y38         LUT3 (Prop_lut3_I2_O)        0.153     5.024 f  u_engine/data_out[63]_i_4/O
+                         net (fo=175, routed)         0.721     5.745    u_engine/data_out[63]_i_4_n_0
+    SLICE_X17Y38         LUT4 (Prop_lut4_I2_O)        0.357     6.102 f  u_engine/state_reg[3]_i_3/O
+                         net (fo=3, routed)           0.586     6.688    u_engine/gen_perm_1r.u_perm/s0_reg[63]_1
+    SLICE_X21Y36         LUT6 (Prop_lut6_I5_O)        0.332     7.020 r  u_engine/gen_perm_1r.u_perm/s0[63]_i_1/O
+                         net (fo=64, routed)          1.770     8.790    u_engine/gen_perm_1r.u_perm_n_0
+    SLICE_X28Y15         FDCE                                         r  u_engine/s0_reg[13]/CE
   -------------------------------------------------------------------    -------------------
 
                          (clock clk rise edge)       10.000    10.000 r  
                                                       0.000    10.000 r  clk (IN)
-                         net (fo=4005, unset)         0.924    10.924    u_engine/clk
-    SLICE_X7Y19          FDCE                                         r  u_engine/s4_reg[44]/C
+                         net (fo=4014, unset)         0.924    10.924    u_engine/clk
+    SLICE_X28Y15         FDCE                                         r  u_engine/s0_reg[13]/C
                          clock pessimism              0.000    10.924    
                          clock uncertainty           -0.035    10.889    
-    SLICE_X7Y19          FDCE (Setup_fdce_C_D)        0.029    10.918    u_engine/s4_reg[44]
+    SLICE_X28Y15         FDCE (Setup_fdce_C_CE)      -0.169    10.720    u_engine/s0_reg[13]
   -------------------------------------------------------------------
-                         required time                         10.918    
-                         arrival time                          -8.821    
+                         required time                         10.720    
+                         arrival time                          -8.790    
   -------------------------------------------------------------------
-                         slack                                  2.097    
+                         slack                                  1.930    
 
-Slack (MET) :             2.114ns  (required time - arrival time)
-  Source:                 u_engine/state_reg_reg[0]_rep/C
+Slack (MET) :             1.934ns  (required time - arrival time)
+  Source:                 u_engine/r_bytes_left_reg[7]/C
                             (rising edge-triggered cell FDCE clocked by clk  {rise@0.000ns fall@5.000ns period=10.000ns})
-  Destination:            u_engine/s4_reg[51]/D
+  Destination:            u_engine/s0_reg[46]/CE
                             (rising edge-triggered cell FDCE clocked by clk  {rise@0.000ns fall@5.000ns period=10.000ns})
   Path Group:             clk
   Path Type:              Setup (Max at Slow Process Corner)
   Requirement:            10.000ns  (clk rise@10.000ns - clk rise@0.000ns)
-  Data Path Delay:        7.879ns  (logic 0.704ns (8.936%)  route 7.175ns (91.064%))
-  Logic Levels:           2  (LUT5=1 LUT6=1)
+  Data Path Delay:        7.777ns  (logic 1.782ns (22.912%)  route 5.995ns (77.088%))
+  Logic Levels:           5  (LUT3=1 LUT4=2 LUT6=2)
   Clock Path Skew:        -0.049ns (DCD - SCD + CPR)
     Destination Clock Delay (DCD):    0.924ns = ( 10.924 - 10.000 ) 
     Source Clock Delay      (SCD):    0.973ns
@@ -469,41 +475,47 @@ Slack (MET) :             2.114ns  (required time - arrival time)
   -------------------------------------------------------------------    -------------------
                          (clock clk rise edge)        0.000     0.000 r  
                                                       0.000     0.000 r  clk (IN)
-                         net (fo=4005, unset)         0.973     0.973    u_engine/clk
-    SLICE_X31Y24         FDCE                                         r  u_engine/state_reg_reg[0]_rep/C
+                         net (fo=4014, unset)         0.973     0.973    u_engine/clk
+    SLICE_X13Y38         FDCE                                         r  u_engine/r_bytes_left_reg[7]/C
   -------------------------------------------------------------------    -------------------
-    SLICE_X31Y24         FDCE (Prop_fdce_C_Q)         0.456     1.429 r  u_engine/state_reg_reg[0]_rep/Q
-                         net (fo=102, routed)         4.416     5.845    u_engine/state_reg_reg[0]_rep_n_0
-    SLICE_X11Y6          LUT5 (Prop_lut5_I1_O)        0.124     5.969 f  u_engine/s4[63]_i_3/O
-                         net (fo=64, routed)          2.758     8.728    u_engine/gen_perm_1r.u_perm/s4_reg[0]_0
-    SLICE_X8Y21          LUT6 (Prop_lut6_I0_O)        0.124     8.852 r  u_engine/gen_perm_1r.u_perm/s4[51]_i_1/O
-                         net (fo=1, routed)           0.000     8.852    u_engine/s4[51]
-    SLICE_X8Y21          FDCE                                         r  u_engine/s4_reg[51]/D
+    SLICE_X13Y38         FDCE (Prop_fdce_C_Q)         0.456     1.429 f  u_engine/r_bytes_left_reg[7]/Q
+                         net (fo=6, routed)           1.114     2.543    u_engine/r_bytes_left_reg_n_0_[7]
+    SLICE_X14Y37         LUT4 (Prop_lut4_I2_O)        0.152     2.695 f  u_engine/data_out[63]_i_7/O
+                         net (fo=3, routed)           0.869     3.564    u_engine/data_out[63]_i_7_n_0
+    SLICE_X15Y38         LUT6 (Prop_lut6_I0_O)        0.332     3.896 r  u_engine/data_out[63]_i_6/O
+                         net (fo=7, routed)           0.975     4.871    u_engine/data_out[63]_i_6_n_0
+    SLICE_X20Y38         LUT3 (Prop_lut3_I2_O)        0.153     5.024 f  u_engine/data_out[63]_i_4/O
+                         net (fo=175, routed)         0.721     5.745    u_engine/data_out[63]_i_4_n_0
+    SLICE_X17Y38         LUT4 (Prop_lut4_I2_O)        0.357     6.102 f  u_engine/state_reg[3]_i_3/O
+                         net (fo=3, routed)           0.586     6.688    u_engine/gen_perm_1r.u_perm/s0_reg[63]_1
+    SLICE_X21Y36         LUT6 (Prop_lut6_I5_O)        0.332     7.020 r  u_engine/gen_perm_1r.u_perm/s0[63]_i_1/O
+                         net (fo=64, routed)          1.730     8.750    u_engine/gen_perm_1r.u_perm_n_0
+    SLICE_X39Y24         FDCE                                         r  u_engine/s0_reg[46]/CE
   -------------------------------------------------------------------    -------------------
 
                          (clock clk rise edge)       10.000    10.000 r  
                                                       0.000    10.000 r  clk (IN)
-                         net (fo=4005, unset)         0.924    10.924    u_engine/clk
-    SLICE_X8Y21          FDCE                                         r  u_engine/s4_reg[51]/C
+                         net (fo=4014, unset)         0.924    10.924    u_engine/clk
+    SLICE_X39Y24         FDCE                                         r  u_engine/s0_reg[46]/C
                          clock pessimism              0.000    10.924    
                          clock uncertainty           -0.035    10.889    
-    SLICE_X8Y21          FDCE (Setup_fdce_C_D)        0.077    10.966    u_engine/s4_reg[51]
+    SLICE_X39Y24         FDCE (Setup_fdce_C_CE)      -0.205    10.684    u_engine/s0_reg[46]
   -------------------------------------------------------------------
-                         required time                         10.966    
-                         arrival time                          -8.852    
+                         required time                         10.684    
+                         arrival time                          -8.750    
   -------------------------------------------------------------------
-                         slack                                  2.114    
+                         slack                                  1.934    
 
-Slack (MET) :             2.121ns  (required time - arrival time)
-  Source:                 u_engine/state_reg_reg[0]_rep/C
+Slack (MET) :             1.938ns  (required time - arrival time)
+  Source:                 u_engine/r_bytes_left_reg[7]/C
                             (rising edge-triggered cell FDCE clocked by clk  {rise@0.000ns fall@5.000ns period=10.000ns})
-  Destination:            u_engine/s4_reg[52]/D
+  Destination:            u_engine/s0_reg[9]/CE
                             (rising edge-triggered cell FDCE clocked by clk  {rise@0.000ns fall@5.000ns period=10.000ns})
   Path Group:             clk
   Path Type:              Setup (Max at Slow Process Corner)
   Requirement:            10.000ns  (clk rise@10.000ns - clk rise@0.000ns)
-  Data Path Delay:        7.876ns  (logic 0.704ns (8.939%)  route 7.172ns (91.061%))
-  Logic Levels:           2  (LUT5=1 LUT6=1)
+  Data Path Delay:        7.773ns  (logic 1.782ns (22.924%)  route 5.991ns (77.076%))
+  Logic Levels:           5  (LUT3=1 LUT4=2 LUT6=2)
   Clock Path Skew:        -0.049ns (DCD - SCD + CPR)
     Destination Clock Delay (DCD):    0.924ns = ( 10.924 - 10.000 ) 
     Source Clock Delay      (SCD):    0.973ns
@@ -518,41 +530,47 @@ Slack (MET) :             2.121ns  (required time - arrival time)
   -------------------------------------------------------------------    -------------------
                          (clock clk rise edge)        0.000     0.000 r  
                                                       0.000     0.000 r  clk (IN)
-                         net (fo=4005, unset)         0.973     0.973    u_engine/clk
-    SLICE_X31Y24         FDCE                                         r  u_engine/state_reg_reg[0]_rep/C
+                         net (fo=4014, unset)         0.973     0.973    u_engine/clk
+    SLICE_X13Y38         FDCE                                         r  u_engine/r_bytes_left_reg[7]/C
   -------------------------------------------------------------------    -------------------
-    SLICE_X31Y24         FDCE (Prop_fdce_C_Q)         0.456     1.429 r  u_engine/state_reg_reg[0]_rep/Q
-                         net (fo=102, routed)         4.416     5.845    u_engine/state_reg_reg[0]_rep_n_0
-    SLICE_X11Y6          LUT5 (Prop_lut5_I1_O)        0.124     5.969 f  u_engine/s4[63]_i_3/O
-                         net (fo=64, routed)          2.755     8.725    u_engine/gen_perm_1r.u_perm/s4_reg[0]_0
-    SLICE_X8Y21          LUT6 (Prop_lut6_I0_O)        0.124     8.849 r  u_engine/gen_perm_1r.u_perm/s4[52]_i_1/O
-                         net (fo=1, routed)           0.000     8.849    u_engine/s4[52]
-    SLICE_X8Y21          FDCE                                         r  u_engine/s4_reg[52]/D
+    SLICE_X13Y38         FDCE (Prop_fdce_C_Q)         0.456     1.429 f  u_engine/r_bytes_left_reg[7]/Q
+                         net (fo=6, routed)           1.114     2.543    u_engine/r_bytes_left_reg_n_0_[7]
+    SLICE_X14Y37         LUT4 (Prop_lut4_I2_O)        0.152     2.695 f  u_engine/data_out[63]_i_7/O
+                         net (fo=3, routed)           0.869     3.564    u_engine/data_out[63]_i_7_n_0
+    SLICE_X15Y38         LUT6 (Prop_lut6_I0_O)        0.332     3.896 r  u_engine/data_out[63]_i_6/O
+                         net (fo=7, routed)           0.975     4.871    u_engine/data_out[63]_i_6_n_0
+    SLICE_X20Y38         LUT3 (Prop_lut3_I2_O)        0.153     5.024 f  u_engine/data_out[63]_i_4/O
+                         net (fo=175, routed)         0.721     5.745    u_engine/data_out[63]_i_4_n_0
+    SLICE_X17Y38         LUT4 (Prop_lut4_I2_O)        0.357     6.102 f  u_engine/state_reg[3]_i_3/O
+                         net (fo=3, routed)           0.586     6.688    u_engine/gen_perm_1r.u_perm/s0_reg[63]_1
+    SLICE_X21Y36         LUT6 (Prop_lut6_I5_O)        0.332     7.020 r  u_engine/gen_perm_1r.u_perm/s0[63]_i_1/O
+                         net (fo=64, routed)          1.726     8.746    u_engine/gen_perm_1r.u_perm_n_0
+    SLICE_X27Y15         FDCE                                         r  u_engine/s0_reg[9]/CE
   -------------------------------------------------------------------    -------------------
 
                          (clock clk rise edge)       10.000    10.000 r  
                                                       0.000    10.000 r  clk (IN)
-                         net (fo=4005, unset)         0.924    10.924    u_engine/clk
-    SLICE_X8Y21          FDCE                                         r  u_engine/s4_reg[52]/C
+                         net (fo=4014, unset)         0.924    10.924    u_engine/clk
+    SLICE_X27Y15         FDCE                                         r  u_engine/s0_reg[9]/C
                          clock pessimism              0.000    10.924    
                          clock uncertainty           -0.035    10.889    
-    SLICE_X8Y21          FDCE (Setup_fdce_C_D)        0.081    10.970    u_engine/s4_reg[52]
+    SLICE_X27Y15         FDCE (Setup_fdce_C_CE)      -0.205    10.684    u_engine/s0_reg[9]
   -------------------------------------------------------------------
-                         required time                         10.970    
-                         arrival time                          -8.849    
+                         required time                         10.684    
+                         arrival time                          -8.746    
   -------------------------------------------------------------------
-                         slack                                  2.121    
+                         slack                                  1.938    
 
-Slack (MET) :             2.131ns  (required time - arrival time)
-  Source:                 u_engine/state_reg_reg[0]_rep/C
+Slack (MET) :             1.964ns  (required time - arrival time)
+  Source:                 u_engine/gate_wr_clear_reg/C
                             (rising edge-triggered cell FDCE clocked by clk  {rise@0.000ns fall@5.000ns period=10.000ns})
-  Destination:            u_engine/s4_reg[54]/D
+  Destination:            u_engine/u_pt_gate/mem_reg[25][17]/CE
                             (rising edge-triggered cell FDCE clocked by clk  {rise@0.000ns fall@5.000ns period=10.000ns})
   Path Group:             clk
   Path Type:              Setup (Max at Slow Process Corner)
   Requirement:            10.000ns  (clk rise@10.000ns - clk rise@0.000ns)
-  Data Path Delay:        7.816ns  (logic 0.937ns (11.988%)  route 6.879ns (88.012%))
-  Logic Levels:           2  (LUT4=1 LUT6=1)
+  Data Path Delay:        7.747ns  (logic 0.580ns (7.487%)  route 7.167ns (92.513%))
+  Logic Levels:           1  (LUT6=1)
   Clock Path Skew:        -0.049ns (DCD - SCD + CPR)
     Destination Clock Delay (DCD):    0.924ns = ( 10.924 - 10.000 ) 
     Source Clock Delay      (SCD):    0.973ns
@@ -567,41 +585,39 @@ Slack (MET) :             2.131ns  (required time - arrival time)
   -------------------------------------------------------------------    -------------------
                          (clock clk rise edge)        0.000     0.000 r  
                                                       0.000     0.000 r  clk (IN)
-                         net (fo=4005, unset)         0.973     0.973    u_engine/clk
-    SLICE_X31Y24         FDCE                                         r  u_engine/state_reg_reg[0]_rep/C
+                         net (fo=4014, unset)         0.973     0.973    u_engine/clk
+    SLICE_X31Y36         FDCE                                         r  u_engine/gate_wr_clear_reg/C
   -------------------------------------------------------------------    -------------------
-    SLICE_X31Y24         FDCE (Prop_fdce_C_Q)         0.456     1.429 f  u_engine/state_reg_reg[0]_rep/Q
-                         net (fo=102, routed)         4.416     5.845    u_engine/state_reg_reg[0]_rep_n_0
-    SLICE_X11Y6          LUT4 (Prop_lut4_I0_O)        0.154     5.999 r  u_engine/s4[63]_i_4/O
-                         net (fo=64, routed)          2.463     8.462    u_engine/gen_perm_1r.u_perm/s4_reg[0]_1
-    SLICE_X7Y21          LUT6 (Prop_lut6_I1_O)        0.327     8.789 r  u_engine/gen_perm_1r.u_perm/s4[54]_i_1/O
-                         net (fo=1, routed)           0.000     8.789    u_engine/s4[54]
-    SLICE_X7Y21          FDCE                                         r  u_engine/s4_reg[54]/D
+    SLICE_X31Y36         FDCE (Prop_fdce_C_Q)         0.456     1.429 r  u_engine/gate_wr_clear_reg/Q
+                         net (fo=114, routed)         4.241     5.670    u_engine/u_pt_gate/gate_wr_clear
+    SLICE_X28Y9          LUT6 (Prop_lut6_I5_O)        0.124     5.794 r  u_engine/u_pt_gate/mem[25][63]_i_1/O
+                         net (fo=64, routed)          2.925     8.720    u_engine/u_pt_gate/mem[25][63]_i_1_n_0
+    SLICE_X37Y44         FDCE                                         r  u_engine/u_pt_gate/mem_reg[25][17]/CE
   -------------------------------------------------------------------    -------------------
 
                          (clock clk rise edge)       10.000    10.000 r  
                                                       0.000    10.000 r  clk (IN)
-                         net (fo=4005, unset)         0.924    10.924    u_engine/clk
-    SLICE_X7Y21          FDCE                                         r  u_engine/s4_reg[54]/C
+                         net (fo=4014, unset)         0.924    10.924    u_engine/u_pt_gate/clk
+    SLICE_X37Y44         FDCE                                         r  u_engine/u_pt_gate/mem_reg[25][17]/C
                          clock pessimism              0.000    10.924    
                          clock uncertainty           -0.035    10.889    
-    SLICE_X7Y21          FDCE (Setup_fdce_C_D)        0.031    10.920    u_engine/s4_reg[54]
+    SLICE_X37Y44         FDCE (Setup_fdce_C_CE)      -0.205    10.684    u_engine/u_pt_gate/mem_reg[25][17]
   -------------------------------------------------------------------
-                         required time                         10.920    
-                         arrival time                          -8.789    
+                         required time                         10.684    
+                         arrival time                          -8.720    
   -------------------------------------------------------------------
-                         slack                                  2.131    
+                         slack                                  1.964    
 
-Slack (MET) :             2.183ns  (required time - arrival time)
-  Source:                 u_engine/state_reg_reg[0]_rep/C
+Slack (MET) :             1.964ns  (required time - arrival time)
+  Source:                 u_engine/gate_wr_clear_reg/C
                             (rising edge-triggered cell FDCE clocked by clk  {rise@0.000ns fall@5.000ns period=10.000ns})
-  Destination:            u_engine/s4_reg[61]/D
+  Destination:            u_engine/u_pt_gate/mem_reg[25][22]/CE
                             (rising edge-triggered cell FDCE clocked by clk  {rise@0.000ns fall@5.000ns period=10.000ns})
   Path Group:             clk
   Path Type:              Setup (Max at Slow Process Corner)
   Requirement:            10.000ns  (clk rise@10.000ns - clk rise@0.000ns)
-  Data Path Delay:        7.812ns  (logic 0.937ns (11.994%)  route 6.875ns (88.006%))
-  Logic Levels:           2  (LUT4=1 LUT6=1)
+  Data Path Delay:        7.747ns  (logic 0.580ns (7.487%)  route 7.167ns (92.513%))
+  Logic Levels:           1  (LUT6=1)
   Clock Path Skew:        -0.049ns (DCD - SCD + CPR)
     Destination Clock Delay (DCD):    0.924ns = ( 10.924 - 10.000 ) 
     Source Clock Delay      (SCD):    0.973ns
@@ -616,41 +632,39 @@ Slack (MET) :             2.183ns  (required time - arrival time)
   -------------------------------------------------------------------    -------------------
                          (clock clk rise edge)        0.000     0.000 r  
                                                       0.000     0.000 r  clk (IN)
-                         net (fo=4005, unset)         0.973     0.973    u_engine/clk
-    SLICE_X31Y24         FDCE                                         r  u_engine/state_reg_reg[0]_rep/C
+                         net (fo=4014, unset)         0.973     0.973    u_engine/clk
+    SLICE_X31Y36         FDCE                                         r  u_engine/gate_wr_clear_reg/C
   -------------------------------------------------------------------    -------------------
-    SLICE_X31Y24         FDCE (Prop_fdce_C_Q)         0.456     1.429 f  u_engine/state_reg_reg[0]_rep/Q
-                         net (fo=102, routed)         4.416     5.845    u_engine/state_reg_reg[0]_rep_n_0
-    SLICE_X11Y6          LUT4 (Prop_lut4_I0_O)        0.154     5.999 r  u_engine/s4[63]_i_4/O
-                         net (fo=64, routed)          2.459     8.458    u_engine/gen_perm_1r.u_perm/s4_reg[0]_1
-    SLICE_X8Y21          LUT6 (Prop_lut6_I1_O)        0.327     8.785 r  u_engine/gen_perm_1r.u_perm/s4[61]_i_1/O
-                         net (fo=1, routed)           0.000     8.785    u_engine/s4[61]
-    SLICE_X8Y21          FDCE                                         r  u_engine/s4_reg[61]/D
+    SLICE_X31Y36         FDCE (Prop_fdce_C_Q)         0.456     1.429 r  u_engine/gate_wr_clear_reg/Q
+                         net (fo=114, routed)         4.241     5.670    u_engine/u_pt_gate/gate_wr_clear
+    SLICE_X28Y9          LUT6 (Prop_lut6_I5_O)        0.124     5.794 r  u_engine/u_pt_gate/mem[25][63]_i_1/O
+                         net (fo=64, routed)          2.925     8.720    u_engine/u_pt_gate/mem[25][63]_i_1_n_0
+    SLICE_X37Y44         FDCE                                         r  u_engine/u_pt_gate/mem_reg[25][22]/CE
   -------------------------------------------------------------------    -------------------
 
                          (clock clk rise edge)       10.000    10.000 r  
                                                       0.000    10.000 r  clk (IN)
-                         net (fo=4005, unset)         0.924    10.924    u_engine/clk
-    SLICE_X8Y21          FDCE                                         r  u_engine/s4_reg[61]/C
+                         net (fo=4014, unset)         0.924    10.924    u_engine/u_pt_gate/clk
+    SLICE_X37Y44         FDCE                                         r  u_engine/u_pt_gate/mem_reg[25][22]/C
                          clock pessimism              0.000    10.924    
                          clock uncertainty           -0.035    10.889    
-    SLICE_X8Y21          FDCE (Setup_fdce_C_D)        0.079    10.968    u_engine/s4_reg[61]
+    SLICE_X37Y44         FDCE (Setup_fdce_C_CE)      -0.205    10.684    u_engine/u_pt_gate/mem_reg[25][22]
   -------------------------------------------------------------------
-                         required time                         10.968    
-                         arrival time                          -8.785    
+                         required time                         10.684    
+                         arrival time                          -8.720    
   -------------------------------------------------------------------
-                         slack                                  2.183    
+                         slack                                  1.964    
 
-Slack (MET) :             2.187ns  (required time - arrival time)
-  Source:                 u_engine/r_bytes_left_reg[10]/C
+Slack (MET) :             1.964ns  (required time - arrival time)
+  Source:                 u_engine/gate_wr_clear_reg/C
                             (rising edge-triggered cell FDCE clocked by clk  {rise@0.000ns fall@5.000ns period=10.000ns})
-  Destination:            u_engine/gate_wr_data_reg[3]/D
+  Destination:            u_engine/u_pt_gate/mem_reg[25][52]/CE
                             (rising edge-triggered cell FDCE clocked by clk  {rise@0.000ns fall@5.000ns period=10.000ns})
   Path Group:             clk
   Path Type:              Setup (Max at Slow Process Corner)
   Requirement:            10.000ns  (clk rise@10.000ns - clk rise@0.000ns)
-  Data Path Delay:        7.654ns  (logic 1.334ns (17.429%)  route 6.320ns (82.571%))
-  Logic Levels:           5  (LUT3=1 LUT4=1 LUT5=3)
+  Data Path Delay:        7.747ns  (logic 0.580ns (7.487%)  route 7.167ns (92.513%))
+  Logic Levels:           1  (LUT6=1)
   Clock Path Skew:        -0.049ns (DCD - SCD + CPR)
     Destination Clock Delay (DCD):    0.924ns = ( 10.924 - 10.000 ) 
     Source Clock Delay      (SCD):    0.973ns
@@ -665,36 +679,28 @@ Slack (MET) :             2.187ns  (required time - arrival time)
   -------------------------------------------------------------------    -------------------
                          (clock clk rise edge)        0.000     0.000 r  
                                                       0.000     0.000 r  clk (IN)
-                         net (fo=4005, unset)         0.973     0.973    u_engine/clk
-    SLICE_X42Y26         FDCE                                         r  u_engine/r_bytes_left_reg[10]/C
+                         net (fo=4014, unset)         0.973     0.973    u_engine/clk
+    SLICE_X31Y36         FDCE                                         r  u_engine/gate_wr_clear_reg/C
   -------------------------------------------------------------------    -------------------
-    SLICE_X42Y26         FDCE (Prop_fdce_C_Q)         0.518     1.491 r  u_engine/r_bytes_left_reg[10]/Q
-                         net (fo=4, routed)           0.788     2.279    u_engine/r_bytes_left_reg_n_0_[10]
-    SLICE_X39Y25         LUT4 (Prop_lut4_I0_O)        0.124     2.403 r  u_engine/data_out[63]_i_10/O
-                         net (fo=6, routed)           1.073     3.475    u_engine/data_out[63]_i_10_n_0
-    SLICE_X38Y25         LUT5 (Prop_lut5_I0_O)        0.124     3.599 f  u_engine/data_out[63]_i_8/O
-                         net (fo=13, routed)          1.149     4.749    u_engine/data_out[63]_i_8_n_0
-    SLICE_X30Y23         LUT3 (Prop_lut3_I0_O)        0.124     4.873 r  u_engine/data_out[63]_i_6/O
-                         net (fo=117, routed)         1.241     6.114    u_engine/data_out[63]_i_6_n_0
-    SLICE_X32Y10         LUT5 (Prop_lut5_I3_O)        0.116     6.230 r  u_engine/data_out[7]_i_2/O
-                         net (fo=8, routed)           0.962     7.191    u_engine/data_out[7]_i_2_n_0
-    SLICE_X29Y8          LUT5 (Prop_lut5_I1_O)        0.328     7.519 r  u_engine/data_out[3]_i_1/O
-                         net (fo=2, routed)           1.107     8.627    u_engine/gate_wr_data0_in[3]
-    SLICE_X35Y19         FDCE                                         r  u_engine/gate_wr_data_reg[3]/D
+    SLICE_X31Y36         FDCE (Prop_fdce_C_Q)         0.456     1.429 r  u_engine/gate_wr_clear_reg/Q
+                         net (fo=114, routed)         4.241     5.670    u_engine/u_pt_gate/gate_wr_clear
+    SLICE_X28Y9          LUT6 (Prop_lut6_I5_O)        0.124     5.794 r  u_engine/u_pt_gate/mem[25][63]_i_1/O
+                         net (fo=64, routed)          2.925     8.720    u_engine/u_pt_gate/mem[25][63]_i_1_n_0
+    SLICE_X37Y44         FDCE                                         r  u_engine/u_pt_gate/mem_reg[25][52]/CE
   -------------------------------------------------------------------    -------------------
 
                          (clock clk rise edge)       10.000    10.000 r  
                                                       0.000    10.000 r  clk (IN)
-                         net (fo=4005, unset)         0.924    10.924    u_engine/clk
-    SLICE_X35Y19         FDCE                                         r  u_engine/gate_wr_data_reg[3]/C
+                         net (fo=4014, unset)         0.924    10.924    u_engine/u_pt_gate/clk
+    SLICE_X37Y44         FDCE                                         r  u_engine/u_pt_gate/mem_reg[25][52]/C
                          clock pessimism              0.000    10.924    
                          clock uncertainty           -0.035    10.889    
-    SLICE_X35Y19         FDCE (Setup_fdce_C_D)       -0.075    10.814    u_engine/gate_wr_data_reg[3]
+    SLICE_X37Y44         FDCE (Setup_fdce_C_CE)      -0.205    10.684    u_engine/u_pt_gate/mem_reg[25][52]
   -------------------------------------------------------------------
-                         required time                         10.814    
-                         arrival time                          -8.627    
+                         required time                         10.684    
+                         arrival time                          -8.720    
   -------------------------------------------------------------------
-                         slack                                  2.187    
+                         slack                                  1.964    
 
 
 
@@ -702,16 +708,16 @@ Slack (MET) :             2.187ns  (required time - arrival time)
 
 Min Delay Paths
 --------------------------------------------------------------------------------------
-Slack (MET) :             0.098ns  (arrival time - required time)
-  Source:                 u_engine/perm_in_x1_reg[3]/C
+Slack (MET) :             0.109ns  (arrival time - required time)
+  Source:                 u_engine/s4_reg[32]/C
                             (rising edge-triggered cell FDCE clocked by clk  {rise@0.000ns fall@5.000ns period=10.000ns})
-  Destination:            u_engine/gen_perm_1r.u_perm/r_x1_reg[3]/D
+  Destination:            u_engine/perm_in_x4_reg[32]/D
                             (rising edge-triggered cell FDCE clocked by clk  {rise@0.000ns fall@5.000ns period=10.000ns})
   Path Group:             clk
   Path Type:              Hold (Min at Fast Process Corner)
   Requirement:            0.000ns  (clk rise@0.000ns - clk rise@0.000ns)
-  Data Path Delay:        0.240ns  (logic 0.186ns (77.466%)  route 0.054ns (22.534%))
-  Logic Levels:           1  (LUT6=1)
+  Data Path Delay:        0.251ns  (logic 0.186ns (74.042%)  route 0.065ns (25.958%))
+  Logic Levels:           1  (LUT5=1)
   Clock Path Skew:        0.022ns (DCD - SCD - CPR)
     Destination Clock Delay (DCD):    0.432ns
     Source Clock Delay      (SCD):    0.410ns
@@ -721,283 +727,37 @@ Slack (MET) :             0.098ns  (arrival time - required time)
   -------------------------------------------------------------------    -------------------
                          (clock clk rise edge)        0.000     0.000 r  
                                                       0.000     0.000 r  clk (IN)
-                         net (fo=4005, unset)         0.410     0.410    u_engine/clk
-    SLICE_X21Y9          FDCE                                         r  u_engine/perm_in_x1_reg[3]/C
+                         net (fo=4014, unset)         0.410     0.410    u_engine/clk
+    SLICE_X9Y31          FDCE                                         r  u_engine/s4_reg[32]/C
   -------------------------------------------------------------------    -------------------
-    SLICE_X21Y9          FDCE (Prop_fdce_C_Q)         0.141     0.551 r  u_engine/perm_in_x1_reg[3]/Q
-                         net (fo=1, routed)           0.054     0.605    u_engine/gen_perm_1r.u_perm/r_x1_reg[63]_0[3]
-    SLICE_X20Y9          LUT6 (Prop_lut6_I5_O)        0.045     0.650 r  u_engine/gen_perm_1r.u_perm/r_x1[3]_i_1/O
-                         net (fo=1, routed)           0.000     0.650    u_engine/gen_perm_1r.u_perm/r_x1[3]
-    SLICE_X20Y9          FDCE                                         r  u_engine/gen_perm_1r.u_perm/r_x1_reg[3]/D
+    SLICE_X9Y31          FDCE (Prop_fdce_C_Q)         0.141     0.551 r  u_engine/s4_reg[32]/Q
+                         net (fo=2, routed)           0.065     0.616    u_engine/s4_reg_n_0_[32]
+    SLICE_X8Y31          LUT5 (Prop_lut5_I4_O)        0.045     0.661 r  u_engine/perm_in_x4[32]_i_1/O
+                         net (fo=1, routed)           0.000     0.661    u_engine/perm_in_x4[32]
+    SLICE_X8Y31          FDCE                                         r  u_engine/perm_in_x4_reg[32]/D
   -------------------------------------------------------------------    -------------------
 
                          (clock clk rise edge)        0.000     0.000 r  
                                                       0.000     0.000 r  clk (IN)
-                         net (fo=4005, unset)         0.432     0.432    u_engine/gen_perm_1r.u_perm/clk
-    SLICE_X20Y9          FDCE                                         r  u_engine/gen_perm_1r.u_perm/r_x1_reg[3]/C
+                         net (fo=4014, unset)         0.432     0.432    u_engine/clk
+    SLICE_X8Y31          FDCE                                         r  u_engine/perm_in_x4_reg[32]/C
                          clock pessimism              0.000     0.432    
-    SLICE_X20Y9          FDCE (Hold_fdce_C_D)         0.121     0.553    u_engine/gen_perm_1r.u_perm/r_x1_reg[3]
+    SLICE_X8Y31          FDCE (Hold_fdce_C_D)         0.121     0.553    u_engine/perm_in_x4_reg[32]
   -------------------------------------------------------------------
                          required time                         -0.553    
-                         arrival time                           0.650    
+                         arrival time                           0.661    
   -------------------------------------------------------------------
-                         slack                                  0.098    
+                         slack                                  0.109    
 
-Slack (MET) :             0.098ns  (arrival time - required time)
-  Source:                 u_engine/s3_reg[32]/C
+Slack (MET) :             0.125ns  (arrival time - required time)
+  Source:                 u_engine/r_k0_reg[45]/C
                             (rising edge-triggered cell FDCE clocked by clk  {rise@0.000ns fall@5.000ns period=10.000ns})
-  Destination:            u_engine/perm_in_x3_reg[32]/D
+  Destination:            u_engine/r_tag_reg[45]/D
                             (rising edge-triggered cell FDCE clocked by clk  {rise@0.000ns fall@5.000ns period=10.000ns})
   Path Group:             clk
   Path Type:              Hold (Min at Fast Process Corner)
   Requirement:            0.000ns  (clk rise@0.000ns - clk rise@0.000ns)
-  Data Path Delay:        0.240ns  (logic 0.186ns (77.466%)  route 0.054ns (22.534%))
-  Logic Levels:           1  (LUT6=1)
-  Clock Path Skew:        0.022ns (DCD - SCD - CPR)
-    Destination Clock Delay (DCD):    0.432ns
-    Source Clock Delay      (SCD):    0.410ns
-    Clock Pessimism Removal (CPR):    -0.000ns
-
-    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
-  -------------------------------------------------------------------    -------------------
-                         (clock clk rise edge)        0.000     0.000 r  
-                                                      0.000     0.000 r  clk (IN)
-                         net (fo=4005, unset)         0.410     0.410    u_engine/clk
-    SLICE_X17Y15         FDCE                                         r  u_engine/s3_reg[32]/C
-  -------------------------------------------------------------------    -------------------
-    SLICE_X17Y15         FDCE (Prop_fdce_C_Q)         0.141     0.551 r  u_engine/s3_reg[32]/Q
-                         net (fo=1, routed)           0.054     0.605    u_engine/s3_reg_n_0_[32]
-    SLICE_X16Y15         LUT6 (Prop_lut6_I2_O)        0.045     0.650 r  u_engine/perm_in_x3[32]_i_1/O
-                         net (fo=1, routed)           0.000     0.650    u_engine/perm_in_x3[32]
-    SLICE_X16Y15         FDCE                                         r  u_engine/perm_in_x3_reg[32]/D
-  -------------------------------------------------------------------    -------------------
-
-                         (clock clk rise edge)        0.000     0.000 r  
-                                                      0.000     0.000 r  clk (IN)
-                         net (fo=4005, unset)         0.432     0.432    u_engine/clk
-    SLICE_X16Y15         FDCE                                         r  u_engine/perm_in_x3_reg[32]/C
-                         clock pessimism              0.000     0.432    
-    SLICE_X16Y15         FDCE (Hold_fdce_C_D)         0.121     0.553    u_engine/perm_in_x3_reg[32]
-  -------------------------------------------------------------------
-                         required time                         -0.553    
-                         arrival time                           0.650    
-  -------------------------------------------------------------------
-                         slack                                  0.098    
-
-Slack (MET) :             0.130ns  (arrival time - required time)
-  Source:                 u_engine/perm_in_x2_reg[30]/C
-                            (rising edge-triggered cell FDCE clocked by clk  {rise@0.000ns fall@5.000ns period=10.000ns})
-  Destination:            u_engine/gen_perm_1r.u_perm/r_x2_reg[30]/D
-                            (rising edge-triggered cell FDCE clocked by clk  {rise@0.000ns fall@5.000ns period=10.000ns})
-  Path Group:             clk
-  Path Type:              Hold (Min at Fast Process Corner)
-  Requirement:            0.000ns  (clk rise@0.000ns - clk rise@0.000ns)
-  Data Path Delay:        0.243ns  (logic 0.186ns (76.391%)  route 0.057ns (23.609%))
-  Logic Levels:           1  (LUT6=1)
-  Clock Path Skew:        0.022ns (DCD - SCD - CPR)
-    Destination Clock Delay (DCD):    0.432ns
-    Source Clock Delay      (SCD):    0.410ns
-    Clock Pessimism Removal (CPR):    -0.000ns
-
-    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
-  -------------------------------------------------------------------    -------------------
-                         (clock clk rise edge)        0.000     0.000 r  
-                                                      0.000     0.000 r  clk (IN)
-                         net (fo=4005, unset)         0.410     0.410    u_engine/clk
-    SLICE_X19Y13         FDCE                                         r  u_engine/perm_in_x2_reg[30]/C
-  -------------------------------------------------------------------    -------------------
-    SLICE_X19Y13         FDCE (Prop_fdce_C_Q)         0.141     0.551 r  u_engine/perm_in_x2_reg[30]/Q
-                         net (fo=1, routed)           0.057     0.609    u_engine/gen_perm_1r.u_perm/r_x2_reg[63]_0[30]
-    SLICE_X18Y13         LUT6 (Prop_lut6_I5_O)        0.045     0.654 r  u_engine/gen_perm_1r.u_perm/r_x2[30]_i_1/O
-                         net (fo=1, routed)           0.000     0.654    u_engine/gen_perm_1r.u_perm/r_x2[30]
-    SLICE_X18Y13         FDCE                                         r  u_engine/gen_perm_1r.u_perm/r_x2_reg[30]/D
-  -------------------------------------------------------------------    -------------------
-
-                         (clock clk rise edge)        0.000     0.000 r  
-                                                      0.000     0.000 r  clk (IN)
-                         net (fo=4005, unset)         0.432     0.432    u_engine/gen_perm_1r.u_perm/clk
-    SLICE_X18Y13         FDCE                                         r  u_engine/gen_perm_1r.u_perm/r_x2_reg[30]/C
-                         clock pessimism              0.000     0.432    
-    SLICE_X18Y13         FDCE (Hold_fdce_C_D)         0.092     0.524    u_engine/gen_perm_1r.u_perm/r_x2_reg[30]
-  -------------------------------------------------------------------
-                         required time                         -0.524    
-                         arrival time                           0.654    
-  -------------------------------------------------------------------
-                         slack                                  0.130    
-
-Slack (MET) :             0.130ns  (arrival time - required time)
-  Source:                 u_engine/perm_in_x2_reg[33]/C
-                            (rising edge-triggered cell FDCE clocked by clk  {rise@0.000ns fall@5.000ns period=10.000ns})
-  Destination:            u_engine/gen_perm_1r.u_perm/r_x2_reg[33]/D
-                            (rising edge-triggered cell FDCE clocked by clk  {rise@0.000ns fall@5.000ns period=10.000ns})
-  Path Group:             clk
-  Path Type:              Hold (Min at Fast Process Corner)
-  Requirement:            0.000ns  (clk rise@0.000ns - clk rise@0.000ns)
-  Data Path Delay:        0.243ns  (logic 0.186ns (76.391%)  route 0.057ns (23.609%))
-  Logic Levels:           1  (LUT6=1)
-  Clock Path Skew:        0.022ns (DCD - SCD - CPR)
-    Destination Clock Delay (DCD):    0.432ns
-    Source Clock Delay      (SCD):    0.410ns
-    Clock Pessimism Removal (CPR):    -0.000ns
-
-    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
-  -------------------------------------------------------------------    -------------------
-                         (clock clk rise edge)        0.000     0.000 r  
-                                                      0.000     0.000 r  clk (IN)
-                         net (fo=4005, unset)         0.410     0.410    u_engine/clk
-    SLICE_X19Y15         FDCE                                         r  u_engine/perm_in_x2_reg[33]/C
-  -------------------------------------------------------------------    -------------------
-    SLICE_X19Y15         FDCE (Prop_fdce_C_Q)         0.141     0.551 r  u_engine/perm_in_x2_reg[33]/Q
-                         net (fo=1, routed)           0.057     0.609    u_engine/gen_perm_1r.u_perm/r_x2_reg[63]_0[33]
-    SLICE_X18Y15         LUT6 (Prop_lut6_I5_O)        0.045     0.654 r  u_engine/gen_perm_1r.u_perm/r_x2[33]_i_1/O
-                         net (fo=1, routed)           0.000     0.654    u_engine/gen_perm_1r.u_perm/r_x2[33]
-    SLICE_X18Y15         FDCE                                         r  u_engine/gen_perm_1r.u_perm/r_x2_reg[33]/D
-  -------------------------------------------------------------------    -------------------
-
-                         (clock clk rise edge)        0.000     0.000 r  
-                                                      0.000     0.000 r  clk (IN)
-                         net (fo=4005, unset)         0.432     0.432    u_engine/gen_perm_1r.u_perm/clk
-    SLICE_X18Y15         FDCE                                         r  u_engine/gen_perm_1r.u_perm/r_x2_reg[33]/C
-                         clock pessimism              0.000     0.432    
-    SLICE_X18Y15         FDCE (Hold_fdce_C_D)         0.092     0.524    u_engine/gen_perm_1r.u_perm/r_x2_reg[33]
-  -------------------------------------------------------------------
-                         required time                         -0.524    
-                         arrival time                           0.654    
-  -------------------------------------------------------------------
-                         slack                                  0.130    
-
-Slack (MET) :             0.133ns  (arrival time - required time)
-  Source:                 u_engine/perm_in_x2_reg[40]/C
-                            (rising edge-triggered cell FDCE clocked by clk  {rise@0.000ns fall@5.000ns period=10.000ns})
-  Destination:            u_engine/gen_perm_1r.u_perm/r_x2_reg[40]/D
-                            (rising edge-triggered cell FDCE clocked by clk  {rise@0.000ns fall@5.000ns period=10.000ns})
-  Path Group:             clk
-  Path Type:              Hold (Min at Fast Process Corner)
-  Requirement:            0.000ns  (clk rise@0.000ns - clk rise@0.000ns)
-  Data Path Delay:        0.275ns  (logic 0.186ns (67.611%)  route 0.089ns (32.389%))
-  Logic Levels:           1  (LUT6=1)
-  Clock Path Skew:        0.022ns (DCD - SCD - CPR)
-    Destination Clock Delay (DCD):    0.432ns
-    Source Clock Delay      (SCD):    0.410ns
-    Clock Pessimism Removal (CPR):    -0.000ns
-
-    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
-  -------------------------------------------------------------------    -------------------
-                         (clock clk rise edge)        0.000     0.000 r  
-                                                      0.000     0.000 r  clk (IN)
-                         net (fo=4005, unset)         0.410     0.410    u_engine/clk
-    SLICE_X17Y17         FDCE                                         r  u_engine/perm_in_x2_reg[40]/C
-  -------------------------------------------------------------------    -------------------
-    SLICE_X17Y17         FDCE (Prop_fdce_C_Q)         0.141     0.551 r  u_engine/perm_in_x2_reg[40]/Q
-                         net (fo=1, routed)           0.089     0.640    u_engine/gen_perm_1r.u_perm/r_x2_reg[63]_0[40]
-    SLICE_X16Y17         LUT6 (Prop_lut6_I5_O)        0.045     0.685 r  u_engine/gen_perm_1r.u_perm/r_x2[40]_i_1/O
-                         net (fo=1, routed)           0.000     0.685    u_engine/gen_perm_1r.u_perm/r_x2[40]
-    SLICE_X16Y17         FDCE                                         r  u_engine/gen_perm_1r.u_perm/r_x2_reg[40]/D
-  -------------------------------------------------------------------    -------------------
-
-                         (clock clk rise edge)        0.000     0.000 r  
-                                                      0.000     0.000 r  clk (IN)
-                         net (fo=4005, unset)         0.432     0.432    u_engine/gen_perm_1r.u_perm/clk
-    SLICE_X16Y17         FDCE                                         r  u_engine/gen_perm_1r.u_perm/r_x2_reg[40]/C
-                         clock pessimism              0.000     0.432    
-    SLICE_X16Y17         FDCE (Hold_fdce_C_D)         0.121     0.553    u_engine/gen_perm_1r.u_perm/r_x2_reg[40]
-  -------------------------------------------------------------------
-                         required time                         -0.553    
-                         arrival time                           0.685    
-  -------------------------------------------------------------------
-                         slack                                  0.133    
-
-Slack (MET) :             0.135ns  (arrival time - required time)
-  Source:                 u_engine/perm_in_x2_reg[36]/C
-                            (rising edge-triggered cell FDCE clocked by clk  {rise@0.000ns fall@5.000ns period=10.000ns})
-  Destination:            u_engine/gen_perm_1r.u_perm/r_x2_reg[36]/D
-                            (rising edge-triggered cell FDCE clocked by clk  {rise@0.000ns fall@5.000ns period=10.000ns})
-  Path Group:             clk
-  Path Type:              Hold (Min at Fast Process Corner)
-  Requirement:            0.000ns  (clk rise@0.000ns - clk rise@0.000ns)
-  Data Path Delay:        0.277ns  (logic 0.186ns (67.123%)  route 0.091ns (32.877%))
-  Logic Levels:           1  (LUT6=1)
-  Clock Path Skew:        0.022ns (DCD - SCD - CPR)
-    Destination Clock Delay (DCD):    0.432ns
-    Source Clock Delay      (SCD):    0.410ns
-    Clock Pessimism Removal (CPR):    -0.000ns
-
-    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
-  -------------------------------------------------------------------    -------------------
-                         (clock clk rise edge)        0.000     0.000 r  
-                                                      0.000     0.000 r  clk (IN)
-                         net (fo=4005, unset)         0.410     0.410    u_engine/clk
-    SLICE_X17Y17         FDCE                                         r  u_engine/perm_in_x2_reg[36]/C
-  -------------------------------------------------------------------    -------------------
-    SLICE_X17Y17         FDCE (Prop_fdce_C_Q)         0.141     0.551 r  u_engine/perm_in_x2_reg[36]/Q
-                         net (fo=1, routed)           0.091     0.642    u_engine/gen_perm_1r.u_perm/r_x2_reg[63]_0[36]
-    SLICE_X16Y17         LUT6 (Prop_lut6_I5_O)        0.045     0.687 r  u_engine/gen_perm_1r.u_perm/r_x2[36]_i_1/O
-                         net (fo=1, routed)           0.000     0.687    u_engine/gen_perm_1r.u_perm/r_x2[36]
-    SLICE_X16Y17         FDCE                                         r  u_engine/gen_perm_1r.u_perm/r_x2_reg[36]/D
-  -------------------------------------------------------------------    -------------------
-
-                         (clock clk rise edge)        0.000     0.000 r  
-                                                      0.000     0.000 r  clk (IN)
-                         net (fo=4005, unset)         0.432     0.432    u_engine/gen_perm_1r.u_perm/clk
-    SLICE_X16Y17         FDCE                                         r  u_engine/gen_perm_1r.u_perm/r_x2_reg[36]/C
-                         clock pessimism              0.000     0.432    
-    SLICE_X16Y17         FDCE (Hold_fdce_C_D)         0.121     0.553    u_engine/gen_perm_1r.u_perm/r_x2_reg[36]
-  -------------------------------------------------------------------
-                         required time                         -0.553    
-                         arrival time                           0.687    
-  -------------------------------------------------------------------
-                         slack                                  0.135    
-
-Slack (MET) :             0.135ns  (arrival time - required time)
-  Source:                 u_engine/s2_reg[17]/C
-                            (rising edge-triggered cell FDCE clocked by clk  {rise@0.000ns fall@5.000ns period=10.000ns})
-  Destination:            u_engine/perm_in_x2_reg[17]/D
-                            (rising edge-triggered cell FDCE clocked by clk  {rise@0.000ns fall@5.000ns period=10.000ns})
-  Path Group:             clk
-  Path Type:              Hold (Min at Fast Process Corner)
-  Requirement:            0.000ns  (clk rise@0.000ns - clk rise@0.000ns)
-  Data Path Delay:        0.277ns  (logic 0.186ns (67.123%)  route 0.091ns (32.877%))
-  Logic Levels:           1  (LUT6=1)
-  Clock Path Skew:        0.022ns (DCD - SCD - CPR)
-    Destination Clock Delay (DCD):    0.432ns
-    Source Clock Delay      (SCD):    0.410ns
-    Clock Pessimism Removal (CPR):    -0.000ns
-
-    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
-  -------------------------------------------------------------------    -------------------
-                         (clock clk rise edge)        0.000     0.000 r  
-                                                      0.000     0.000 r  clk (IN)
-                         net (fo=4005, unset)         0.410     0.410    u_engine/clk
-    SLICE_X17Y11         FDCE                                         r  u_engine/s2_reg[17]/C
-  -------------------------------------------------------------------    -------------------
-    SLICE_X17Y11         FDCE (Prop_fdce_C_Q)         0.141     0.551 r  u_engine/s2_reg[17]/Q
-                         net (fo=1, routed)           0.091     0.642    u_engine/s2_reg_n_0_[17]
-    SLICE_X16Y11         LUT6 (Prop_lut6_I2_O)        0.045     0.687 r  u_engine/perm_in_x2[17]_i_1/O
-                         net (fo=1, routed)           0.000     0.687    u_engine/perm_in_x2[17]
-    SLICE_X16Y11         FDCE                                         r  u_engine/perm_in_x2_reg[17]/D
-  -------------------------------------------------------------------    -------------------
-
-                         (clock clk rise edge)        0.000     0.000 r  
-                                                      0.000     0.000 r  clk (IN)
-                         net (fo=4005, unset)         0.432     0.432    u_engine/clk
-    SLICE_X16Y11         FDCE                                         r  u_engine/perm_in_x2_reg[17]/C
-                         clock pessimism              0.000     0.432    
-    SLICE_X16Y11         FDCE (Hold_fdce_C_D)         0.121     0.553    u_engine/perm_in_x2_reg[17]
-  -------------------------------------------------------------------
-                         required time                         -0.553    
-                         arrival time                           0.687    
-  -------------------------------------------------------------------
-                         slack                                  0.135    
-
-Slack (MET) :             0.145ns  (arrival time - required time)
-  Source:                 u_engine/gen_perm_1r.u_perm/r_x3_reg[19]/C
-                            (rising edge-triggered cell FDCE clocked by clk  {rise@0.000ns fall@5.000ns period=10.000ns})
-  Destination:            u_engine/r_tag_reg[19]/D
-                            (rising edge-triggered cell FDCE clocked by clk  {rise@0.000ns fall@5.000ns period=10.000ns})
-  Path Group:             clk
-  Path Type:              Hold (Min at Fast Process Corner)
-  Requirement:            0.000ns  (clk rise@0.000ns - clk rise@0.000ns)
-  Data Path Delay:        0.287ns  (logic 0.186ns (64.889%)  route 0.101ns (35.111%))
+  Data Path Delay:        0.266ns  (logic 0.186ns (69.810%)  route 0.080ns (30.190%))
   Logic Levels:           1  (LUT2=1)
   Clock Path Skew:        0.022ns (DCD - SCD - CPR)
     Destination Clock Delay (DCD):    0.432ns
@@ -1008,37 +768,37 @@ Slack (MET) :             0.145ns  (arrival time - required time)
   -------------------------------------------------------------------    -------------------
                          (clock clk rise edge)        0.000     0.000 r  
                                                       0.000     0.000 r  clk (IN)
-                         net (fo=4005, unset)         0.410     0.410    u_engine/gen_perm_1r.u_perm/clk
-    SLICE_X13Y9          FDCE                                         r  u_engine/gen_perm_1r.u_perm/r_x3_reg[19]/C
+                         net (fo=4014, unset)         0.410     0.410    u_engine/clk
+    SLICE_X13Y31         FDCE                                         r  u_engine/r_k0_reg[45]/C
   -------------------------------------------------------------------    -------------------
-    SLICE_X13Y9          FDCE (Prop_fdce_C_Q)         0.141     0.551 r  u_engine/gen_perm_1r.u_perm/r_x3_reg[19]/Q
-                         net (fo=7, routed)           0.101     0.652    u_engine/gen_perm_1r.u_perm/perm_out_x3[19]
-    SLICE_X12Y9          LUT2 (Prop_lut2_I0_O)        0.045     0.697 r  u_engine/gen_perm_1r.u_perm/r_tag[19]_i_1/O
-                         net (fo=1, routed)           0.000     0.697    u_engine/s30[19]
-    SLICE_X12Y9          FDCE                                         r  u_engine/r_tag_reg[19]/D
+    SLICE_X13Y31         FDCE (Prop_fdce_C_Q)         0.141     0.551 r  u_engine/r_k0_reg[45]/Q
+                         net (fo=3, routed)           0.080     0.632    u_engine/gen_perm_1r.u_perm/s3_reg[63]_0[45]
+    SLICE_X12Y31         LUT2 (Prop_lut2_I1_O)        0.045     0.677 r  u_engine/gen_perm_1r.u_perm/r_tag[45]_i_1/O
+                         net (fo=1, routed)           0.000     0.677    u_engine/s30[45]
+    SLICE_X12Y31         FDCE                                         r  u_engine/r_tag_reg[45]/D
   -------------------------------------------------------------------    -------------------
 
                          (clock clk rise edge)        0.000     0.000 r  
                                                       0.000     0.000 r  clk (IN)
-                         net (fo=4005, unset)         0.432     0.432    u_engine/clk
-    SLICE_X12Y9          FDCE                                         r  u_engine/r_tag_reg[19]/C
+                         net (fo=4014, unset)         0.432     0.432    u_engine/clk
+    SLICE_X12Y31         FDCE                                         r  u_engine/r_tag_reg[45]/C
                          clock pessimism              0.000     0.432    
-    SLICE_X12Y9          FDCE (Hold_fdce_C_D)         0.120     0.552    u_engine/r_tag_reg[19]
+    SLICE_X12Y31         FDCE (Hold_fdce_C_D)         0.120     0.552    u_engine/r_tag_reg[45]
   -------------------------------------------------------------------
                          required time                         -0.552    
-                         arrival time                           0.697    
+                         arrival time                           0.677    
   -------------------------------------------------------------------
-                         slack                                  0.145    
+                         slack                                  0.125    
 
-Slack (MET) :             0.155ns  (arrival time - required time)
-  Source:                 u_engine/perm_in_x2_reg[57]/C
+Slack (MET) :             0.132ns  (arrival time - required time)
+  Source:                 u_engine/perm_in_x2_reg[17]/C
                             (rising edge-triggered cell FDCE clocked by clk  {rise@0.000ns fall@5.000ns period=10.000ns})
-  Destination:            u_engine/gen_perm_1r.u_perm/r_x2_reg[57]/D
+  Destination:            u_engine/gen_perm_1r.u_perm/r_x2_reg[17]/D
                             (rising edge-triggered cell FDCE clocked by clk  {rise@0.000ns fall@5.000ns period=10.000ns})
   Path Group:             clk
   Path Type:              Hold (Min at Fast Process Corner)
   Requirement:            0.000ns  (clk rise@0.000ns - clk rise@0.000ns)
-  Data Path Delay:        0.297ns  (logic 0.186ns (62.564%)  route 0.111ns (37.436%))
+  Data Path Delay:        0.273ns  (logic 0.186ns (68.106%)  route 0.087ns (31.894%))
   Logic Levels:           1  (LUT6=1)
   Clock Path Skew:        0.022ns (DCD - SCD - CPR)
     Destination Clock Delay (DCD):    0.432ns
@@ -1049,38 +809,38 @@ Slack (MET) :             0.155ns  (arrival time - required time)
   -------------------------------------------------------------------    -------------------
                          (clock clk rise edge)        0.000     0.000 r  
                                                       0.000     0.000 r  clk (IN)
-                         net (fo=4005, unset)         0.410     0.410    u_engine/clk
-    SLICE_X19Y23         FDCE                                         r  u_engine/perm_in_x2_reg[57]/C
+                         net (fo=4014, unset)         0.410     0.410    u_engine/clk
+    SLICE_X21Y24         FDCE                                         r  u_engine/perm_in_x2_reg[17]/C
   -------------------------------------------------------------------    -------------------
-    SLICE_X19Y23         FDCE (Prop_fdce_C_Q)         0.141     0.551 r  u_engine/perm_in_x2_reg[57]/Q
-                         net (fo=1, routed)           0.111     0.662    u_engine/gen_perm_1r.u_perm/r_x2_reg[63]_0[57]
-    SLICE_X20Y22         LUT6 (Prop_lut6_I5_O)        0.045     0.707 r  u_engine/gen_perm_1r.u_perm/r_x2[57]_i_1/O
-                         net (fo=1, routed)           0.000     0.707    u_engine/gen_perm_1r.u_perm/r_x2[57]
-    SLICE_X20Y22         FDCE                                         r  u_engine/gen_perm_1r.u_perm/r_x2_reg[57]/D
+    SLICE_X21Y24         FDCE (Prop_fdce_C_Q)         0.141     0.551 r  u_engine/perm_in_x2_reg[17]/Q
+                         net (fo=1, routed)           0.087     0.638    u_engine/gen_perm_1r.u_perm/r_x2_reg[63]_1[17]
+    SLICE_X20Y24         LUT6 (Prop_lut6_I5_O)        0.045     0.683 r  u_engine/gen_perm_1r.u_perm/r_x2[17]_i_1/O
+                         net (fo=1, routed)           0.000     0.683    u_engine/gen_perm_1r.u_perm/r_x2[17]
+    SLICE_X20Y24         FDCE                                         r  u_engine/gen_perm_1r.u_perm/r_x2_reg[17]/D
   -------------------------------------------------------------------    -------------------
 
                          (clock clk rise edge)        0.000     0.000 r  
                                                       0.000     0.000 r  clk (IN)
-                         net (fo=4005, unset)         0.432     0.432    u_engine/gen_perm_1r.u_perm/clk
-    SLICE_X20Y22         FDCE                                         r  u_engine/gen_perm_1r.u_perm/r_x2_reg[57]/C
+                         net (fo=4014, unset)         0.432     0.432    u_engine/gen_perm_1r.u_perm/clk
+    SLICE_X20Y24         FDCE                                         r  u_engine/gen_perm_1r.u_perm/r_x2_reg[17]/C
                          clock pessimism              0.000     0.432    
-    SLICE_X20Y22         FDCE (Hold_fdce_C_D)         0.121     0.553    u_engine/gen_perm_1r.u_perm/r_x2_reg[57]
+    SLICE_X20Y24         FDCE (Hold_fdce_C_D)         0.120     0.552    u_engine/gen_perm_1r.u_perm/r_x2_reg[17]
   -------------------------------------------------------------------
-                         required time                         -0.553    
-                         arrival time                           0.707    
+                         required time                         -0.552    
+                         arrival time                           0.683    
   -------------------------------------------------------------------
-                         slack                                  0.155    
+                         slack                                  0.132    
 
-Slack (MET) :             0.157ns  (arrival time - required time)
-  Source:                 u_engine/gen_perm_1r.u_perm/r_x2_reg[53]/C
+Slack (MET) :             0.139ns  (arrival time - required time)
+  Source:                 u_engine/r_k0_reg[14]/C
                             (rising edge-triggered cell FDCE clocked by clk  {rise@0.000ns fall@5.000ns period=10.000ns})
-  Destination:            u_engine/s2_reg[53]/D
+  Destination:            u_engine/perm_in_x2_reg[14]/D
                             (rising edge-triggered cell FDCE clocked by clk  {rise@0.000ns fall@5.000ns period=10.000ns})
   Path Group:             clk
   Path Type:              Hold (Min at Fast Process Corner)
   Requirement:            0.000ns  (clk rise@0.000ns - clk rise@0.000ns)
-  Data Path Delay:        0.225ns  (logic 0.164ns (72.791%)  route 0.061ns (27.209%))
-  Logic Levels:           0  
+  Data Path Delay:        0.252ns  (logic 0.186ns (73.665%)  route 0.066ns (26.335%))
+  Logic Levels:           1  (LUT6=1)
   Clock Path Skew:        0.022ns (DCD - SCD - CPR)
     Destination Clock Delay (DCD):    0.432ns
     Source Clock Delay      (SCD):    0.410ns
@@ -1090,25 +850,273 @@ Slack (MET) :             0.157ns  (arrival time - required time)
   -------------------------------------------------------------------    -------------------
                          (clock clk rise edge)        0.000     0.000 r  
                                                       0.000     0.000 r  clk (IN)
-                         net (fo=4005, unset)         0.410     0.410    u_engine/gen_perm_1r.u_perm/clk
-    SLICE_X16Y23         FDCE                                         r  u_engine/gen_perm_1r.u_perm/r_x2_reg[53]/C
+                         net (fo=4014, unset)         0.410     0.410    u_engine/clk
+    SLICE_X18Y17         FDCE                                         r  u_engine/r_k0_reg[14]/C
   -------------------------------------------------------------------    -------------------
-    SLICE_X16Y23         FDCE (Prop_fdce_C_Q)         0.164     0.574 r  u_engine/gen_perm_1r.u_perm/r_x2_reg[53]/Q
-                         net (fo=5, routed)           0.061     0.635    u_engine/perm_out_x2[53]
-    SLICE_X17Y23         FDCE                                         r  u_engine/s2_reg[53]/D
+    SLICE_X18Y17         FDCE (Prop_fdce_C_Q)         0.141     0.551 r  u_engine/r_k0_reg[14]/Q
+                         net (fo=3, routed)           0.066     0.618    u_engine/r_k0_reg_n_0_[14]
+    SLICE_X19Y17         LUT6 (Prop_lut6_I1_O)        0.045     0.663 r  u_engine/perm_in_x2[14]_i_1/O
+                         net (fo=1, routed)           0.000     0.663    u_engine/perm_in_x2[14]
+    SLICE_X19Y17         FDCE                                         r  u_engine/perm_in_x2_reg[14]/D
   -------------------------------------------------------------------    -------------------
 
                          (clock clk rise edge)        0.000     0.000 r  
                                                       0.000     0.000 r  clk (IN)
-                         net (fo=4005, unset)         0.432     0.432    u_engine/clk
-    SLICE_X17Y23         FDCE                                         r  u_engine/s2_reg[53]/C
+                         net (fo=4014, unset)         0.432     0.432    u_engine/clk
+    SLICE_X19Y17         FDCE                                         r  u_engine/perm_in_x2_reg[14]/C
                          clock pessimism              0.000     0.432    
-    SLICE_X17Y23         FDCE (Hold_fdce_C_D)         0.047     0.479    u_engine/s2_reg[53]
+    SLICE_X19Y17         FDCE (Hold_fdce_C_D)         0.092     0.524    u_engine/perm_in_x2_reg[14]
   -------------------------------------------------------------------
-                         required time                         -0.479    
-                         arrival time                           0.635    
+                         required time                         -0.524    
+                         arrival time                           0.663    
   -------------------------------------------------------------------
-                         slack                                  0.157    
+                         slack                                  0.139    
+
+Slack (MET) :             0.143ns  (arrival time - required time)
+  Source:                 u_engine/r_k1_reg[0]/C
+                            (rising edge-triggered cell FDCE clocked by clk  {rise@0.000ns fall@5.000ns period=10.000ns})
+  Destination:            u_engine/perm_in_x3_reg[0]/D
+                            (rising edge-triggered cell FDCE clocked by clk  {rise@0.000ns fall@5.000ns period=10.000ns})
+  Path Group:             clk
+  Path Type:              Hold (Min at Fast Process Corner)
+  Requirement:            0.000ns  (clk rise@0.000ns - clk rise@0.000ns)
+  Data Path Delay:        0.284ns  (logic 0.186ns (65.445%)  route 0.098ns (34.555%))
+  Logic Levels:           1  (LUT6=1)
+  Clock Path Skew:        0.022ns (DCD - SCD - CPR)
+    Destination Clock Delay (DCD):    0.432ns
+    Source Clock Delay      (SCD):    0.410ns
+    Clock Pessimism Removal (CPR):    -0.000ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock clk rise edge)        0.000     0.000 r  
+                                                      0.000     0.000 r  clk (IN)
+                         net (fo=4014, unset)         0.410     0.410    u_engine/clk
+    SLICE_X9Y19          FDCE                                         r  u_engine/r_k1_reg[0]/C
+  -------------------------------------------------------------------    -------------------
+    SLICE_X9Y19          FDCE (Prop_fdce_C_Q)         0.141     0.551 r  u_engine/r_k1_reg[0]/Q
+                         net (fo=3, routed)           0.098     0.649    u_engine/r_k1[0]
+    SLICE_X8Y19          LUT6 (Prop_lut6_I1_O)        0.045     0.694 r  u_engine/perm_in_x3[0]_i_1/O
+                         net (fo=1, routed)           0.000     0.694    u_engine/perm_in_x3[0]
+    SLICE_X8Y19          FDCE                                         r  u_engine/perm_in_x3_reg[0]/D
+  -------------------------------------------------------------------    -------------------
+
+                         (clock clk rise edge)        0.000     0.000 r  
+                                                      0.000     0.000 r  clk (IN)
+                         net (fo=4014, unset)         0.432     0.432    u_engine/clk
+    SLICE_X8Y19          FDCE                                         r  u_engine/perm_in_x3_reg[0]/C
+                         clock pessimism              0.000     0.432    
+    SLICE_X8Y19          FDCE (Hold_fdce_C_D)         0.120     0.552    u_engine/perm_in_x3_reg[0]
+  -------------------------------------------------------------------
+                         required time                         -0.552    
+                         arrival time                           0.694    
+  -------------------------------------------------------------------
+                         slack                                  0.143    
+
+Slack (MET) :             0.145ns  (arrival time - required time)
+  Source:                 u_engine/r_k0_reg[8]/C
+                            (rising edge-triggered cell FDCE clocked by clk  {rise@0.000ns fall@5.000ns period=10.000ns})
+  Destination:            u_engine/s3_reg[8]/D
+                            (rising edge-triggered cell FDCE clocked by clk  {rise@0.000ns fall@5.000ns period=10.000ns})
+  Path Group:             clk
+  Path Type:              Hold (Min at Fast Process Corner)
+  Requirement:            0.000ns  (clk rise@0.000ns - clk rise@0.000ns)
+  Data Path Delay:        0.287ns  (logic 0.186ns (64.755%)  route 0.101ns (35.245%))
+  Logic Levels:           1  (LUT6=1)
+  Clock Path Skew:        0.022ns (DCD - SCD - CPR)
+    Destination Clock Delay (DCD):    0.432ns
+    Source Clock Delay      (SCD):    0.410ns
+    Clock Pessimism Removal (CPR):    -0.000ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock clk rise edge)        0.000     0.000 r  
+                                                      0.000     0.000 r  clk (IN)
+                         net (fo=4014, unset)         0.410     0.410    u_engine/clk
+    SLICE_X13Y18         FDCE                                         r  u_engine/r_k0_reg[8]/C
+  -------------------------------------------------------------------    -------------------
+    SLICE_X13Y18         FDCE (Prop_fdce_C_Q)         0.141     0.551 r  u_engine/r_k0_reg[8]/Q
+                         net (fo=3, routed)           0.101     0.652    u_engine/gen_perm_1r.u_perm/s3_reg[63]_0[8]
+    SLICE_X12Y18         LUT6 (Prop_lut6_I5_O)        0.045     0.697 r  u_engine/gen_perm_1r.u_perm/s3[8]_i_1/O
+                         net (fo=1, routed)           0.000     0.697    u_engine/s3[8]
+    SLICE_X12Y18         FDCE                                         r  u_engine/s3_reg[8]/D
+  -------------------------------------------------------------------    -------------------
+
+                         (clock clk rise edge)        0.000     0.000 r  
+                                                      0.000     0.000 r  clk (IN)
+                         net (fo=4014, unset)         0.432     0.432    u_engine/clk
+    SLICE_X12Y18         FDCE                                         r  u_engine/s3_reg[8]/C
+                         clock pessimism              0.000     0.432    
+    SLICE_X12Y18         FDCE (Hold_fdce_C_D)         0.121     0.553    u_engine/s3_reg[8]
+  -------------------------------------------------------------------
+                         required time                         -0.553    
+                         arrival time                           0.697    
+  -------------------------------------------------------------------
+                         slack                                  0.145    
+
+Slack (MET) :             0.146ns  (arrival time - required time)
+  Source:                 u_engine/s3_reg[20]/C
+                            (rising edge-triggered cell FDCE clocked by clk  {rise@0.000ns fall@5.000ns period=10.000ns})
+  Destination:            u_engine/perm_in_x3_reg[20]/D
+                            (rising edge-triggered cell FDCE clocked by clk  {rise@0.000ns fall@5.000ns period=10.000ns})
+  Path Group:             clk
+  Path Type:              Hold (Min at Fast Process Corner)
+  Requirement:            0.000ns  (clk rise@0.000ns - clk rise@0.000ns)
+  Data Path Delay:        0.288ns  (logic 0.186ns (64.537%)  route 0.102ns (35.463%))
+  Logic Levels:           1  (LUT4=1)
+  Clock Path Skew:        0.022ns (DCD - SCD - CPR)
+    Destination Clock Delay (DCD):    0.432ns
+    Source Clock Delay      (SCD):    0.410ns
+    Clock Pessimism Removal (CPR):    -0.000ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock clk rise edge)        0.000     0.000 r  
+                                                      0.000     0.000 r  clk (IN)
+                         net (fo=4014, unset)         0.410     0.410    u_engine/clk
+    SLICE_X17Y23         FDCE                                         r  u_engine/s3_reg[20]/C
+  -------------------------------------------------------------------    -------------------
+    SLICE_X17Y23         FDCE (Prop_fdce_C_Q)         0.141     0.551 r  u_engine/s3_reg[20]/Q
+                         net (fo=2, routed)           0.102     0.653    u_engine/s3_reg_n_0_[20]
+    SLICE_X16Y23         LUT4 (Prop_lut4_I1_O)        0.045     0.698 r  u_engine/perm_in_x3[20]_i_1/O
+                         net (fo=1, routed)           0.000     0.698    u_engine/perm_in_x3[20]
+    SLICE_X16Y23         FDCE                                         r  u_engine/perm_in_x3_reg[20]/D
+  -------------------------------------------------------------------    -------------------
+
+                         (clock clk rise edge)        0.000     0.000 r  
+                                                      0.000     0.000 r  clk (IN)
+                         net (fo=4014, unset)         0.432     0.432    u_engine/clk
+    SLICE_X16Y23         FDCE                                         r  u_engine/perm_in_x3_reg[20]/C
+                         clock pessimism              0.000     0.432    
+    SLICE_X16Y23         FDCE (Hold_fdce_C_D)         0.121     0.553    u_engine/perm_in_x3_reg[20]
+  -------------------------------------------------------------------
+                         required time                         -0.553    
+                         arrival time                           0.698    
+  -------------------------------------------------------------------
+                         slack                                  0.146    
+
+Slack (MET) :             0.147ns  (arrival time - required time)
+  Source:                 u_engine/s4_reg[11]/C
+                            (rising edge-triggered cell FDCE clocked by clk  {rise@0.000ns fall@5.000ns period=10.000ns})
+  Destination:            u_engine/perm_in_x4_reg[11]/D
+                            (rising edge-triggered cell FDCE clocked by clk  {rise@0.000ns fall@5.000ns period=10.000ns})
+  Path Group:             clk
+  Path Type:              Hold (Min at Fast Process Corner)
+  Requirement:            0.000ns  (clk rise@0.000ns - clk rise@0.000ns)
+  Data Path Delay:        0.289ns  (logic 0.186ns (64.293%)  route 0.103ns (35.707%))
+  Logic Levels:           1  (LUT5=1)
+  Clock Path Skew:        0.022ns (DCD - SCD - CPR)
+    Destination Clock Delay (DCD):    0.432ns
+    Source Clock Delay      (SCD):    0.410ns
+    Clock Pessimism Removal (CPR):    -0.000ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock clk rise edge)        0.000     0.000 r  
+                                                      0.000     0.000 r  clk (IN)
+                         net (fo=4014, unset)         0.410     0.410    u_engine/clk
+    SLICE_X9Y20          FDCE                                         r  u_engine/s4_reg[11]/C
+  -------------------------------------------------------------------    -------------------
+    SLICE_X9Y20          FDCE (Prop_fdce_C_Q)         0.141     0.551 r  u_engine/s4_reg[11]/Q
+                         net (fo=2, routed)           0.103     0.654    u_engine/s4_reg_n_0_[11]
+    SLICE_X8Y20          LUT5 (Prop_lut5_I4_O)        0.045     0.699 r  u_engine/perm_in_x4[11]_i_1/O
+                         net (fo=1, routed)           0.000     0.699    u_engine/perm_in_x4[11]
+    SLICE_X8Y20          FDCE                                         r  u_engine/perm_in_x4_reg[11]/D
+  -------------------------------------------------------------------    -------------------
+
+                         (clock clk rise edge)        0.000     0.000 r  
+                                                      0.000     0.000 r  clk (IN)
+                         net (fo=4014, unset)         0.432     0.432    u_engine/clk
+    SLICE_X8Y20          FDCE                                         r  u_engine/perm_in_x4_reg[11]/C
+                         clock pessimism              0.000     0.432    
+    SLICE_X8Y20          FDCE (Hold_fdce_C_D)         0.121     0.553    u_engine/perm_in_x4_reg[11]
+  -------------------------------------------------------------------
+                         required time                         -0.553    
+                         arrival time                           0.699    
+  -------------------------------------------------------------------
+                         slack                                  0.147    
+
+Slack (MET) :             0.156ns  (arrival time - required time)
+  Source:                 u_engine/s4_reg[2]/C
+                            (rising edge-triggered cell FDCE clocked by clk  {rise@0.000ns fall@5.000ns period=10.000ns})
+  Destination:            u_engine/perm_in_x4_reg[2]/D
+                            (rising edge-triggered cell FDCE clocked by clk  {rise@0.000ns fall@5.000ns period=10.000ns})
+  Path Group:             clk
+  Path Type:              Hold (Min at Fast Process Corner)
+  Requirement:            0.000ns  (clk rise@0.000ns - clk rise@0.000ns)
+  Data Path Delay:        0.269ns  (logic 0.209ns (77.635%)  route 0.060ns (22.365%))
+  Logic Levels:           1  (LUT5=1)
+  Clock Path Skew:        0.022ns (DCD - SCD - CPR)
+    Destination Clock Delay (DCD):    0.432ns
+    Source Clock Delay      (SCD):    0.410ns
+    Clock Pessimism Removal (CPR):    -0.000ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock clk rise edge)        0.000     0.000 r  
+                                                      0.000     0.000 r  clk (IN)
+                         net (fo=4014, unset)         0.410     0.410    u_engine/clk
+    SLICE_X10Y18         FDCE                                         r  u_engine/s4_reg[2]/C
+  -------------------------------------------------------------------    -------------------
+    SLICE_X10Y18         FDCE (Prop_fdce_C_Q)         0.164     0.574 r  u_engine/s4_reg[2]/Q
+                         net (fo=2, routed)           0.060     0.634    u_engine/s4_reg_n_0_[2]
+    SLICE_X11Y18         LUT5 (Prop_lut5_I4_O)        0.045     0.679 r  u_engine/perm_in_x4[2]_i_1/O
+                         net (fo=1, routed)           0.000     0.679    u_engine/perm_in_x4[2]
+    SLICE_X11Y18         FDCE                                         r  u_engine/perm_in_x4_reg[2]/D
+  -------------------------------------------------------------------    -------------------
+
+                         (clock clk rise edge)        0.000     0.000 r  
+                                                      0.000     0.000 r  clk (IN)
+                         net (fo=4014, unset)         0.432     0.432    u_engine/clk
+    SLICE_X11Y18         FDCE                                         r  u_engine/perm_in_x4_reg[2]/C
+                         clock pessimism              0.000     0.432    
+    SLICE_X11Y18         FDCE (Hold_fdce_C_D)         0.092     0.524    u_engine/perm_in_x4_reg[2]
+  -------------------------------------------------------------------
+                         required time                         -0.524    
+                         arrival time                           0.679    
+  -------------------------------------------------------------------
+                         slack                                  0.156    
+
+Slack (MET) :             0.156ns  (arrival time - required time)
+  Source:                 u_engine/s4_reg[41]/C
+                            (rising edge-triggered cell FDCE clocked by clk  {rise@0.000ns fall@5.000ns period=10.000ns})
+  Destination:            u_engine/perm_in_x4_reg[41]/D
+                            (rising edge-triggered cell FDCE clocked by clk  {rise@0.000ns fall@5.000ns period=10.000ns})
+  Path Group:             clk
+  Path Type:              Hold (Min at Fast Process Corner)
+  Requirement:            0.000ns  (clk rise@0.000ns - clk rise@0.000ns)
+  Data Path Delay:        0.269ns  (logic 0.209ns (77.635%)  route 0.060ns (22.365%))
+  Logic Levels:           1  (LUT5=1)
+  Clock Path Skew:        0.022ns (DCD - SCD - CPR)
+    Destination Clock Delay (DCD):    0.432ns
+    Source Clock Delay      (SCD):    0.410ns
+    Clock Pessimism Removal (CPR):    -0.000ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock clk rise edge)        0.000     0.000 r  
+                                                      0.000     0.000 r  clk (IN)
+                         net (fo=4014, unset)         0.410     0.410    u_engine/clk
+    SLICE_X10Y27         FDCE                                         r  u_engine/s4_reg[41]/C
+  -------------------------------------------------------------------    -------------------
+    SLICE_X10Y27         FDCE (Prop_fdce_C_Q)         0.164     0.574 r  u_engine/s4_reg[41]/Q
+                         net (fo=2, routed)           0.060     0.634    u_engine/s4_reg_n_0_[41]
+    SLICE_X11Y27         LUT5 (Prop_lut5_I4_O)        0.045     0.679 r  u_engine/perm_in_x4[41]_i_1/O
+                         net (fo=1, routed)           0.000     0.679    u_engine/perm_in_x4[41]
+    SLICE_X11Y27         FDCE                                         r  u_engine/perm_in_x4_reg[41]/D
+  -------------------------------------------------------------------    -------------------
+
+                         (clock clk rise edge)        0.000     0.000 r  
+                                                      0.000     0.000 r  clk (IN)
+                         net (fo=4014, unset)         0.432     0.432    u_engine/clk
+    SLICE_X11Y27         FDCE                                         r  u_engine/perm_in_x4_reg[41]/C
+                         clock pessimism              0.000     0.432    
+    SLICE_X11Y27         FDCE (Hold_fdce_C_D)         0.092     0.524    u_engine/perm_in_x4_reg[41]
+  -------------------------------------------------------------------
+                         required time                         -0.524    
+                         arrival time                           0.679    
+  -------------------------------------------------------------------
+                         slack                                  0.156    
 
 
 
@@ -1122,36 +1130,36 @@ Period(ns):         10.000
 Sources:            { clk }
 
 Check Type        Corner  Lib Pin  Reference Pin  Required(ns)  Actual(ns)  Slack(ns)  Location      Pin
-Min Period        n/a     FDCE/C   n/a            1.000         10.000      9.000      SLICE_X33Y23  u_engine/busy_reg/C
-Min Period        n/a     FDCE/C   n/a            1.000         10.000      9.000      SLICE_X36Y23  u_engine/data_in_ready_reg/C
-Min Period        n/a     FDCE/C   n/a            1.000         10.000      9.000      SLICE_X32Y14  u_engine/data_out_reg[0]/C
-Min Period        n/a     FDCE/C   n/a            1.000         10.000      9.000      SLICE_X28Y19  u_engine/data_out_reg[10]/C
-Min Period        n/a     FDCE/C   n/a            1.000         10.000      9.000      SLICE_X29Y8   u_engine/data_out_reg[11]/C
-Min Period        n/a     FDCE/C   n/a            1.000         10.000      9.000      SLICE_X32Y14  u_engine/data_out_reg[12]/C
-Min Period        n/a     FDCE/C   n/a            1.000         10.000      9.000      SLICE_X29Y8   u_engine/data_out_reg[13]/C
-Min Period        n/a     FDCE/C   n/a            1.000         10.000      9.000      SLICE_X28Y19  u_engine/data_out_reg[14]/C
-Min Period        n/a     FDCE/C   n/a            1.000         10.000      9.000      SLICE_X34Y12  u_engine/data_out_reg[15]/C
-Min Period        n/a     FDCE/C   n/a            1.000         10.000      9.000      SLICE_X34Y20  u_engine/data_out_reg[16]/C
-Low Pulse Width   Slow    FDCE/C   n/a            0.500         5.000       4.500      SLICE_X33Y23  u_engine/busy_reg/C
-Low Pulse Width   Fast    FDCE/C   n/a            0.500         5.000       4.500      SLICE_X33Y23  u_engine/busy_reg/C
-Low Pulse Width   Slow    FDCE/C   n/a            0.500         5.000       4.500      SLICE_X36Y23  u_engine/data_in_ready_reg/C
-Low Pulse Width   Fast    FDCE/C   n/a            0.500         5.000       4.500      SLICE_X36Y23  u_engine/data_in_ready_reg/C
-Low Pulse Width   Slow    FDCE/C   n/a            0.500         5.000       4.500      SLICE_X32Y14  u_engine/data_out_reg[0]/C
-Low Pulse Width   Fast    FDCE/C   n/a            0.500         5.000       4.500      SLICE_X32Y14  u_engine/data_out_reg[0]/C
-Low Pulse Width   Slow    FDCE/C   n/a            0.500         5.000       4.500      SLICE_X28Y19  u_engine/data_out_reg[10]/C
-Low Pulse Width   Fast    FDCE/C   n/a            0.500         5.000       4.500      SLICE_X28Y19  u_engine/data_out_reg[10]/C
-Low Pulse Width   Slow    FDCE/C   n/a            0.500         5.000       4.500      SLICE_X29Y8   u_engine/data_out_reg[11]/C
-Low Pulse Width   Fast    FDCE/C   n/a            0.500         5.000       4.500      SLICE_X29Y8   u_engine/data_out_reg[11]/C
-High Pulse Width  Slow    FDCE/C   n/a            0.500         5.000       4.500      SLICE_X33Y23  u_engine/busy_reg/C
-High Pulse Width  Fast    FDCE/C   n/a            0.500         5.000       4.500      SLICE_X33Y23  u_engine/busy_reg/C
-High Pulse Width  Slow    FDCE/C   n/a            0.500         5.000       4.500      SLICE_X36Y23  u_engine/data_in_ready_reg/C
-High Pulse Width  Fast    FDCE/C   n/a            0.500         5.000       4.500      SLICE_X36Y23  u_engine/data_in_ready_reg/C
-High Pulse Width  Slow    FDCE/C   n/a            0.500         5.000       4.500      SLICE_X32Y14  u_engine/data_out_reg[0]/C
-High Pulse Width  Fast    FDCE/C   n/a            0.500         5.000       4.500      SLICE_X32Y14  u_engine/data_out_reg[0]/C
-High Pulse Width  Slow    FDCE/C   n/a            0.500         5.000       4.500      SLICE_X28Y19  u_engine/data_out_reg[10]/C
-High Pulse Width  Fast    FDCE/C   n/a            0.500         5.000       4.500      SLICE_X28Y19  u_engine/data_out_reg[10]/C
-High Pulse Width  Slow    FDCE/C   n/a            0.500         5.000       4.500      SLICE_X29Y8   u_engine/data_out_reg[11]/C
-High Pulse Width  Fast    FDCE/C   n/a            0.500         5.000       4.500      SLICE_X29Y8   u_engine/data_out_reg[11]/C
+Min Period        n/a     FDCE/C   n/a            1.000         10.000      9.000      SLICE_X22Y36  u_engine/busy_reg/C
+Min Period        n/a     FDCE/C   n/a            1.000         10.000      9.000      SLICE_X23Y38  u_engine/data_in_ready_reg/C
+Min Period        n/a     FDCE/C   n/a            1.000         10.000      9.000      SLICE_X31Y18  u_engine/data_out_reg[0]/C
+Min Period        n/a     FDCE/C   n/a            1.000         10.000      9.000      SLICE_X27Y31  u_engine/data_out_reg[10]/C
+Min Period        n/a     FDCE/C   n/a            1.000         10.000      9.000      SLICE_X21Y15  u_engine/data_out_reg[11]/C
+Min Period        n/a     FDCE/C   n/a            1.000         10.000      9.000      SLICE_X31Y18  u_engine/data_out_reg[12]/C
+Min Period        n/a     FDCE/C   n/a            1.000         10.000      9.000      SLICE_X22Y13  u_engine/data_out_reg[13]/C
+Min Period        n/a     FDCE/C   n/a            1.000         10.000      9.000      SLICE_X30Y17  u_engine/data_out_reg[14]/C
+Min Period        n/a     FDCE/C   n/a            1.000         10.000      9.000      SLICE_X22Y13  u_engine/data_out_reg[15]/C
+Min Period        n/a     FDCE/C   n/a            1.000         10.000      9.000      SLICE_X30Y17  u_engine/data_out_reg[16]/C
+Low Pulse Width   Slow    FDCE/C   n/a            0.500         5.000       4.500      SLICE_X22Y36  u_engine/busy_reg/C
+Low Pulse Width   Fast    FDCE/C   n/a            0.500         5.000       4.500      SLICE_X22Y36  u_engine/busy_reg/C
+Low Pulse Width   Slow    FDCE/C   n/a            0.500         5.000       4.500      SLICE_X23Y38  u_engine/data_in_ready_reg/C
+Low Pulse Width   Fast    FDCE/C   n/a            0.500         5.000       4.500      SLICE_X23Y38  u_engine/data_in_ready_reg/C
+Low Pulse Width   Slow    FDCE/C   n/a            0.500         5.000       4.500      SLICE_X31Y18  u_engine/data_out_reg[0]/C
+Low Pulse Width   Fast    FDCE/C   n/a            0.500         5.000       4.500      SLICE_X31Y18  u_engine/data_out_reg[0]/C
+Low Pulse Width   Slow    FDCE/C   n/a            0.500         5.000       4.500      SLICE_X27Y31  u_engine/data_out_reg[10]/C
+Low Pulse Width   Fast    FDCE/C   n/a            0.500         5.000       4.500      SLICE_X27Y31  u_engine/data_out_reg[10]/C
+Low Pulse Width   Slow    FDCE/C   n/a            0.500         5.000       4.500      SLICE_X21Y15  u_engine/data_out_reg[11]/C
+Low Pulse Width   Fast    FDCE/C   n/a            0.500         5.000       4.500      SLICE_X21Y15  u_engine/data_out_reg[11]/C
+High Pulse Width  Slow    FDCE/C   n/a            0.500         5.000       4.500      SLICE_X22Y36  u_engine/busy_reg/C
+High Pulse Width  Fast    FDCE/C   n/a            0.500         5.000       4.500      SLICE_X22Y36  u_engine/busy_reg/C
+High Pulse Width  Slow    FDCE/C   n/a            0.500         5.000       4.500      SLICE_X23Y38  u_engine/data_in_ready_reg/C
+High Pulse Width  Fast    FDCE/C   n/a            0.500         5.000       4.500      SLICE_X23Y38  u_engine/data_in_ready_reg/C
+High Pulse Width  Slow    FDCE/C   n/a            0.500         5.000       4.500      SLICE_X31Y18  u_engine/data_out_reg[0]/C
+High Pulse Width  Fast    FDCE/C   n/a            0.500         5.000       4.500      SLICE_X31Y18  u_engine/data_out_reg[0]/C
+High Pulse Width  Slow    FDCE/C   n/a            0.500         5.000       4.500      SLICE_X27Y31  u_engine/data_out_reg[10]/C
+High Pulse Width  Fast    FDCE/C   n/a            0.500         5.000       4.500      SLICE_X27Y31  u_engine/data_out_reg[10]/C
+High Pulse Width  Slow    FDCE/C   n/a            0.500         5.000       4.500      SLICE_X21Y15  u_engine/data_out_reg[11]/C
+High Pulse Width  Fast    FDCE/C   n/a            0.500         5.000       4.500      SLICE_X21Y15  u_engine/data_out_reg[11]/C
 
 
 

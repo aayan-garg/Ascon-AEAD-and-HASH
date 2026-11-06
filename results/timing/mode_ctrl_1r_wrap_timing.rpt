@@ -1,7 +1,7 @@
 Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2025 Advanced Micro Devices, Inc. All Rights Reserved.
 --------------------------------------------------------------------------------------------------------------------------------------------------------------
 | Tool Version : Vivado v.2025.1 (win64) Build 6140274 Thu May 22 00:12:29 MDT 2025
-| Date         : Thu Nov  5 17:18:21 2026
+| Date         : Fri Nov  6 09:22:22 2026
 | Host         : LAPTOP-9H0QSNOD running 64-bit major release  (build 9200)
 | Command      : report_timing_summary -file C:/Users/Aayan/Desktop/RTL_Project/Ascon-AEAD-and-HASH/results/timing/mode_ctrl_1r_wrap_timing.rpt -max_paths 10
 | Design       : mode_ctrl_1r_wrap

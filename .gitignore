@@ -63,6 +63,7 @@ results/**/*.wdb
 scratch/
 build/
 vivado_proj/
+tools/sbox_opt/bin/
 *.exe
 *.elf
 *.bin

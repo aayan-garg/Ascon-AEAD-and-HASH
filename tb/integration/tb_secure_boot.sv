@@ -49,19 +49,23 @@ module tb_secure_boot;
     longint unsigned cycle_reset_release = 0;
     longint unsigned cycle_jump_enable   = 0;
     longint unsigned cycle_test_pass_lat = 0;
+    reg              timing_measure_en   = 1'b0;
     reg              jump_captured       = 1'b0;
     reg              pass_captured       = 1'b0;
     integer          boot_log_fd;
 
-    // Free-running cycle counter at 100 MHz (10 ns/cycle)
-    always @(posedge clk) cycle_count <= cycle_count + 1;
-
-    // Latch first rising edge of boot_jump_enable and test_pass
+    // Single synchronous always block: free-running counter and race-free nonblocking latching
     always @(posedge clk) begin
+        cycle_count <= cycle_count + 1;
         if (!rst_n) begin
-            jump_captured <= 1'b0;
-            pass_captured <= 1'b0;
-        end else begin
+            jump_captured       <= 1'b0;
+            pass_captured       <= 1'b0;
+            cycle_jump_enable   <= 0;
+            cycle_test_pass_lat <= 0;
+        end else if (timing_measure_en) begin
+            if (cycle_reset_release == 0) begin
+                cycle_reset_release <= cycle_count;
+            end
             if (dut.boot_jump_enable && !jump_captured) begin
                 cycle_jump_enable <= cycle_count;
                 jump_captured     <= 1'b1;
@@ -120,12 +124,6 @@ module tb_secure_boot;
         #(CLK_PERIOD * 10);
         @(negedge clk);
         rst_n = 1'b1;
-        // [F8] Record reset release cycle and clear timing captures
-        cycle_reset_release = cycle_count;
-        cycle_jump_enable   = 0;
-        cycle_test_pass_lat = 0;
-        jump_captured       = 1'b0;
-        pass_captured       = 1'b0;
         #(CLK_PERIOD * 5);
     endtask
 
@@ -163,6 +161,8 @@ module tb_secure_boot;
         $display("--- CASE 1: Valid Untampered Candidate Firmware Image ---");
         $display("----------------------------------------------------------------");
         $readmemh("firmware/tests/boot_matrix/bram_case1_valid.hex", dut.bram_mem);
+        timing_measure_en   = 1'b1;
+        cycle_reset_release = 0;
         reset_soc();
 
         fork : timeout_case1
@@ -173,10 +173,12 @@ module tb_secure_boot;
             end
             begin
                 wait (test_pass == 1'b1);
+                wait (pass_captured == 1'b1);
                 repeat(2) @(posedge clk);
                 disable timeout_case1;
             end
         join
+        timing_measure_en = 1'b0;
 
         check_case("Case 1: test_pass asserted (CPU jumped to candidate payload)", test_pass == 1'b1);
         check_case("Case 1: LEDs illuminate solid boot pattern 4'b1111", led == 4'b1111);
@@ -193,6 +195,13 @@ module tb_secure_boot;
                      delta_pass, delta_pass * 10.0 / 1000.0);
             $display("  [SPEC]   Clock: 100 MHz, Payload: 64 bytes (TRUSTED_PAYLOAD_LEN)");
             $display("  [ASSUME] Larger payloads require re-parameterizing firmware and re-running sim.");
+
+            // Self-checks required by task T5:
+            check_case("Timing: reset_to_jump > 0", delta_jump > 0);
+            check_case("Timing: reset_to_test_pass > reset_to_jump", delta_pass > delta_jump);
+            check_case("Timing: reset_to_jump equals 906 cycles (64B)", delta_jump == 906);
+            check_case("Timing: reset_to_test_pass equals 1342 cycles (64B)", delta_pass == 1342);
+
             if (boot_log_fd) begin
                 $fdisplay(boot_log_fd, "Case 1 (64B payload): reset_to_jump=%0d cycles = %.2f us",
                           delta_jump, delta_jump * 10.0 / 1000.0);
@@ -231,7 +240,7 @@ module tb_secure_boot;
         check_case("Case 2: Deterministic refusal LED pattern 4'b1010 detected", led == 4'b1010);
         check_case("Case 2: Candidate payload never executed (test_pass is 0)", test_pass == 1'b0);
         check_case("Case 2: Hardware boot_jump_enable remains 0", dut.boot_jump_enable == 1'b0);
-        write_case_log(2, "Byte-Flipped Firmware (Payload Tampering)", 4, 0);
+        write_case_log(2, "Byte-Flipped Firmware (Payload Tampering)", 8, 0);
 
         // ---------------------------------------------------------------------
         // Case 3: Wrong Reference Digest (§12.5 Case 3)
@@ -259,7 +268,7 @@ module tb_secure_boot;
         check_case("Case 3: Refusal pattern 4'b1010 on wrong reference digest", led == 4'b1010);
         check_case("Case 3: test_pass remains 0", test_pass == 1'b0);
         check_case("Case 3: boot_jump_enable remains 0", dut.boot_jump_enable == 1'b0);
-        write_case_log(3, "Wrong Reference Digest (Provisioning Error)", 7, 0);
+        write_case_log(3, "Wrong Reference Digest (Provisioning Error)", 11, 0);
 
         // ---------------------------------------------------------------------
         // Case 4: Invalid Declared Length (§12.5 Case 4)
@@ -288,7 +297,7 @@ module tb_secure_boot;
         check_case("Case 4: Immediate refusal on length violation (LED = 4'b1010)", led == 4'b1010);
         check_case("Case 4: test_pass remains 0", test_pass == 1'b0);
         check_case("Case 4: boot_jump_enable remains 0", dut.boot_jump_enable == 1'b0);
-        write_case_log(4, "Invalid Declared Length (Header Violation)", 10, 0);
+        write_case_log(4, "Invalid Declared Length (Header Violation)", 14, 0);
 
         // ---------------------------------------------------------------------
         // Case 5: Malformed Header Magic (§12.5 Case 5)
@@ -316,7 +325,7 @@ module tb_secure_boot;
         check_case("Case 5: Immediate refusal on malformed magic (LED = 4'b1010)", led == 4'b1010);
         check_case("Case 5: test_pass remains 0", test_pass == 1'b0);
         check_case("Case 5: boot_jump_enable remains 0", dut.boot_jump_enable == 1'b0);
-        write_case_log(5, "Malformed Header Magic (0xDEADBEEF)", 13, 0);
+        write_case_log(5, "Malformed Header Magic (0xDEADBEEF)", 17, 0);
 
         // ---------------------------------------------------------------------
         // Case 6: Injected DMA Fault / Timeout (§12.5 Case 6)
@@ -365,7 +374,7 @@ module tb_secure_boot;
         check_case("Case 6: DMA error caught deterministically (LED = 4'b1010)", led == 4'b1010);
         check_case("Case 6: test_pass remains 0", test_pass == 1'b0);
         check_case("Case 6: boot_jump_enable remains 0", dut.boot_jump_enable == 1'b0);
-        write_case_log(6, "Injected DMA Fault / Timeout", 16, 0);
+        write_case_log(6, "Injected DMA Fault / Timeout", 20, 0);
 
         // ---------------------------------------------------------------------
         // Case 7: Injected Accelerator Error (§12.5 Case 7)
@@ -413,7 +422,7 @@ module tb_secure_boot;
         check_case("Case 7: Accelerator fault caught deterministically (LED = 4'b1010)", led == 4'b1010);
         check_case("Case 7: test_pass remains 0", test_pass == 1'b0);
         check_case("Case 7: boot_jump_enable remains 0", dut.boot_jump_enable == 1'b0);
-        write_case_log(7, "Injected Accelerator Error", 19, 0);
+        write_case_log(7, "Injected Accelerator Error", 23, 0);
 
         // ---------------------------------------------------------------------
         // Case 8: Reset Mid-Verification (§12.5 Case 8)
@@ -437,7 +446,7 @@ module tb_secure_boot;
         check_case("Case 8: boot_jump_enable is 0 during reset", dut.boot_jump_enable == 1'b0);
         check_case("Case 8: test_pass remained 0", test_pass == 1'b0);
         rst_n = 1'b1;
-        write_case_log(8, "Reset Mid-Verification", 22, 0);
+        write_case_log(8, "Reset Mid-Verification", 26, 0);
 
         // ---------------------------------------------------------------------
         // Case 9: Repeated Boot Attempt After Refusal (§12.5 Case 9)
@@ -475,7 +484,7 @@ module tb_secure_boot;
         check_case("Case 9: Remains locked in STATE_HALT_REFUSE after repeated attempt", dut.u_ascon.u_boot_ctrl.fsm_state == 4'd7);
         check_case("Case 9: boot_jump_enable remains 0", dut.boot_jump_enable == 1'b0);
         check_case("Case 9: boot_refuse remains 1", dut.boot_refuse == 1'b1);
-        write_case_log(9, "Repeated Boot Attempt After Refusal", 25, 0);
+        write_case_log(9, "Repeated Boot Attempt After Refusal", 29, 0);
 
         // ---------------------------------------------------------------------
         // Final Summary

@@ -1,0 +1,7 @@
+Tool Name: UC Berkeley Espresso
+Tool Version: Version #2.3 (Release date 01/31/88)
+Command Line: wsl /mnt/c/Users/Aayan/Desktop/RTL_Project/Ascon-AEAD-and-HASH/tools/sbox_opt/bin/espresso -Dexact /mnt/c/Users/Aayan/Desktop/RTL_Project/Ascon-AEAD-and-HASH/scripts/ascon_sbox.pla
+Input File: scripts/ascon_sbox.pla
+Exit Code: 0
+Minimized Product Terms: 30
+Raw Output Saved To: results/synthesis/espresso_raw_output.pla

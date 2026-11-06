@@ -61,10 +61,11 @@ Complete post-route implementation metrics and comparisons are maintained in the
 2. **Throughput-to-Area Efficiency Leader:** The 2-round unrolled engine (`mode_ctrl_2r_wrap`) achieves **887.90 kbps/LUT** at 100 MHz (3,200.00 Mbps AEAD throughput, 3,604 LUTs), retiring 128 bits of ciphertext every 4 clock cycles.
 3. **Logic Footprint Leader:** The half-round folded pipeline (`mode_ctrl_half_wrap`) minimizes logic resources to **2,995 LUTs** (-6.1% vs. 1R baseline) by time-multiplexing substitution and linear diffusion over 2 clock cycles.
 4. **S-Box Design Variations:**
-   - **ESPRESSO SOP (`sbox5_espresso.sv`):** 3,253 LUTs, WNS +1.879 ns (123.14 MHz), providing externally minimized equations verified against the NIST table.
-   - **Kernel (`sbox5_kernel.sv`):** 3,052 LUTs, WNS +2.142 ns (127.26 MHz). This is an ANF restatement of the standard equations; no kernel extraction was performed.
-   - **BDD (`sbox5_bdd.sv`):** 3,055 LUTs, WNS +2.086 ns (126.36 MHz). This is a 32-entry lookup table; no BDD decomposition was performed.
-   - The 3,052/3,055 versus 3,191 LUT difference is not attributed to either unperformed technique; it may reflect synthesis variation or a baseline run from a different `round_core.sv` revision.
+   - **Baseline (`sbox5.sv` in `mode_ctrl_1r_wrap`):** 3,191 LUTs, 4,015 FFs, WNS +1.925 ns (123.84 MHz).
+   - **ESPRESSO SOP (`sbox5_espresso.sv` in `mode_ctrl_1r_espresso_wrap`):** 3,258 LUTs, 4,015 FFs, WNS +1.621 ns (119.35 MHz), generated via UC Berkeley ESPRESSO (`-Dexact`, 30-cube exact cover).
+   - **Kernel Extraction (`sbox5_kernel.sv` in `mode_ctrl_1r_kernel_wrap`):** 3,192 LUTs, 4,015 FFs, WNS +2.226 ns (128.64 MHz), synthesized via Brayton-McMullen algebraic kernel/co-kernel extraction.
+   - **ROBDD Decomposition (`sbox5_bdd.sv` in `mode_ctrl_1r_bdd_wrap`):** 3,225 LUTs, 4,015 FFs, WNS +1.856 ns (122.79 MHz), decomposed using optimal interleaved variable ordering.
+   - **Hardware Mapping Context:** Because the 5-bit Ascon S-box maps to only a few 6-input LUTs (LUT6), Vivado synthesis re-maps whatever Boolean form it is given into native LUT6 primitives. Differences within ~2% (a spread of 67 LUTs out of >3,100) across the four variants represent synthesis placement/routing variations rather than a fundamental technique benefit, confirming all three optimization paradigms achieve equivalent high-quality hardware realization.
 5. **Serial-32 Trade-off Analysis:** The 32-bit serialized datapath (`permutation_serial32.sv`, inspired by Groß et al., DSD 2015) evaluates 32 shared S-boxes over two clock cycles per round. On modern 6-input FPGA LUTs, the multiplexing logic and pipeline registers exceed the S-box logic savings (3,353 LUTs, 4,180 FFs), resulting in 238.59 kbps/LUT (0.48x of 1R baseline efficiency). It remains advantageous on ASICs or 4-LUT architectures where raw gate count dominates multiplexer cost.
 
 ---

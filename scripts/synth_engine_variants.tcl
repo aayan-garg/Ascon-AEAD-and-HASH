@@ -30,8 +30,19 @@ set ENGINE_VARIANTS {
 }
 
 if { $argc > 0 } {
-    set RUN_VARIANTS [list [lindex $argv 0]]
-    puts "Running targeted engine variant: $RUN_VARIANTS"
+    set arg0 [lindex $argv 0]
+    if { $arg0 == "sbox" } {
+        set RUN_VARIANTS {
+            "mode_ctrl_1r_wrap"
+            "mode_ctrl_1r_espresso_wrap"
+            "mode_ctrl_1r_kernel_wrap"
+            "mode_ctrl_1r_bdd_wrap"
+        }
+        puts "Running targeted S-box engine variants: $RUN_VARIANTS"
+    } else {
+        set RUN_VARIANTS [list $arg0]
+        puts "Running targeted engine variant: $RUN_VARIANTS"
+    }
 } else {
     set RUN_VARIANTS $ENGINE_VARIANTS
     puts "Running all engine variants: $RUN_VARIANTS"

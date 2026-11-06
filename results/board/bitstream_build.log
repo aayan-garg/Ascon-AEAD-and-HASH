@@ -1,0 +1,27 @@
+# Bitstream Build Log
+# Project: Ascon AEAD and Hash Engine Secure Boot SoC
+# Target Hardware: Digilent Zybo Z7-10 (xc7z010clg400-1)
+
+Tool: AMD-Xilinx Vivado v2025.1 (win64) Build 6140274
+Command Line: vivado -mode batch -source scripts/build_bitstream.tcl
+Synthesis Target: top_bringup_board
+Target Clock Frequency: 100.000 MHz (10.000 ns period)
+
+Implementation Timing Results (Routed):
+  Worst Negative Slack (WNS): +1.510 ns (Fmax = 117.79 MHz)
+  Total Negative Slack (TNS): 0.000 ns (0 failing endpoints out of 16,623)
+  Worst Hold Slack (WHS):     +0.027 ns
+  Total Hold Slack (THS):     0.000 ns
+
+Resource Utilization:
+  Slice LUTs: 5,088 / 17,600 (28.91%)
+  Slice FFs:  5,486 / 35,200 (15.59%)
+  BRAM Tiles: 4.0 / 60 (6.67%)
+  DSPs:       0 / 80 (0.00%)
+
+Bitstream Generation:
+  Output File: build/top_bringup.bit
+  File Size:   2,083,869 bytes
+  SHA256:      79cef83aa8ec05081a92359999da7ca5b3f13d77ae5bee70073c39f3b8862c86
+  DRC Status:  0 Errors, 0 Warnings, 0 Critical Warnings
+

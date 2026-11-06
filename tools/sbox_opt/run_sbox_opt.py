@@ -2,7 +2,7 @@
 """
 tools/sbox_opt/run_sbox_opt.py
 Unified execution script for 5x5 S-Box optimization techniques:
-  1. Two-Level Heuristic Minimization (ESPRESSO / SOPform)
+  1. Two-Level Heuristic Minimization (UC Berkeley ESPRESSO; SymPy SOPform cross-check)
   2. Multi-Level Logic Synthesis & Algebraic Kernel Extraction
   3. Binary Decision Diagram (BDD) Decomposition & Ordering Study
 Generates comparison table and verifies bit-exact compliance with NIST SP 800-232 Table 6.
@@ -53,7 +53,7 @@ def main():
 ## 1. Executive Summary
 
 This directory provides the automated, reproducible synthesis and optimization toolchain for evaluating the 5×5 Ascon S-box across three distinct Boolean paradigms:
-1. **Two-Level Sum-of-Products Minimization (ESPRESSO / SOPform):** `espresso_runner.py`
+1. **Two-Level Sum-of-Products Minimization (UC Berkeley ESPRESSO; SymPy SOPform cross-check):** `espresso_runner.py`
 2. **Multi-Level Logic Synthesis & Kernel Extraction:** `kernel_extractor.py`
 3. **Reduced Ordered Binary Decision Diagrams (ROBDDs):** `bdd_synthesizer.py`
 
@@ -67,7 +67,7 @@ Every variant is exhaustively proved 100% equivalent to NIST SP 800-232 Table 6 
 |---|:---:|---|:---:|:---:|:---:|
 | **Standard Bit-Slice (`sbox5.sv`)** | Canonical Equations | 3 XOR in, 5 Keccak-$\\chi$ AND-XOR, 4 XOR out | Affine input/output sharing | `DONE-VERIFIED` | 32/32 PASS |
 | **ESPRESSO SOP (`sbox5_espresso.sv`)** | 36 Product Terms | Two-Level Sum-of-Products (140 literals) | Minimal SOP covers per output | `DONE-VERIFIED` | 32/32 PASS |
-| **Algebraic Kernel (`sbox5_kernel.sv`)** | Common Kernels | Multi-level factorized network | 5 shared kernels ($K_0..K_4$) | `DONE-VERIFIED` | 32/32 PASS |
+| **Algebraic Kernel (`sbox5_kernel.sv`)** | Common Kernels | Multi-level factorized network | 6 shared kernels ($k_0..k_5$, 40.7% lit reduction) | `DONE-VERIFIED` | 32/32 PASS |
 | **Shared ROBDD (`sbox5_bdd.sv`)** | 32 ITE Nodes | 2:1 Multiplexer Tree (Interleaved ordering) | 32 shared ITE multiplexers | `DONE-VERIFIED` | 32/32 PASS |
 
 ---

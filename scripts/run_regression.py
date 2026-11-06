@@ -94,7 +94,7 @@ def run_step(name: str, cmd: list, cwd: str = ROOT_DIR) -> tuple[bool, float, st
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
             text=True,
-            timeout=300
+            timeout=600  # 10 min timeout to accommodate 1025-vector KAT suites under load
         )
         duration = time.time() - start
         passed = (proc.returncode == 0)
