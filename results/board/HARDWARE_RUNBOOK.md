@@ -1,14 +1,16 @@
 # Hardware Runbook — Ascon Secure Boot on Digilent Zybo Z7-10
 
-> **Notice:** No on-board result has been recorded yet. This runbook defines the exact operational procedure, hardware pin mapping, and expected behaviors for physical testing on the Digilent Zybo Z7-10.
+> **Notice:** No on-board result has been recorded yet. This runbook defines the exact operational procedure, hardware pin mapping, and expected behaviors for physical testing on the Digilent Zybo Z7-10. Complete test module specifications and ILA waveform analyses are documented in [`docs/hardware_test_plan.md`](../../docs/hardware_test_plan.md) and [`results/board/ila_verification_report.md`](ila_verification_report.md).
 
 - **Target Board:** Digilent Zybo Z7-10 (AMD-Xilinx Zynq-7000 XC7Z010-1CLG400C)
 - **Top-Level Module:** `rtl/soc/top_bringup_board.sv`
 - **Constraints File:** `board/zybo_z7_10.xdc`
-- **Bitstream Target:** `build/top_bringup.bit`
+- **Bitstream Target:** `build/top_bringup.bit` (or ILA debug bitstream: `build/top_bringup_ila.bit`)
 - **Synthesized Default Firmware:** `firmware/tests/boot_matrix/bram_case1_valid.hex`
 - **Clock:** 125 MHz on-board oscillator (pin K17) → MMCM → 100 MHz system clock
 - **Primary Reset:** BTN0 (pin K18, Active-High) → Inverted and synchronized to 100 MHz clock domain
+- **Hardware Test Plan:** [`docs/hardware_test_plan.md`](../../docs/hardware_test_plan.md)
+- **ILA Verification Report:** [`results/board/ila_verification_report.md`](ila_verification_report.md)
 
 ---
 
