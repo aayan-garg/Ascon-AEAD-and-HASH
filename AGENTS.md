@@ -55,7 +55,7 @@ If a question arises about:
 | **Requirements Traceability** | [`docs/requirements_traceability.md`](docs/requirements_traceability.md) | Single source of truth for R1–R19 status and evidence file links |
 | **Directory Structure** | [`docs/directory_structure.md`](docs/directory_structure.md) | Creating any new file or directory; doing a structural review |
 | **Status Tracker** | [`docs/status.md`](docs/status.md) | Starting any session (to know where we left off); after completing any task (to update it) |
-| **Project Spec** | [`../Project_PS.md`](../Project_PS.md) | Verifying a requirement is real vs. recommended; checking exact spec wording |
+| **Project Spec** | `Project_PS.md` (workspace reference outside this repository) | Verifying a requirement is real vs. recommended; checking exact spec wording |
 | **Register Map** | [`docs/register_map.md`](docs/register_map.md) | Writing bus integration RTL or firmware that accesses the accelerator |
 | **Architecture** | [`docs/architecture.md`](docs/architecture.md) | Understanding FSMs, data flows, mode controller state table |
 | **Threat Model** | [`docs/threat_model.md`](docs/threat_model.md) | Writing secure-boot logic; understanding trust boundaries |
