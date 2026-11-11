@@ -1,6 +1,6 @@
 # Hardware Runbook — Ascon Secure Boot on Digilent Zybo Z7-10
 
-> **Notice:** On-board physical validation completed and verified on the Digilent Zybo Z7-10. Both normal boot (Green LD6, discrete LEDs `4'b1111`) and live SW0 byte-flip fault injection (Red LD6, discrete LEDs `4'b1010`) are confirmed and captured in 100 MHz on-chip ILA silicon traces in [`results/board/ila_traces/`](ila_traces/). Complete test module specifications and ILA waveform analyses are documented in [`docs/hardware_test_plan.md`](../../docs/hardware_test_plan.md) and [`results/board/ila_verification_report.md`](ila_verification_report.md).
+> **Notice:** Partial on-board validation has been recorded on the Digilent Zybo Z7-10: both normal boot (Green `LD6`, discrete LEDs `4'b1111`) and live `SW0` byte-flip refusal (Red `LD6`, discrete LEDs `4'b1010`) were visually observed and sampled in steady state via immediate-trigger (`-trigger_now`) Vivado ILA captures in [`results/board/ila_traces/`](ila_traces/). Physical `SW1` bench confirmation, rising-edge triggered transient ILA capture, oscilloscope/counter latency measurement, and on-board KAT execution remain pending. Complete test specifications and ILA analysis are documented in [`docs/hardware_test_plan.md`](../../docs/hardware_test_plan.md) and [`results/board/ila_verification_report.md`](ila_verification_report.md).
 
 - **Target Board:** Digilent Zybo Z7-10 (AMD-Xilinx Zynq-7000 XC7Z010-1CLG400C)
 - **Top-Level Module:** `rtl/soc/top_bringup_board.sv`
@@ -24,8 +24,8 @@ Derived directly from `rtl/soc/top_bringup_board.sv`, `rtl/soc/top_bringup.sv`, 
 | **Push Button 0** | `K18` | Input | `rst_btn` | Active-High manual reset (BTN0 pressed = reset asserted) |
 | **Slide Switch 0** | `G15` | Input | `sw[0]` | **Live DMA Byte-Flip Fault Injection:** When `SW0 = 1`, inverts bit 0 of word `0x410` during DMA payload read |
 | **Slide Switch 1** | `P15` | Input | `sw[1]` | **Live Hardware Tamper Sensor:** When `SW1 = 1`, asserts physical `tamper_det` input to `boot_ctrl.sv` |
-| **Slide Switch 2** | `W13` | Input | `sw[2]` | User input (read by soft-core via AXI-Lite GPIO) |
-| **Slide Switch 3** | `T16` | Input | `sw[3]` | User input (read by soft-core via AXI-Lite GPIO) |
+| **Slide Switch 2** | `W13` | Input | `sw[2]` | Unused / reserved slide switch input on `top_bringup_board` |
+| **Slide Switch 3** | `T16` | Input | `sw[3]` | Unused / reserved slide switch input on `top_bringup_board` |
 | **Discrete LED 0** | `M14` | Output | `led[0]` | Boot status (LD0): ON during verification; ON when boot passes |
 | **Discrete LED 1** | `M15` | Output | `led[1]` | Error indicator (LD1): ON during refusal (`4'b1010`) |
 | **Discrete LED 2** | `G14` | Output | `led[2]` | Busy indicator (LD2): ON when boot passes (`4'b1111`) |
@@ -110,8 +110,8 @@ For physical evidence submission, record:
 2. **Boot Latency Measurement:**
    - Connect an oscilloscope or logic analyzer probe to test point / PMOD pin if routed, or capture a high-framerate phone video (e.g. 240 fps) of the reset release to Green LED transition.
    - Compare measured physical latency against exact simulation benchmarks below.
-3. **UART Output:**
-   - UART console output via micro-USB COM port (115200 baud, 8-N-1): `[TO BE CONFIRMED ON BOARD]` (Soft-UART output depends on optional firmware print routines).
+3. **UART Output / Status Observability:**
+   - No UART peripheral is instantiated in [`rtl/soc/top_bringup_board.sv`](../../rtl/soc/top_bringup_board.sv) or [`rtl/soc/top_bringup.sv`](../../rtl/soc/top_bringup.sv). On-board status observability is provided via `led[3:0]`, RGB LED `LD6`, and the Vivado ILA debug core (`u_ila_0`).
 
 ---
 

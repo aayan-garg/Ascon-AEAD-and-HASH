@@ -1,7 +1,7 @@
 # Final Comprehensive Project Audit & Verification Report
 ## Ascon-128 AEAD & Ascon-Hash256 Cryptographic Engine with RISC-V Secure Boot for Digilent Zybo Z7-10
 
-- **Date:** November 5, 2026  
+- **Date:** November 11, 2026  
 - **Target Device:** AMD-Xilinx Zynq-7000 SoC XC7Z010-1CLG400C (Digilent Zybo Z7-10)  
 - **Normative Standard:** NIST SP 800-232 (Final Standard, August 2025)  
 - **System Architecture:** PicoRV32 RV32I CPU + AXI4-Lite Control + Contention-Free BRAM Port B DMA Streaming + Ascon Permutation Engine + Hardware Security Plaintext Gate + Hardware Fetch Guard  
@@ -18,7 +18,7 @@ This report documents the comprehensive implementation, formal verification, and
 All components—including the 320-bit permutation datapath across seven distinct architectural variants, the dual-mode controller FSM with Little-Endian rate formatting, the hardware plaintext release shadow buffer, the contention-free DMA engine, the secure boot controller with hardware fetch guard, and the formal CTL state safety properties—have been implemented and verified using live tool runs:
 - **NIST Known Answer Tests (KATs):** 100% bit-exact compliance across all 1,089 AEAD vectors and 1,025 Hash vectors in live Vivado XSim simulations.
 - **Formal CTL Model Checking:** Proved all 5 safety properties in NuSMV 2.6.0 on the secure boot controller model, with an automated 6-step counterexample synthesized on a flawed model.
-- **Physical Synthesis & STA:** Closed timing at 100 MHz across all standalone permutation cores, full engine wrappers, and the complete SoC top-level design (WNS = +1.570 ns, $F_{max} = 118.62$ MHz).
+- **Physical Synthesis & STA:** Closed timing at 100 MHz across all standalone permutation cores, full engine wrappers, the baseline SoC bitstream (`WNS = +1.510 ns`, $F_{max} = 117.79$ MHz), and the ILA-instrumented bitstream (`WNS = +1.042 ns`).
 - **Dual-Gate Defense Verification:** Verified through both the 9-case boot matrix and a dedicated forced-jump negative testbench (`tb_forced_jump.sv`), proving that untrusted application execution is blocked until cryptographically authorized.
 
 ---
@@ -32,7 +32,7 @@ Summary of major remediation achievements:
 2. **Formal CTL Model Checking:** Replaced legacy Python simulation with the NuSMV 2.6.0 model checker, verifying all 5 CTLSPECs on `formal/ctl/boot_safety_corrected.smv` and producing counterexamples on `boot_safety_broken.smv`.
 3. **Hardware Fetch Guard:** Wired `rtl/soc/fetch_guard.sv` combinational gating between BRAM Port A and the PicoRV32 instruction bus, forcing NOP instructions (`0x00000013`) whenever the candidate firmware region ($\ge \text{0x1040}$) is fetched without `jump_enable`.
 4. **Permutation Serial-32:** Fully debugged the 32-bit serialized datapath (`permutation_serial32.sv`), proving 100% equivalence on 135 differential vectors and passing full KAT suites.
-5. **SoC Timing Closure:** Pipelined critical control signals in `mode_ctrl.sv` to improve SoC setup slack from -2.657 ns to **+1.570 ns** at 100 MHz ($F_{max} = 118.62$ MHz).
+5. **SoC Timing Closure:** Pipelined critical control signals in `mode_ctrl.sv` to improve SoC setup slack from -2.657 ns to **+1.510 ns** at 100 MHz ($F_{max} = 117.79$ MHz).
 6. **Cycle-Accurate Boot Benchmarks:** Synchronously benchmarked boot latency across 64 B, 1 KB, and 4 KB payload sizes, deriving an empirical linear scaling equation.
 
 ---
@@ -46,7 +46,7 @@ Key highlights:
 - **Hardware Plaintext Gating (`R5`):** Shadow buffer (`plaintext_gate.sv`) enforces the security contract that unauthenticated plaintext is never observable on external busses before tag verification (`tag_ok == 1`), and triggers active zeroization upon authentication failure.
 - **Bus & DMA Streaming Architecture (`R7`):** Memory-mapped AXI4-Lite control plane (`axil_regs.sv`) and independent Port B BRAM DMA master (`dma_master.sv`) provide contention-free data streaming without stalling host CPU execution.
 - **Hardware Secure Boot Flow (`R8`, `R14`):** Dual-gate security combining software cryptographic hash comparison in Boot ROM firmware with hardware latching and instruction bus fetch-guard interception.
-- **Physical Board Scope (`R19`):** On-board physical testing is out of scope per project rules. Bitstream generation was not attempted (implementation stopped at `route_design` with timing closed at WNS +1.570 ns).
+- **Physical Board Scope (`R19`):** Bitstream generation succeeded for both baseline (`build/top_bringup.bit`, WNS `+1.510 ns`, $F_{max} = 117.79$ MHz) and ILA-instrumented (`build/top_bringup_ila.bit`, WNS `+1.042 ns`) builds. On a physical Digilent Zybo Z7-10 (`xc7z010_1`), normal boot (`LD0..3 = 4'b1111`, RGB `LD6` = Green) and live `SW0` DMA bit-flip refusal (`LD0..3 = 4'b1010`, RGB `LD6` = Red) were verified visually and sampled in steady state via Vivado ILA (`-trigger_now`); rising-edge transient boot ILA capture, physical `SW1` tamper testing, on-board cycle measurement, and on-board KAT execution remain pending ([`HARDWARE_RUNBOOK.md`](../results/board/HARDWARE_RUNBOOK.md), [`ila_verification_report.md`](../results/board/ila_verification_report.md)).
 
 ---
 
@@ -57,13 +57,13 @@ Complete post-route implementation metrics and comparisons are maintained in the
 - **Full Engine Out-of-Context Wrappers (`mode_ctrl`):** [`results/performance/engine_comparison_table.md`](../results/performance/engine_comparison_table.md)
 
 ### Key Architectural Findings:
-1. **Full SoC Implementation:** Routed out-of-context on AMD-Xilinx XC7Z010 at 100 MHz using 5,088 Slice LUTs (28.91%), 5,486 Slice FFs (15.59%), and 4 Block RAMs (RAMB36E1), achieving **WNS = +1.570 ns** ($F_{max} = 118.62$ MHz).
+1. **Full SoC Implementation:** Implemented with physical board constraints (`top_bringup_board` + `board/zybo_z7_10.xdc`) on AMD-Xilinx XC7Z010 at 100 MHz using 5,088 Slice LUTs (28.91%), 5,486 Slice FFs (15.59%), and 4 Block RAMs (RAMB36E1), achieving **WNS = +1.510 ns** ($F_{max} = 117.79$ MHz).
 2. **Throughput-to-Area Efficiency Leader:** The 2-round unrolled engine (`mode_ctrl_2r_wrap`) achieves **887.90 kbps/LUT** at 100 MHz (3,200.00 Mbps AEAD throughput, 3,604 LUTs), retiring 128 bits of ciphertext every 4 clock cycles.
 3. **Logic Footprint Leader:** The half-round folded pipeline (`mode_ctrl_half_wrap`) minimizes logic resources to **2,995 LUTs** (-6.1% vs. 1R baseline) by time-multiplexing substitution and linear diffusion over 2 clock cycles.
 4. **S-Box Design Variations:**
    - **Baseline (`sbox5.sv` in `mode_ctrl_1r_wrap`):** 3,191 LUTs, 4,015 FFs, WNS +1.925 ns (123.84 MHz).
    - **ESPRESSO SOP (`sbox5_espresso.sv` in `mode_ctrl_1r_espresso_wrap`):** 3,258 LUTs, 4,015 FFs, WNS +1.621 ns (119.35 MHz), generated via UC Berkeley ESPRESSO (`-Dexact`, 30-cube exact cover, 130 input literals).
-   - **Kernel Extraction (`sbox5_kernel.sv` in `mode_ctrl_1r_kernel_wrap`):** 3,192 LUTs, 4,015 FFs, WNS +2.226 ns (128.64 MHz), synthesized via Brayton-McMullen algebraic kernel/co-kernel extraction.
+   - **Kernel Extraction (`sbox5_kernel.sv` in `mode_ctrl_1r_kernel_wrap`):** 3,192 LUTs, 4,015 FFs, WNS +2.226 ns (128.63 MHz), synthesized via Brayton-McMullen algebraic kernel/co-kernel extraction.
    - **ROBDD Decomposition (`sbox5_bdd.sv` in `mode_ctrl_1r_bdd_wrap`):** 3,225 LUTs, 4,015 FFs, WNS +1.856 ns (122.79 MHz), decomposed using optimal interleaved variable ordering.
    - **Hardware Mapping Context:** Because the 5-bit Ascon S-box maps to only a few 6-input LUTs (LUT6), Vivado synthesis re-maps whatever Boolean form it is given into native LUT6 primitives. Differences within ~2% (a spread of 67 LUTs out of >3,100) across the four variants represent synthesis placement/routing variations rather than a fundamental technique benefit, confirming all three optimization paradigms achieve equivalent high-quality hardware realization.
 5. **Serial-32 Trade-off Analysis:** The 32-bit serialized datapath (`permutation_serial32.sv`, inspired by Groß et al., DSD 2015) evaluates 32 shared S-boxes over two clock cycles per round. On modern 6-input FPGA LUTs, the multiplexing logic and pipeline registers exceed the S-box logic savings (3,353 LUTs, 4,180 FFs), resulting in 238.59 kbps/LUT (0.48x of 1R baseline efficiency). It remains advantageous on ASICs or 4-LUT architectures where raw gate count dominates multiplexer cost.
@@ -116,6 +116,6 @@ The base overhead represents Boot ROM initialization, header parsing, BRAM bus s
 
 ## 6. Audit Verdict and Sign-off
 
-Every requirement from `Project_PS.md` is implemented, simulated, formally verified, and synthesized. All figures in this document originate directly from committed tool transcripts and synthesis reports.
+Every simulation, formal CTL, RTL, and synthesis requirement from `Project_PS.md` is implemented and verified with committed artifacts; physical normal boot and `SW0` byte-flip refusal are logged on Zybo Z7-10 with steady-state ILA traces, while hardware masking remains NOT DONE and rising-edge transient ILA capture, `SW1` bench logging, on-board latency measurement, and on-board KAT execution remain pending.
 
-**Final Audit Verdict:** `ALL SIMULATION, FORMAL CTL, RTL, AND SYNTHESIS REQUIREMENTS FULLY VERIFIED WITH COMMITTED EVIDENCE.`
+**Final Audit Verdict:** `SIMULATION, FORMAL CTL, RTL, AND SYNTHESIS VERIFIED; NORMAL & SW0 BOARD BOOT LOGGED (MASKING NOT DONE; EDGE-ILA / SW1 / ON-BOARD KAT PENDING).`

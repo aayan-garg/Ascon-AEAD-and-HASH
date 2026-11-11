@@ -4,7 +4,7 @@
 **Target Hardware:** Digilent Zybo Z7-10 Development Board (AMD-Xilinx XC7Z010-1CLG400C)  
 **System Clock:** 100.0 MHz (10.0 ns period) generated via MMCM from 125.0 MHz Ethernet PHY oscillator  
 **Primary Reference:** `Project_PS.md` (Problem Statement & Project-Specific Deliverables)  
-**Status:** Pre-Hardware Execution & ILA Capture Specification  
+**Status:** Hardware Test Specification & Active Validation Record (Normal/`SW0` Steady-State Logged; Edge-Triggered ILA / `SW1` / On-Board KAT Pending)  
 
 ---
 
@@ -32,7 +32,6 @@ Every test procedure in this document directly traces to the requirements and de
 flowchart TD
     subgraph HostPC ["Host PC Workstation"]
         VivadoHW ["Vivado Hardware Manager\n(JTAG Server TCP:3121)"]
-        Terminal ["Serial Console (115200 8-N-1)\n(Digilent USB UART)"]
     end
 
     subgraph ZyboBoard ["Digilent Zybo Z7-10 Board (XC7Z010-1CLG400C)"]
@@ -68,7 +67,6 @@ flowchart TD
     end
 
     VivadoHW <==>|Micro-USB JTAG (J12)| Debug
-    Terminal <==>|Micro-USB UART (J12)| CPU
     CLK100 --> SoC
     CLK100 --> ILA
     RSTSYNC --> SoC
@@ -77,7 +75,7 @@ flowchart TD
     BCTRL --> GUARD
     BCTRL --> LEDS
     BCTRL --> RGB
-    SoC -.->|Probed Internal Nets| ILA
+    SoC -.->|11 Probes / 18 Bits| ILA
 ```
 
 ### 2.2 Board Pin Constraints & Hardware Interface
@@ -90,8 +88,8 @@ The pin assignments are enforced in [`board/zybo_z7_10.xdc`](../board/zybo_z7_10
 | **Push Button 0** | `K18` | LVCMOS33 | `rst_btn` | Active-High manual reset. Pressing BTN0 forces asynchronous reset; release produces synchronous deassertion. |
 | **Slide Switch 0** | `G15` | LVCMOS33 | `sw[0]` | **Live DMA Byte-Flip Fault Injection:** Inverts bit 0 of BRAM word `0x410` (byte `0x1040`) during DMA read. |
 | **Slide Switch 1** | `P15` | LVCMOS33 | `sw[1]` | **Live Glitch / Tamper Sensor:** Asserts physical `tamper_det` input to `boot_ctrl.sv`, tripping sticky lockout. |
-| **Slide Switch 2** | `W13` | LVCMOS33 | `sw[2]` | Auxiliary user configuration (read by soft-core via AXI-Lite GPIO). |
-| **Slide Switch 3** | `T16` | LVCMOS33 | `sw[3]` | Auxiliary user configuration (read by soft-core via AXI-Lite GPIO). |
+| **Slide Switch 2** | `W13` | LVCMOS33 | `sw[2]` | Unused / reserved slide switch input on `top_bringup_board` |
+| **Slide Switch 3** | `T16` | LVCMOS33 | `sw[3]` | Unused / reserved slide switch input on `top_bringup_board` |
 | **Discrete LED 0** | `M14` | LVCMOS33 | `led[0]` | Boot verification activity (LD0); illuminated during normal boot pass. |
 | **Discrete LED 1** | `M15` | LVCMOS33 | `led[1]` | Boot refusal alert (LD1); illuminated during refusal pattern `4'b1010`. |
 | **Discrete LED 2** | `G14` | LVCMOS33 | `led[2]` | DMA hashing activity (LD2); illuminated during normal boot pass. |
@@ -220,40 +218,33 @@ The Integrated Logic Analyzer core (`xilinx.com:ip:ila:6.2`) is inserted into th
 - **Sampling Clock:** `clk_100mhz` (100.0 MHz, 10.0 ns resolution)
 - **Sample Depth:** 1024 samples (provides $10.24\,\mu\text{s}$ continuous real-time capture window)
 - **Input Pipeline Stages:** 0 (cycle-accurate alignment with system clock)
-- **Total Monitored Nets:** 21 signals / buses (75 total probe bits)
+- **Total Monitored Nets:** 11 probe ports (18 total probe bits, per [`scripts/build_bitstream_ila.tcl`](../scripts/build_bitstream_ila.tcl))
 
 ### 4.2 Complete ILA Probe Signal Map
 
 | Probe Port | Probe Width | Monitored Signal / Net Name | Radix | Semantic Function in Secure Boot |
 |:---|:---:|:---|:---:|:---|
-| `probe0` | 1 | `rst_n` | BIN | Synchronous active-low system reset |
-| `probe1` | 1 | `u_soc/boot_jump_enable` | BIN | **Safety Gate:** Hardware jump authorization to CPU |
-| `probe2` | 1 | `u_soc/boot_refuse` | BIN | **Refusal Indicator:** Terminal lockout flag |
-| `probe3` | 1 | `u_soc/u_ascon/u_boot_ctrl/hash_ok` | BIN | **Digest Match:** 256-bit hardware comparator match flag |
-| `probe4` | 1 | `u_soc/u_ascon/u_boot_ctrl/tamper_latched_q`| BIN | **Tamper Latch:** Sticky physical tamper register |
-| `probe5` | 4 | `u_soc/u_ascon/u_boot_ctrl/state_q[3:0]` | HEX | **Boot FSM State:** Current state of `boot_ctrl.sv` |
-| `probe6` | 1 | `u_soc/dma_start` | BIN | DMA transfer initiation pulse |
-| `probe7` | 1 | `u_soc/dma_busy` | BIN | DMA engine actively fetching BRAM words |
-| `probe8` | 1 | `u_soc/dma_done` | BIN | DMA payload stream transfer complete pulse |
-| `probe9` | 1 | `u_soc/dma_err` | BIN | DMA address boundary violation error |
-| `probe10` | 1 | `u_soc/dma_stream_valid` | BIN | DMA stream data valid handshake |
-| `probe11` | 1 | `u_soc/dma_stream_ready` | BIN | Ascon engine stream ready handshake |
-| `probe12` | 1 | `u_soc/dma_stream_last` | BIN | Final 64-bit word of DMA payload stream |
-| `probe13` | 12 | `u_soc/dma_bram_addr[11:0]` | HEX | BRAM word address fetched by DMA master |
-| `probe14` | 32 | `u_soc/dma_bram_rdata[31:0]` | HEX | Raw 32-bit data read from BRAM (reflecting SW0 bit flip) |
-| `probe15` | 4 | `sw_IBUF[3:0]` | BIN | Physical slide switches (SW0=flip, SW1=tamper) |
-| `probe16` | 4 | `led_OBUF[3:0]` | HEX | Discrete status LEDs LD0..LD3 |
-| `probe17` | 3 | `rgb_led[2:0]` | BIN | RGB status LED LD6 ([0]=Red, [1]=Green, [2]=Blue) |
-| `probe18` | 1 | `u_soc/test_pass` | BIN | Software application completion flag |
-| `probe19` | 1 | `u_soc/trap` | BIN | PicoRV32 illegal instruction / trap indicator |
+| `probe0` | 1 | `rst_n` | HEX | Synchronized active-low system reset |
+| `probe1` | 1 | `u_soc/boot_refuse` | HEX | **Refusal Indicator:** Terminal lockout flag |
+| `probe2` | 1 | `u_soc/u_ascon/u_boot_ctrl/hash_ok` | HEX | **Digest Match:** 256-bit hardware comparator match flag |
+| `probe3` | 1 | `u_soc/dma_start` | HEX | DMA transfer initiation pulse |
+| `probe4` | 1 | `u_soc/dma_busy` | HEX | DMA engine actively fetching BRAM words |
+| `probe5` | 1 | `u_soc/dma_done` | HEX | DMA payload stream transfer complete flag |
+| `probe6` | 1 | `u_soc/dma_stream_valid` | HEX | DMA stream data valid handshake |
+| `probe7` | 1 | `u_soc/dma_stream_ready` | HEX | Ascon engine stream ready handshake |
+| `probe8` | 4 | `led_OBUF[3:0]` | HEX | Discrete status LEDs LD0..LD3 |
+| `probe9` | 2 | `sw_IBUF[1:0]` | HEX | Physical slide switches (`SW0`=flip, `SW1`=tamper) |
+| `probe10` | 3 | `u_soc/rgb_led[2:0]` | HEX | RGB status LED LD6 (`[0]=Red`, `[1]=Green`, `[2]=Blue`) |
 
 ---
 
-## 5. ILA Waveform Results & Verification Analysis
+## 5. Simulated Transient Reference & Recorded Hardware Captures
 
-### 5.1 Case 1: Golden Secure Boot Waveform Capture (Normal Boot, SW0=0, SW1=0)
+> **Important Distinction:** The committed on-board ILA CSV captures (`results/board/ila_traces/ila_capture_normal_boot.csv` and `ila_capture_fault_injection.csv`) were captured in immediate `-trigger_now` steady-state mode after boot completed. The cycle-by-cycle boot diagrams below illustrate **simulated reference timing** from `tb_secure_boot.sv` (`906` / `1,342` cycles at `100 MHz`); armed rising-edge hardware ILA captures (`capture_ila.tcl normal` and `fault`) are pending to record the live boot transient on silicon.
 
-**Trigger Setup:** Trigger on rising edge of `u_soc/boot_jump_enable` (Probe 1 == `1'b1`) with 10% pre-trigger buffer.
+### 5.1 Case 1: Golden Secure Boot Reference Flow (Normal Boot, SW0=0, SW1=0)
+
+**Target Trigger Setup (for transient capture):** Trigger on rising edge of `u_soc/dma_start` (`probe3 == 1'b1`) via `scripts/capture_ila.tcl normal`. Observed `-trigger_now` steady-state hardware values (`ila_capture_normal_boot.csv`): `rst_n=1, boot_refuse=0, hash_ok=1, dma_done=1, led_OBUF=0xF, sw_IBUF=0x0, rgb_led=0x2 (Green)`.
 
 ```mermaid
 sequenceDiagram
@@ -286,7 +277,7 @@ sequenceDiagram
     Note over CPU: Cycle 1342: Application completes; write GPIO (LEDs = 0xF, RGB = Green)
 ```
 
-#### Real-Time Logic Analyzer Cycle Trace (Normal Boot)
+#### Simulated XSim Reference Cycle Trace (Normal Boot)
 
 ```text
 Clock Cycle      : ... 18 ... 22 ... 26 ... 880 ... 904 ... 906 ... 910 ... 1342
@@ -309,17 +300,15 @@ led[3:0]         : -------------------< 4'b0001 >---------------------------<   
 test_pass        : ___________________________________________________________________________________/~~
 ```
 
-**Key Takeaways from Normal Boot ILA Capture:**
-1. `hash_ok` strictly transitions from 0 to 1 at **Cycle 905**, exactly one cycle prior to `boot_jump_enable` asserting at **Cycle 906**.
-2. This provides on-chip physical verification of the formal CTL theorem:
-   $$AG(\text{jump} \rightarrow \text{hash\_ok})$$
-3. Application completes at **Cycle 1,342** with `test_pass = 1` and discrete LEDs displaying `4'b1111`.
+**Key Takeaways from Simulation & Steady-State Hardware Capture:**
+1. In Vivado XSim (`tb_secure_boot.sv`), `hash_ok` transitions to `1` prior to `boot_jump_enable` asserting at **Cycle 906** (`9.06 µs`), and application completion occurs at **Cycle 1,342** (`13.42 µs`), matching the formal CTL invariant $AG(\text{jump} \rightarrow \text{hash\_ok})$.
+2. On the physical Digilent Zybo Z7-10 (`ila_capture_normal_boot.csv`), steady-state `-trigger_now` capture confirms `hash_ok = 1`, `boot_refuse = 0`, `led_OBUF = 4'b1111`, and `rgb_led = 3'b010` (Green).
 
 ---
 
-### 5.2 Case 2: Byte-Flip Fault Injection ILA Capture (SW0=1, Refusal Path, PS-DEL-5)
+### 5.2 Case 2: Byte-Flip Fault Injection Reference & Hardware Capture (SW0=1, Refusal Path, PS-DEL-5)
 
-**Trigger Setup:** Trigger on rising edge of `u_soc/boot_refuse` (Probe 2 == `1'b1`) with 50% pre-trigger buffer.
+**Target Trigger Setup (for transient capture):** Trigger on rising edge of `u_soc/boot_refuse` (`probe1 == 1'b1`) via `scripts/capture_ila.tcl fault`. Observed `-trigger_now` steady-state hardware values (`ila_capture_fault_injection.csv`): `rst_n=1, boot_refuse=1, hash_ok=0, dma_done=1, led_OBUF=0xA, sw_IBUF=0x1, rgb_led=0x1 (Red)`.
 
 ```mermaid
 sequenceDiagram
@@ -348,7 +337,7 @@ sequenceDiagram
     Note over CPU: CPU trapped in safe NOP slide; application never executes
 ```
 
-#### Real-Time Logic Analyzer Cycle Trace (Tamper Refusal)
+#### Simulated XSim Reference Cycle Trace (Tamper Refusal)
 
 ```text
 Clock Cycle      : ... 18 ... 22 ... 26 ... 880 ... 890 ... 892 ... 906 ... 1000
@@ -382,21 +371,23 @@ test_pass        : _____________________________________________________________
 To ensure total reproducibility on any development machine, automated scripts are provided in the repository:
 
 ### 6.1 ILA Bitstream Generation Script: `scripts/build_bitstream_ila.tcl`
-Executes full synthesis, non-intrusively inserts the ILA debug core on the 21 monitored signals, runs physical implementation, and generates both the bitstream and the Hardware Manager probe definition file:
+Executes full synthesis, inserts the ILA debug core (`u_ila_0`) on the **11 configured probes (18 bits)**, runs physical implementation, and generates both the bitstream and the Hardware Manager probe definition file:
 ```bash
 # Run batch ILA build in Vivado:
 C:\Xilinx\2025.1\Vivado\bin\vivado.bat -mode batch -nojournal -log build/vivado_ila_build.log -source scripts/build_bitstream_ila.tcl
 ```
-- **Generated Bitstream:** `build/top_bringup_ila.bit`
-- **Generated Debug Probes:** `build/top_bringup_ila.ltx`
-- **Resource Overhead:** Adds only ~1,250 LUTs, ~1,400 FFs, and 3 Block RAMs (utilization remains under 36% of XC7Z010).
+- **Generated Bitstream (local/gitignored):** `build/top_bringup_ila.bit`
+- **Generated Debug Probes (local/gitignored):** `build/top_bringup_ila.ltx`
+- **Measured ILA Build Overhead & Totals (`utilization_bringup_ila.txt`, `timing_bringup_ila.txt`):** Adds `+1,696` LUTs, `+2,257` FFs, and `+4.5` BRAM Tiles over the baseline build (`6,784` LUTs [38.55%], `7,743` FFs [22.00%], `8.5` BRAM Tiles [14.17%]), closing post-route STA at **WNS = +1.042 ns** (`0` failing endpoints of 21,115).
 
 ### 6.2 Automated Hardware Manager ILA Programming & Capture: `scripts/capture_ila.tcl`
-Connects to the Zybo Z7-10 via JTAG, loads `top_bringup_ila.bit` with `top_bringup_ila.ltx`, arms the trigger, captures real-time samples, and exports trace data:
+Connects to the Zybo Z7-10 via JTAG, loads `top_bringup_ila.bit` with `top_bringup_ila.ltx`, arms the trigger (or captures immediately with `now`), and exports CSV trace data:
 ```bash
-# Program board and arm ILA capture:
+# Capture steady-state running SoC immediately (-trigger_now):
+C:\Xilinx\2025.1\Vivado\bin\vivado.bat -mode batch -nojournal -nolog -source scripts/capture_ila.tcl -tclargs now
+# Arm rising-edge capture for normal boot (press BTN0 when prompted):
 C:\Xilinx\2025.1\Vivado\bin\vivado.bat -mode batch -nojournal -nolog -source scripts/capture_ila.tcl -tclargs normal
-# For fault injection capture:
+# Arm rising-edge capture for fault injection (set SW0=1 and press BTN0 when prompted):
 C:\Xilinx\2025.1\Vivado\bin\vivado.bat -mode batch -nojournal -nolog -source scripts/capture_ila.tcl -tclargs fault
 ```
 
@@ -406,10 +397,10 @@ C:\Xilinx\2025.1\Vivado\bin\vivado.bat -mode batch -nojournal -nolog -source scr
 
 | Checklist Item | Requirement | Verification Method | Status |
 |:---|:---|:---|:---:|
-| **AC-01: Clocking** | 100.0 MHz system clock from 125 MHz input; MMCM locked; 0 setup/hold violations ($WNS \ge +1.5\text{ ns}$). | Timing report & MMCM lock LED | Verified in Timing Report ($WNS = +1.510$ ns) |
-| **AC-02: Normal Boot** | Valid firmware image boots to `0x1040`; discrete LEDs = `4'b1111`, RGB LD6 = Solid Green. | Visual observation & ILA capture | Defined & Verified in HW-02 |
-| **AC-03: Byte-Flip Fault** | Toggling SW0=1 flips candidate bit 0 during DMA; boot refuses; LEDs = `4'b1010`, RGB LD6 = Solid Red. | Switch toggle & ILA capture | Defined & Verified in HW-03 |
-| **AC-04: Tamper Lockout** | Toggling SW1=1 asserts tamper latch; refusal state persists after SW1 cleared until BTN0 reset. | Switch toggle & ILA capture | Defined & Verified in HW-04 |
-| **AC-05: Fetch Guard** | Unauthorized fetches to $\ge \text{0x1040}$ intercepted and replaced with RISC-V NOP (`0x00000013`). | ILA probe & negative sim | Verified in Simulation & RTL |
-| **AC-06: Boot Timing** | Exact cycle counts match scaling benchmark: 64B = 906 cyc, 1KB = 2,706 cyc, 4KB = 8,462 cyc. | Hardware cycle counter & ILA | Benchmarked in `boot_scaling_benchmark.log` |
-| **AC-07: NIST KATs** | 100% bit-exact compliance on Ascon-AEAD128 and Ascon-Hash256 on hardware. | On-board KAT runner & ILA | Verified in Golden Model & RTL |
+| **AC-01: Clocking** | 100.0 MHz system clock from 125 MHz input; MMCM locked; 0 setup/hold violations. | Post-route Timing Report | Verified in Timing Reports (Baseline `WNS = +1.510 ns`; ILA `WNS = +1.042 ns`) |
+| **AC-02: Normal Boot** | Valid firmware image boots; discrete LEDs = `4'b1111`, RGB LD6 = Solid Green. | Visual observation & steady-state ILA CSV | **Verified on Board** (`ila_capture_normal_boot.csv`, `LD6` Green, `0xF`) |
+| **AC-03: Byte-Flip Fault** | Toggling SW0=1 flips candidate bit 0 during DMA; boot refuses; LEDs = `4'b1010`, RGB LD6 = Solid Red. | Switch toggle & steady-state ILA CSV | **Verified on Board** (`ila_capture_fault_injection.csv`, `LD6` Red, `0xA`) |
+| **AC-04: Tamper Lockout** | Toggling SW1=1 asserts tamper latch; refusal state persists after SW1 cleared until BTN0 reset. | Switch toggle & ILA capture | Verified in Simulation/CTL (`tb_secure_boot.sv` Case 9); on-board record pending |
+| **AC-05: Fetch Guard** | Unauthorized fetches to $\ge \text{0x1040}$ intercepted and replaced with RISC-V NOP (`0x00000013`). | Negative sim (`tb_forced_jump.sv`) & ILA | Verified in Simulation & RTL (`forced_jump_sim.log`) |
+| **AC-06: Boot Timing** | Exact cycle counts match scaling benchmark: 64B = 906 cyc, 1KB = 2,706 cyc, 4KB = 8,462 cyc. | Simulation benchmark & armed ILA capture | Benchmarked in XSim (`boot_scaling_benchmark.log`); armed transient ILA pending |
+| **AC-07: NIST KATs** | 100% bit-exact compliance on Ascon-AEAD128 and Ascon-Hash256. | Golden model + Vivado XSim KAT suites; on-board runner | 2,114 KATs Verified in Golden Model & RTL XSim (`results/kat/`); on-board KAT runner NOT YET RUN (not included in `top_bringup_board` BRAM image) |

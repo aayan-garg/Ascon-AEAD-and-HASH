@@ -1,7 +1,7 @@
 # Phase 2: RISC-V Core (PicoRV32) Bring-Up Report
 
 - **Date:** 2026-10-21 (Updated November 5, 2026)
-- **Status:** `[x] SIMULATION VERIFIED; TIMING CLOSED AT ROUTE_DESIGN`
+- **Status:** `[x] SIMULATION VERIFIED; TIMING CLOSED & BITSTREAM GENERATED`
 - **Core:** PicoRV32 RV32I AXI4-Lite Core (`rtl/soc/picorv32.v`)
 - **Top-Level:** `rtl/soc/top_bringup.sv`
 - **Testbench:** `tb/unit/tb_picorv32_bringup.sv`
@@ -119,14 +119,14 @@ Synthesized and placed/routed with AMD-Xilinx Vivado v2025.1.0:
 
 | Metric | Target | Measured | Timing Margin / Status |
 |---|---|:---:|---|
-| **Worst Negative Slack (WNS)** | $\ge 0.000\text{ ns}$ | **+1.570 ns** | **MET (1.570 ns positive setup slack)** |
+| **Worst Negative Slack (WNS)** | $\ge 0.000\text{ ns}$ | **+1.510 ns** | **MET (1.510 ns positive setup slack)** |
 | **Total Negative Slack (TNS)** | $0.000\text{ ns}$ | **0.000 ns** | **MET (0 failing endpoints)** |
-| **Worst Hold Slack (WHS)** | $\ge 0.000\text{ ns}$ | **+0.036 ns** | **MET (No hold violations)** |
+| **Worst Hold Slack (WHS)** | $\ge 0.000\text{ ns}$ | **+0.027 ns** | **MET (No hold violations)** |
 | **Total Hold Slack (THS)** | $0.000\text{ ns}$ | **0.000 ns** | **MET (0 failing endpoints)** |
-| **Maximum Frequency ($F_{max}$)**| $\ge 100\text{ MHz}$ | **118.62 MHz** | **MET** |
+| **Maximum Frequency ($F_{max}$)**| $\ge 100\text{ MHz}$ | **117.79 MHz** | **MET** |
 
 ---
 
 ## 7. Implementation & Hardware Scope Status
 
-Bitstream generation not attempted (on-board testing out of scope per rules; implementation stopped at route_design with WNS +1.570 ns). All physical constraints are verified in [`board/zybo_z7_10.xdc`](../../board/zybo_z7_10.xdc) and board top-level RTL [`rtl/soc/top_bringup_board.sv`](../../rtl/soc/top_bringup_board.sv).
+Routed timing closed cleanly at +1.510 ns WNS ($F_{max} = 117.79\text{ MHz}$) and bitstream generation was completed via [`scripts/build_bitstream.tcl`](../../scripts/build_bitstream.tcl) (`build/top_bringup.bit`, raw build transcript archived in [`results/board/bitstream_build_raw.log`](bitstream_build_raw.log)). Physical constraints are enforced in [`board/zybo_z7_10.xdc`](../../board/zybo_z7_10.xdc) for [`rtl/soc/top_bringup_board.sv`](../../rtl/soc/top_bringup_board.sv), with on-board execution procedures and recorded results tracked in [`results/board/HARDWARE_RUNBOOK.md`](HARDWARE_RUNBOOK.md).

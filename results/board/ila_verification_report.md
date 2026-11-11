@@ -1,191 +1,97 @@
 # Integrated Logic Analyzer (ILA) Hardware Verification Report
 
-**Project:** Ascon AEAD and Hash Engine for IoT Secure Boot  
-**Target Hardware:** Digilent Zybo Z7-10 (AMD-Xilinx Zynq-7000 XC7Z010-1CLG400C)  
-**System Clock:** 100.0 MHz ($T_{\text{clk}} = 10.0\text{ ns}$)  
-**Debug Tool:** AMD-Xilinx Vivado Integrated Logic Analyzer (ILA 6.2)  
-**Probe Definition File:** `build/top_bringup_ila.ltx`  
-**Reference Document:** [`docs/hardware_test_plan.md`](../../docs/hardware_test_plan.md)  
+- **Project:** Ascon AEAD and Hash Engine for IoT Secure Boot
+- **Target Hardware:** Digilent Zybo Z7-10 (AMD-Xilinx Zynq-7000 `xc7z010clg400-1`)
+- **System Clock:** 100.0 MHz ($T_{\text{clk}} = 10.0\text{ ns}$ via MMCM from 125.0 MHz PHY oscillator)
+- **Debug Tool:** AMD-Xilinx Vivado Integrated Logic Analyzer (`xilinx.com:ip:ila:6.2`)
+- **Build & Capture Scripts:** [`scripts/build_bitstream_ila.tcl`](../../scripts/build_bitstream_ila.tcl), [`scripts/capture_ila.tcl`](../../scripts/capture_ila.tcl)
+- **ILA Bitstream / Probes (gitignored local outputs):** `build/top_bringup_ila.bit` (SHA256 `73509960B279B6F45E7196DB4C7BC266A47025391670194D819D1D3BD9843224`), `build/top_bringup_ila.ltx`
+- **Reference Document:** [`docs/hardware_test_plan.md`](../../docs/hardware_test_plan.md)
 
 ---
 
-## 1. ILA Core Overview & Instrumentation Topology
+## 1. ILA Core Topology & Actual Probe Mapping
 
-The Integrated Logic Analyzer core (`u_ila_0`) provides cycle-accurate, non-intrusive visibility into the internal state machines, DMA streaming transactions, cryptographic handshakes, and hardware safety gates of the Ascon Secure Boot SoC.
+The ILA core (`u_ila_0`) is inserted post-synthesis in [`scripts/build_bitstream_ila.tcl`](../../scripts/build_bitstream_ila.tcl) and sampled in the `clk_100mhz` domain.
 
 ### 1.1 Core Configuration Parameters
 - **IP Core:** `xilinx.com:ip:ila:6.2`
-- **Sampling Clock:** `clk_100mhz` (Synchronous to CPU, DMA, and Ascon core)
-- **Sample Buffer Depth:** 1,024 samples ($10.24\,\mu\text{s}$ window at 100 MHz)
-- **Input Pipeline Stages:** 0 (Immediate cycle-matched capture)
-- **Total Probes:** 20 probe ports (75 monitored nets)
-- **Capture Modes:** Basic trigger, multi-condition trigger, storage qualification
+- **Sampling Clock:** `clk_100mhz` (`100.0 MHz`, `10.0 ns` sample period)
+- **Sample Buffer Depth (`C_DATA_DEPTH`):** `1,024` samples ($10.24\,\mu\text{s}$ continuous window)
+- **Input Pipeline Stages (`C_INPUT_PIPE_STAGES`):** `0`
+- **Trigger Position (`CONTROL.TRIGGER_POSITION`):** `512` (midpoint in `capture_ila.tcl`)
+- **Configured Probes:** **11 probe ports (18 total probe bits)**
 
-### 1.2 Probed Signal Dictionary
+### 1.2 Probed Signal Dictionary (Matches `scripts/build_bitstream_ila.tcl`)
 
-| Probe Port | Signal / Hierarchical Net | Width | Radix | Semantic Function |
+| Probe Port | Signal / Hierarchical Net | Width | Radix | Semantic Role |
 |:---|:---|:---:|:---:|:---|
-| `probe0` | `rst_n` | 1 | BIN | Synchronous active-low system reset |
-| `probe1` | `u_soc/boot_jump_enable` | 1 | BIN | CPU jump authorization gate to application region |
-| `probe2` | `u_soc/boot_refuse` | 1 | BIN | Permanent terminal lockout indicator |
-| `probe3` | `u_soc/u_ascon/u_boot_ctrl/hash_ok` | 1 | BIN | Hardware 256-bit digest comparator match flag |
-| `probe4` | `u_soc/u_ascon/u_boot_ctrl/tamper_latched_q` | 1 | BIN | Sticky physical tamper / glitch detection register |
-| `probe5` | `u_soc/u_ascon/u_boot_ctrl/fsm_state[3:0]` | 4 | HEX | Boot Controller FSM state encoding |
-| `probe6` | `u_soc/dma_start` | 1 | BIN | DMA payload stream initiation pulse |
-| `probe7` | `u_soc/dma_busy` | 1 | BIN | DMA streaming active |
-| `probe8` | `u_soc/dma_done` | 1 | BIN | DMA payload transfer complete |
-| `probe9` | `u_soc/dma_err` | 1 | BIN | DMA address boundary violation error |
-| `probe10` | `u_soc/dma_stream_valid` | 1 | BIN | DMA stream data valid handshake |
-| `probe11` | `u_soc/dma_stream_ready` | 1 | BIN | Ascon accelerator stream ready handshake |
-| `probe12` | `u_soc/dma_stream_last` | 1 | BIN | DMA end-of-payload marker |
-| `probe13` | `u_soc/dma_bram_addr[11:0]` | 12 | HEX | Dual-port BRAM Port B read address |
-| `probe14` | `u_soc/dma_bram_rdata[31:0]` | 32 | HEX | 32-bit data read from BRAM (with SW0 fault injection) |
-| `probe15` | `sw_IBUF[3:0]` | 4 | BIN | Physical slide switches (SW0=flip, SW1=tamper) |
-| `probe16` | `led_OBUF[3:0]` | 4 | HEX | Discrete user LEDs LD0..LD3 |
-| `probe17` | `rgb_led[2:0]` | 3 | BIN | RGB status LED LD6 ([0]=Red, [1]=Green, [2]=Blue) |
-| `probe18` | `u_soc/test_pass` | 1 | BIN | Application execution completion indicator |
-| `probe19` | `u_soc/trap` | 1 | BIN | CPU illegal instruction / exception trap |
+| `probe0` | `rst_n` | 1 | HEX | Synchronized active-low system reset |
+| `probe1` | `u_soc/boot_refuse` | 1 | HEX | Hardware refusal lockout output from `boot_ctrl` |
+| `probe2` | `u_soc/u_ascon/u_boot_ctrl/hash_ok` | 1 | HEX | Hardware 256-bit digest comparator match flag |
+| `probe3` | `u_soc/dma_start` | 1 | HEX | DMA payload stream start pulse |
+| `probe4` | `u_soc/dma_busy` | 1 | HEX | DMA streaming active flag |
+| `probe5` | `u_soc/dma_done` | 1 | HEX | DMA payload stream complete flag |
+| `probe6` | `u_soc/dma_stream_valid` | 1 | HEX | DMA-to-Ascon AXI-Stream `tvalid` |
+| `probe7` | `u_soc/dma_stream_ready` | 1 | HEX | Ascon-to-DMA AXI-Stream `tready` |
+| `probe8` | `led_OBUF[3:0]` | 4 | HEX | Discrete user LEDs `LD0..LD3` |
+| `probe9` | `sw_IBUF[1:0]` | 2 | HEX | Slide switches (`sw[0]` DMA flip, `sw[1]` tamper) |
+| `probe10` | `u_soc/rgb_led[2:0]` | 3 | HEX | RGB LED `LD6` (`[0]=Red`, `[1]=Green`, `[2]=Blue`) |
 
 ---
 
-## 2. Test Case 1: Normal Boot ILA Results (Golden Image, SW0=0, SW1=0)
+## 2. Committed On-Board ILA Captures (`-trigger_now` Steady-State Snapshots)
 
-### 2.1 Trigger Setup
-- **Trigger Condition:** Rising edge of `u_soc/boot_jump_enable` (`probe1 == 1'b1`)
-- **Trigger Position:** 880 samples (captures pre-jump DMA streaming and hashing history)
-- **Status:** **PASS**
+On November 6, 2026, two 1,024-sample ILA captures were exported from the physical Digilent Zybo Z7-10 using `scripts/capture_ila.tcl` in immediate trigger mode (`run_hw_ila $hw_ila -trigger_now`, trigger marker at sample `512`). Because `-trigger_now` fires after programming/boot completes, both CSV logs capture **steady-state post-boot hardware probe values** across all 1,024 samples (`0..1023`), confirming physical LED/switch and internal status nets on silicon:
 
-### 2.2 ILA Waveform Timing Diagram (Cycle-Accurate)
+| Capture Artifact | Board Stimulus | Visual Observation | `rst_n` | `boot_refuse` | `hash_ok` | `dma_done` | `led_OBUF[3:0]` | `sw_IBUF[1:0]` | `u_soc/rgb_led[2:0]` |
+|---|---|---|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
+| [`ila_capture_normal_boot.csv`](ila_traces/ila_capture_normal_boot.csv) | `SW0=0`, `SW1=0` (valid `bram_case1_valid.hex`) | `LD0..3` all ON, `LD6` Solid **Green** | `1` | `0` | `1` | `1` | `0xF` (`4'b1111`) | `0x0` | `0x2` (Green) |
+| [`ila_capture_fault_injection.csv`](ila_traces/ila_capture_fault_injection.csv) | `SW0=1`, `SW1=0` (DMA bit-0 flip at word `0x410`) | `LD0..3` `4'b1010`, `LD6` Solid **Red** | `1` | `1` | `0` | `1` | `0xA` (`4'b1010`) | `0x1` | `0x1` (Red) |
 
-```text
-Sample Index (Cycles) : ... 18 ... 22 ... 26 ... 870 ... 890 ... 904 ... 905 ... 906 ... 910 ... 1342
--------------------------------------------------------------------------------------------------------------------
-clk_100mhz            : _/~\_/~\_/~\_/~\_/~\_/~\_/~\_/~\_/~\_/~\_/~\_/~\_/~\_/~\_/~\_/~\_/~\_/~\_/~\_/~\_/~\_/~\_
-rst_n                 : ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-sw_IBUF[3:0]          : ---------------------------------< 4'b0000 >-----------------------------------------------
-dma_start             : __/~~~\____________________________________________________________________________________
-dma_busy              : ___/~~~~~~~~~~~~~~~~~~~\___________________________________________________________________
-dma_stream_valid      : ___/~~~~~~~~~~~~~~~~~~~\___________________________________________________________________
-dma_stream_ready      : ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-dma_bram_addr[11:0]   : ----< 410 >< 411 >< 417 >------------------------------------------------------------------
-dma_done              : ____________________/~~~\__________________________________________________________________
-fsm_state[3:0]        : --< 1 ><       2       ><                 3                 >< 4 >< 5 ><     6 (JUMP)     >
-hash_ok               : ___________________________________________________________________/~~~~~~~~~~~~~~~~~~~~~~~
-boot_jump_enable      : _____________________________________________________________________/~~~~~~~~~~~~~~~~~~~~~
-boot_refuse           : ___________________________________________________________________________________________
-rgb_led[2:0]          : -----------< 3'b100 (BLUE) >---------------------------------------<    3'b010 (GREEN)    >
-led_OBUF[3:0]         : -------------------< 4'b0001 >-------------------------------------<    4'b1111 (0xF)     >
-test_pass             : ________________________________________________________________________________________/~~
-```
-
-### 2.3 Detailed Timing & Phase Breakdown
-1. **Boot ROM Phase (Cycles 0–18 / 0–180 ns):**  
-   CPU powers up in reset state, enters Boot ROM at address `0x0000_0000`. Configures DMA registers: source address set to candidate payload base `0x0000_1040`, length set to 64 bytes (`0x40`). Pulse `dma_start` asserted at cycle 18.
-2. **DMA Streaming Phase (Cycles 18–26 / 180–260 ns):**  
-   `dma_busy` and `dma_stream_valid` assert high. DMA engine fetches 8 sequential 64-bit words from BRAM Port B (words `12'h410` through `12'h417`). Ascon Hash-256 accelerator receives stream with 0 wait-states (`dma_stream_ready=1`). `dma_done` pulses high at cycle 26.
-3. **Ascon Permutation & Hashing Phase (Cycles 26–880 / 0.26–8.80 µs):**  
-   Ascon Hash-256 core runs 12-round initialization permutation, absorbs the 64-byte payload, and executes the 12-round finalization permutation ($p^b$).
-4. **Digest Comparison & Authorization Phase (Cycles 880–906 / 8.80–9.06 µs):**  
-   At cycle 885, Ascon core completes hashing and presents the 256-bit computed digest `ascon_digest[255:0]` to `boot_ctrl.sv`.  
-   - `boot_ctrl` comparator compares with `DEFAULT_TRUSTED_DIGEST`:
-     $$\text{ascon\_digest} == \text{32'hEDB41305\_12075573\_11B6C8A2\_AFB9E393\_7FE61055\_A2267BDC\_433A4F7B\_777BB3DF}$$
-   - **At Cycle 905:** Comparator evaluates equality: `hash_ok` asserts high (`1'b1`).
-   - **At Cycle 906:** Boot controller advances state machine: `fsm_state = STATE_JUMP` (`4'd6`). `boot_jump_enable` asserts high.
-5. **Application Execution Phase (Cycles 906–1,342 / 9.06–13.42 µs):**  
-   Instruction fetch guard unmasks application region. CPU exits Boot ROM loop, jumps to `0x0000_1040`, and executes application instructions. At cycle 1,342, application writes `0x8000_000F` to GPIO, driving discrete LEDs to `4'b1111` and RGB LED to solid GREEN.
+In both steady-state captures, `dma_start = 0`, `dma_busy = 0`, `dma_stream_valid = 0`, and `dma_stream_ready = 0` (`TRIGGER = 1` at sample `512`, `0` elsewhere).
 
 ---
 
-## 3. Test Case 2: Byte-Flip Fault Injection ILA Results (SW0=1, Refusal Path)
+## 3. Simulated Transient Timing vs. Pending Hardware Captures
 
-### 3.1 Trigger Setup
-- **Trigger Condition:** Rising edge of `u_soc/boot_refuse` (`probe2 == 1'b1`)
-- **Trigger Position:** 850 samples
-- **Status:** **PASS**
+Cycle-by-cycle transient transitions during boot are verified in **Vivado XSim simulation** rather than captured yet with an armed rising-edge trigger on silicon:
 
-### 3.2 ILA Waveform Timing Diagram (Fault Injection Path)
-
-```text
-Sample Index (Cycles) : ... 18 ... 22 ... 26 ... 870 ... 885 ... 890 ... 891 ... 906 ... 1024
--------------------------------------------------------------------------------------------------------------------
-clk_100mhz            : _/~\_/~\_/~\_/~\_/~\_/~\_/~\_/~\_/~\_/~\_/~\_/~\_/~\_/~\_/~\_/~\_/~\_/~\_/~\_/~\_/~\_/~\_
-rst_n                 : ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-sw_IBUF[3:0]          : ---------------------------------< 4'b0001 (SW0=1) >---------------------------------------
-dma_start             : __/~~~\____________________________________________________________________________________
-dma_busy              : ___/~~~~~~~~~~~~~~~~~~~\___________________________________________________________________
-dma_bram_addr[11:0]   : ----< 410 >< 411 >< 417 >------------------------------------------------------------------
-dma_bram_rdata[31:0]  : ----< RAW ^ 1 >-----------------------------------------------------------------------------
-dma_done              : ____________________/~~~\__________________________________________________________________
-fsm_state[3:0]        : --< 1 ><       2       ><                 3                 >< 4 >< 5 >< 7 (STATE_REFUSE)  >
-hash_ok               : ___________________________________________________________________________________________
-boot_jump_enable      : ___________________________________________________________________________________________
-boot_refuse           : _______________________________________________________________________/~~~~~~~~~~~~~~~~~~~
-rgb_led[2:0]          : -----------< 3'b100 (BLUE) >-------------------------------------------<    3'b001 (RED)    >
-led_OBUF[3:0]         : -------------------< 4'b0001 >-----------------------------------------<    4'b1010 (0xA)   >
-fetch_guard_active    : ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-test_pass             : ___________________________________________________________________________________________
-```
-
-### 3.3 Security & Failure Analysis
-1. **Fault Injection Point:** Slide switch SW0 is set to `1`. In `top_bringup.sv`, line 278:
-   ```verilog
-   wire [31:0] dma_bram_rdata = (sw[0] && (dma_bram_addr_q == 12'h410)) ?
-                                (dma_bram_raw ^ 32'h00000001) : dma_bram_raw;
-   ```
-   During the first DMA read cycle (word `0x410`, address `0x1040`), bit 0 is inverted in hardware.
-2. **Cryptographic Avalanche Effect:** The 1-bit input inversion corrupts the internal 320-bit Ascon state across all 12 rounds. At cycle 885, the computed 256-bit digest differs completely from the golden digest (128 of 256 bits inverted).
-3. **Hardware Refusal Decision (Cycle 890):**  
-   - `boot_ctrl` comparator evaluates `hash_match == 0`.
-   - `hash_ok` remains permanently low (`1'b0`).
-   - `fsm_state` enters `STATE_HALT_REFUSE` (`4'd7`).
-   - `boot_refuse` asserts high (`1'b1`).
-   - `boot_jump_enable` remains permanently low (`1'b0`).
-4. **Fetch Guard Active Interception:**  
-   Because `boot_jump_enable == 0`, `fetch_guard.sv` intercepts all CPU instruction fetches to address $\ge \text{0x1040}$ and substitutes RISC-V NOP (`0x0000_0013`). The application payload is never executed.
-5. **Visual Lockout Output:** Discrete LEDs lock to refusal pattern **`4'b1010`** (`0xA`), and RGB LED LD6 locks to solid **RED** (`3'b001`).
+- **Simulated Reference (`tb_secure_boot.sv` / `boot_timing_sim.log` / `boot_scaling_benchmark.log`):**
+  - **Valid Boot (Case 1, 64 B):** `reset_to_jump = 906 cycles (9.06 us)`, `reset_to_test_pass = 1,342 cycles (13.42 us)` at `100 MHz`.
+  - **Refusal Paths (Cases 2–9):** `boot_refuse` locks at `1`, `boot_jump_enable` remains `0`, discrete LEDs drive `4'b1010`, and `fetch_guard` intercepts application fetches with RISC-V NOP (`0x0000_0013`).
+- **Pending On-Board Edge-Triggered / Bench Items (`STATUS: PENDING`):**
+  1. **Armed Rising-Edge Normal Boot ILA Capture:** Run `capture_ila.tcl` in `normal` mode (trigger on `u_soc/dma_start == 1`, press `BTN0` while armed) to record the transient `0 -> dma_start -> hash_ok -> GREEN` transition on silicon.
+  2. **Armed Rising-Edge Fault ILA Capture:** Run `capture_ila.tcl` in `fault` mode (trigger on `u_soc/boot_refuse == 1` with `SW0 = 1`, press `BTN0`) to record the transient refusal transition on silicon.
+  3. **Physical `SW1` Tamper Bench Log:** Verify `SW1 = 1` lockout and post-`SW1 -> 0` sticky persistence until `BTN0` reset on the physical board (verified in RTL simulation Case 9 and NuSMV CTL proof).
 
 ---
 
-## 4. Test Case 3: Hardware Glitch / Physical Tamper Sensor ILA Results (SW1=1)
+## 4. Formal CTL Correlation
 
-### 4.1 Trigger Setup
-- **Trigger Condition:** Rising edge of `u_soc/u_ascon/u_boot_ctrl/tamper_latched_q` (`probe4 == 1'b1`)
-- **Status:** **PASS**
+In Phase 9, NuSMV 2.6.0 proved all five CTL safety properties on [`formal/ctl/boot_safety_corrected.smv`](../../formal/ctl/boot_safety_corrected.smv) ([`results/formal/nuxmv/proof_corrected_nusmv.log`](../formal/nuxmv/proof_corrected_nusmv.log)):
+- `AG(jump -> hash_ok)`
+- `AG(jump -> verified_before_jump)`
+- `AG(tamper_latched -> !EF jump)`
+- `AG(DECIDE & !hash_ok -> AX REFUSE)`
+- `AG(refuse -> AG refuse)`
 
-### 4.2 Waveform Summary
-- When `SW1` is toggled high, `tamper_det` asserts.
-- `tamper_latched_q` transitions to `1'b1` within 10.0 ns.
-- `verified_before_jump_q` is immediately forced to `0`.
-- If the system was in `STATE_JUMP`, authorization is immediately revoked; if the system was in verification, it transitions directly to `STATE_HALT_REFUSE`.
-- **Sticky Latch Verification:** Even after `SW1` is returned to `0`, `tamper_latched_q` remains held at `1'b1` until the physical reset button (BTN0) is pressed.
+On silicon, the committed `-trigger_now` captures corroborate the reachable terminal invariants (`hash_ok = 1, boot_refuse = 0, rgb_led = GREEN` for untampered boot vs. `hash_ok = 0, boot_refuse = 1, rgb_led = RED` under `SW0 = 1` fault injection). Rising-edge cycle ordering on the live FPGA fabric will be confirmed once the armed `normal` / `fault` ILA captures are run.
 
 ---
 
-## 5. Physical Verification of Formal CTL Theorem
+## 5. ILA Bitstream Utilization & Static Timing Summary
 
-In Phase 9, formal model checking proved the following Computational Tree Logic (CTL) specification in NuSMV 2.6.0:
-$$\text{CTLSPEC } AG(\text{jump} \rightarrow \text{hash\_ok})$$
+All numbers below are taken directly from [`results/synthesis/utilization_bringup.txt`](../synthesis/utilization_bringup.txt), [`results/timing/timing_bringup.txt`](../timing/timing_bringup.txt), [`results/synthesis/utilization_bringup_ila.txt`](../synthesis/utilization_bringup_ila.txt), and [`results/timing/timing_bringup_ila.txt`](../timing/timing_bringup_ila.txt):
 
-The Integrated Logic Analyzer traces provide direct physical proof on the silicon fabric:
-
-| Formal State / Signal | Formal Variable (`boot_safety.smv`) | Silicon Net in ILA Capture | Hardware Invariance Confirmed on ILA Trace |
-|:---|:---|:---|:---|
-| **Jump Authorization** | `jump` | `u_soc/boot_jump_enable` | Never transitions to 1 unless `hash_ok == 1` has already asserted. |
-| **Digest Authentication**| `hash_ok` | `u_soc/u_ascon/u_boot_ctrl/hash_ok` | Required precondition for `boot_jump_enable`. In fault mode, remains 0. |
-| **Permanent Lockout** | `refuse` | `u_soc/boot_refuse` | Once asserted, remains 1 for all subsequent cycles until reset ($AG(\text{refuse} \rightarrow AG(\text{refuse}))$). |
-| **Tamper Sticky Latch** | `tamper_latched` | `u_soc/u_ascon/u_boot_ctrl/tamper_latched_q` | Latches high asynchronously; revokes jump authorization unconditionally. |
-
----
-
-## 6. Synthesis & Implementation Resources with ILA Core
-
-The table below demonstrates that instrumenting the SoC with the 1,024-depth ILA core leaves ample resource headroom on the target AMD-Xilinx XC7Z010 device:
-
-| Resource Type | Baseline SoC (`top_bringup_board`) | ILA Debug Core (`u_ila_0`) | Total Instrumented Design | Available on XC7Z010 | Final Utilization (%) |
+| Metric | Baseline SoC (`top_bringup_board`) | ILA Instrumented Build (`top_bringup_board` + `u_ila_0`) | ILA Overhead | Available (`XC7Z010`) | ILA Utilization (%) |
 |:---|:---:|:---:|:---:|:---:|:---:|
-| **Slice LUTs** | 5,088 | 1,248 | **6,336** | 17,600 | **36.00%** |
-| **Slice Registers (FF)**| 5,486 | 1,412 | **6,898** | 35,200 | **19.60%** |
-| **Block RAM (RAMB36E1)**| 4.5 | 3.0 | **7.5** | 60 | **12.50%** |
-| **Clock Buffers (BUFG)**| 2 | 1 | **3** | 32 | **9.38%** |
-| **MMCM Blocks** | 1 | 0 | **1** | 2 | **50.00%** |
-| **Worst Negative Slack (WNS)** | +1.510 ns | - | **+1.428 ns** | $\ge 0.0\text{ ns}$ | **TIMING CLOSED (100 MHz)** |
+| **Slice LUTs** | 5,088 | **6,784** | +1,696 | 17,600 | **38.55%** |
+| **Slice Registers (FFs)** | 5,486 | **7,743** | +2,257 | 35,200 | **22.00%** |
+| **Block RAM Tiles** | 4 (`4 RAMB36E1`) | **8.5** (`8 RAMB36E1 + 1 RAMB18E1`) | +4.5 | 60 | **14.17%** |
+| **Clock Buffers (`BUFGCTRL`)** | 2 | **3** | +1 | 32 | **9.38%** |
+| **MMCM (`MMCME2_ADV`)** | 1 | **1** | 0 | 2 | **50.00%** |
+| **Post-Route Setup Slack (WNS @ 100 MHz)** | +1.510 ns | **+1.042 ns** | -0.468 ns | $\ge 0.000\text{ ns}$ | **MET (0 / 21,115 failing)** |
+| **Post-Route Hold Slack (WHS)** | +0.027 ns | **+0.023 ns** | -0.004 ns | $\ge 0.000\text{ ns}$ | **MET (0 / 21,099 failing)** |
+
+*(Note: During intermediate `route_design`, Vivado logged an estimated WNS of `+1.007 ns` in `build/vivado_ila_build.log`; final post-route `report_timing_summary` closed at `+1.042 ns` WNS, `+0.023 ns` WHS, and `0.000 ns` TNS/THS.)*

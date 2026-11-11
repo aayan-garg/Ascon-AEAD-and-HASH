@@ -35,17 +35,24 @@ python scripts/run_regression.py
 # Or set env var: VIVADO_PATH=C:\Xilinx\2025.1\Vivado\bin python scripts/run_regression.py
 ```
 
-### 4 — Run Individual Simulation
+### 4 — Run Regression & Simulations
 ```bash
-# Example: exhaustive AEAD KAT testbench
-python scripts/run_regression.py --test tb_aead_full
+# Full regression (KATs + NuSMV formal + Vivado XSim 39/39 tests):
+python scripts/run_regression.py
+
+# Or simulation-only / custom XSim run:
+python scripts/run_regression.py --skip-kats --skip-formal
 ```
 
-### 5 — Synthesize All Variants (OOC)
+### 5 — Synthesize Variants & Generate Tables
 ```bash
-# In Vivado Tcl console or batch:
+# Permutation variants (OOC)
 vivado -mode batch -source scripts/synth_variants.tcl
 python scripts/parse_synth_reports.py   # regenerates results/performance/comparison_table.md
+
+# Full AEAD+Hash engine variants
+vivado -mode batch -source scripts/synth_engine_variants.tcl
+python scripts/generate_engine_table.py # regenerates results/performance/engine_comparison_table.md
 ```
 
 ---
@@ -54,48 +61,51 @@ python scripts/parse_synth_reports.py   # regenerates results/performance/compar
 
 ```
 rtl/
-  ascon/          Cryptographic core: permutation, S-box, diffusion, AEAD/hash controllers
-  soc/            PicoRV32 SoC, boot_ctrl FSM, fetch_guard, top-level wrappers
-  bus/            AXI4-Lite register file
-  dma/            Custom DMA streaming engine
+  ascon/          Cryptographic core: permutation variants, S-box (LUT/BDD/ESPRESSO/kernel), AEAD/hash/mode controllers
+  soc/            PicoRV32 SoC, boot_ctrl FSM, fetch_guard, top_bringup & top_bringup_board
+  bus/            AXI4-Lite register file (axil_regs.sv)
+  dma/            Custom DMA streaming engine (dma_master.sv)
 tb/
   unit/           Unit testbenches (permutation, S-box, mode_ctrl, security gate, full KATs)
-  integration/    SoC-level testbenches (AXI, DMA, secure boot)
+  integration/    SoC-level testbenches (AXI, DMA, secure boot, payload scaling)
   vectors/        Binary KAT memory files ($readmemh)
 formal/
-  ctl/            NuSMV SMV model + corrected model + broken-model counterexample
-  sva/            SVA property files (placeholder for SymbiYosys flow)
+  ctl/            NuSMV SMV models + verify_smv.py
+  sva/            SVA properties (boot_ctrl_sva.sv)
 firmware/
-  bootrom/        Secure boot C firmware + linker scripts
-  tests/          Peripheral test programs + boot matrix BRAM images
+  bootrom/        Secure boot C firmware + trusted manifest header
+  tests/          Peripheral test programs + boot matrix BRAM hex images
 reference/
   pyascon/        Python golden model (Ascon reference implementation)
   kat/            NIST SP 800-232 official KAT text files
   run_kats.py     Golden model KAT verification script
+tools/
+  sbox_opt/       Berkeley ESPRESSO, BDD & kernel S-box optimization scripts + PLA literal counter
 scripts/
-  kat_to_vectors.py      Convert KAT files → $readmemh vector files
-  run_regression.py      Automated regression runner (Vivado XSim)
-  parse_synth_reports.py Read Vivado reports → comparison_table.md
-  synth_variants.tcl     OOC synthesis for all permutation variants
-  gen_perm_vectors.py    Generate random permutation test vectors (Python oracle)
-  provision_image.py     Create test BRAM images for boot matrix
+  build_bitstream.tcl / build_bitstream_ila.tcl   Vivado bitstream & ILA build scripts
+  program_board.tcl / program_board.bat           Hardware JTAG programming scripts
+  capture_ila.tcl / diagnose_jtag.tcl             Hardware ILA CSV capture & JTAG diagnostics
+  run_regression.py (.ps1 / .sh)                  Automated regression runner (KATs + NuSMV + XSim)
+  check_doc_links.py / check_doc_numbers.py       Repository consistency checkers
 board/
   zybo_z7_10.xdc         Physical constraints (pins, clock, I/O)
   timing_ooc.xdc         OOC timing constraints
 docs/
-  final_report.md         Comprehensive technical evaluation report
-  requirements_traceability.md Single source of truth for R1-R19
-  AUDIT_RESPONSE.md       Single source of truth for audit remediations
-  architecture.md         System architecture and submodule design
-  research_review.md      Literature survey + technique selection
-  threat_model.md         Security threat model & attack surfaces
-  CHANGELOG.md            Consolidation record & change history
-  decisions/              Architecture decision records
+  status.md                      Current project & hardware-bringup status
+  hardware_test_plan.md          Hardware bringup & ILA test plan
+  final_report.md                Comprehensive technical evaluation report
+  requirements_traceability.md   Single source of truth for R1-R19
+  AUDIT_RESPONSE.md              Audit remediation record
+  directory_structure.md         Verified repository inventory
+  CHANGELOG.md                   Change history & consolidation record
+  decisions/                     Architecture decision records
 results/
   kat/            KAT pass logs
-  formal/nuxmv/   Real NuSMV 2.6.0 transcripts
-  performance/    Synthesis comparison table
-  board/          Board-level logs, boot matrix, runbook
+  formal/         Formal & SVA logs (NuSMV 2.6.0 transcripts + SymbiYosys placeholder log)
+  performance/    Synthesis comparison tables (variants & engines)
+  synthesis/      Vivado utilization reports & ESPRESSO raw PLA/log
+  timing/         Vivado timing reports
+  board/          HARDWARE_RUNBOOK.md, bitstream logs, boot_matrix/, ila_verification_report.md, ila_traces/
 ```
 
 ---
@@ -107,11 +117,12 @@ results/
 |------|---------|--------|
 | Python golden model (AEAD) | 1,089 | ✅ PASS |
 | Python golden model (Hash) | 1,025 | ✅ PASS |
-| RTL exhaustive AEAD KAT (`tb_aead_full.sv`) | 1,089 | Requires Vivado sim |
-| RTL exhaustive Hash KAT (`tb_hash_full.sv`) | 1,025 | Requires Vivado sim |
+| RTL exhaustive AEAD KAT (`tb_aead_full.sv`) | 1,089 | ✅ PASS (Vivado XSim, 39/39 regression) |
+| RTL exhaustive Hash KAT (`tb_hash_full.sv`) | 1,025 | ✅ PASS (Vivado XSim, 39/39 regression) |
 
-### Permutation Variants (XC7Z010 OOC @ 100 MHz)
-See [`results/performance/comparison_table.md`](results/performance/comparison_table.md) for full table.
+### Permutation Variants & Hardware Bring-Up (XC7Z010 @ 100 MHz)
+- Engine & permutation comparison tables: [`results/performance/comparison_table.md`](results/performance/comparison_table.md), [`results/performance/engine_comparison_table.md`](results/performance/engine_comparison_table.md)
+- Board runbook & ILA verification report (normal boot + `SW0` fault refusal verified on Zybo Z7-10; `SW1` & rising-edge transient ILA pending): [`results/board/HARDWARE_RUNBOOK.md`](results/board/HARDWARE_RUNBOOK.md), [`results/board/ila_verification_report.md`](results/board/ila_verification_report.md)
 
 | Variant | Fmax (MHz) | AEAD Throughput @ 100MHz | AEAD Throughput @ Fmax |
 |---------|:---:|:---:|:---:|

@@ -36,12 +36,12 @@
 
 ## 3. Key Observations
 
-1. **2-Round Unrolled** achieves the highest raw throughput at 3,200.00 Mbps @ 100 MHz and 3,719.16 Mbps @ Fmax, with 887.90 kbps/LUT and 3,604 LUTs (+12.9% area vs. 1R baseline).
+1. **2-Round Unrolled** achieves the highest raw throughput at 3,200.00 Mbps @ 100 MHz and 3,691.74 Mbps @ Fmax, with 887.90 kbps/LUT and 3,604 LUTs (+12.9% area vs. 1R baseline).
 2. **Half-Round (0.5R)** minimizes engine area (2,995 LUTs, -6.1% vs. 1R baseline) by folding round operations over 2 clock cycles, delivering 800.00 Mbps @ 100 MHz (267.11 kbps/LUT).
 3. **Serial-32 Datapath** on Xilinx 7-series FPGA consumes more LUTs than 1R baseline (3,353 vs 3,191 LUTs, +5.1%) and requires 2x cycles per block (16 cycles AEAD, 24 cycles Hash), resulting in lower efficiency (238.59 kbps/LUT vs 501.41 kbps/LUT for 1R baseline). The 6-input LUT architecture makes 1R bit-sliced S-boxes compact, so the multiplexing and state partitioning overhead exceeds the logic sharing savings.
 4. **S-Box Variant Comparison Across Identical Engine Wrappers:**
    - **1R Baseline (Canonical Bit-Sliced):** 3,191 LUTs, 4,015 FFs, WNS +1.925 ns (123.84 MHz).
-   - **1R Kernel (Brayton-McMullen Factored):** 3,192 LUTs, 4,015 FFs, WNS +2.226 ns (128.64 MHz).
+   - **1R Kernel (Brayton-McMullen Factored):** 3,192 LUTs, 4,015 FFs, WNS +2.226 ns (128.63 MHz).
    - **1R BDD (Optimal ROBDD Mux Network):** 3,225 LUTs, 4,015 FFs, WNS +1.856 ns (122.79 MHz).
    - **1R ESPRESSO (Exact 30-Cube SOP):** 3,258 LUTs, 4,015 FFs, WNS +1.621 ns (119.35 MHz).
-   - **Hardware Impact Analysis:** A 5-bit Ascon S-box maps to only a few 6-input LUTs (LUT6) on Xilinx 7-series architectures. Because Vivado synthesis re-maps and flattens small Boolean networks into LUT6 primitives during physical technology mapping, differences within ~2% (3,191 to 3,258 LUTs) across identical engine wrappers represent synthesis mapping noise rather than a fundamental architecture benefit, demonstrating that all three optimization paradigms achieve equivalent high-quality hardware realization.
+   - **Hardware Impact Analysis:** A 5-bit Ascon S-box maps to only a few 6-input LUTs (LUT6) on Xilinx 7-series architectures. Because Vivado synthesis re-maps and flattens small Boolean networks into LUT6 primitives during physical technology mapping, differences within ~2.1% (3,191 to 3,258 LUTs) across identical engine wrappers represent synthesis mapping noise rather than a fundamental architecture benefit, demonstrating that all three optimization paradigms achieve equivalent high-quality hardware realization.

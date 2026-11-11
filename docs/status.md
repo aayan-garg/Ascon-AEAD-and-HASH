@@ -15,11 +15,11 @@
 
 | Field | Value |
 |---|---|
-| **Current Phase** | Complete: All Phases 0–12 Signed Off (Hardware Verified on Digilent Zybo Z7-10 via Vivado ILA) |
-| **Last Action** | Physical on-board hardware testing on Digilent Zybo Z7-10 (XC7Z010-1CLG400C): (1) Verified normal secure boot (LD0..3 = 4'b1111, RGB LD6 = Solid Green); (2) Verified SW0 live DMA byte-flip fault injection refusal (LD0..3 = 4'b1010, RGB LD6 = Solid Red); (3) Extracted 100 MHz on-chip ILA silicon traces in `results/board/ila_traces/`; (4) Built and closed timing on ILA bitstream `top_bringup_ila.bit` (WNS +1.007 ns at 100 MHz). |
-| **Date** | 2026-11-06 |
-| **Overall Progress** | 100% Complete across all deliverables (Simulation, Formal CTL, Synthesis, Bitstream, and Physical Hardware Sign-off) |
-| **Hardware / Board Scope** | Physical on-board validation successfully completed and logged with ILA hardware traces. |
+| **Current Phase** | Repository Reconciled & Cleaned (Core Verification Complete; Partial Physical Zybo Z7-10 Validation Recorded) |
+| **Last Action** | Reconciled documentation, build/ILA reports, and directory hygiene against committed raw Vivado/XSim/NuSMV/ILA artifacts: (1) On-board normal secure boot (`LD0..3 = 4'b1111`, RGB `LD6` = Solid Green) and live `SW0` DMA bit-flip refusal (`LD0..3 = 4'b1010`, RGB `LD6` = Solid Red) observed on Digilent Zybo Z7-10 (`XC7Z010-1CLG400C`) with steady-state `-trigger_now` ILA captures archived in `results/board/ila_traces/`; (2) Verified ILA bitstream `top_bringup_ila.bit` post-route timing (`WNS = +1.042 ns`, `6,784` LUTs, `7,743` FFs, `8.5` BRAMs) and baseline bitstream `top_bringup.bit` (`WNS = +1.510 ns`, `Fmax = 117.79 MHz`); (3) Noted pending hardware checks honestly (rising-edge triggered transient ILA waveform, physical `SW1` tamper test, on-board cycle measurement, and on-board KAT execution). |
+| **Date** | 2026-11-11 |
+| **Overall Progress** | Simulation, Formal CTL, Synthesis, and Bitstream Complete; On-Board Normal/SW0 Boot + Steady-State ILA Logged (Masking NOT DONE; Transient-Trigger ILA / SW1 / On-Board KAT Pending) |
+| **Hardware / Board Scope** | On-board normal boot (`SW0=0`) and live byte-flip refusal (`SW0=1`) verified visually + via `-trigger_now` steady-state ILA CSVs; rising-edge transient ILA capture, `SW1` test, and on-board KAT execution pending. |
 
 ---
 
@@ -29,7 +29,7 @@
 |---|---|:---:|---|
 | 0 | Spec Audit & Research | `COMPLETED` | [`docs/research_review.md`](research_review.md), [`docs/decisions/`](decisions/) |
 | 1 | Repo & Environment | `COMPLETED` | Clean repo, automated regression runner [`scripts/run_regression.py`](../scripts/run_regression.py) |
-| 2 | RISC-V SoC Bring-up | `COMPLETED` | Routed with WNS +1.570 ns at 100 MHz ([`results/timing/timing_bringup.txt`](../results/timing/timing_bringup.txt)) |
+| 2 | RISC-V SoC Bring-up | `COMPLETED` | Routed with WNS +1.510 ns at 100 MHz, Fmax = 117.79 MHz ([`results/timing/timing_bringup.txt`](../results/timing/timing_bringup.txt)) |
 | 3 | Golden Model | `COMPLETED` | 2,120 NIST KAT vectors pass in [`reference/run_kats.py`](../reference/run_kats.py) |
 | 4 | Permutation Datapath & Hand HLS | `COMPLETED` | Hand HLS derived in [`docs/hand_hls_derivation.md`](hand_hls_derivation.md); 1R, 2R, Half-Round, Serial-32, ESPRESSO, Kernel, BDD bit-exact ([`tb_sbox_equiv.sv`](../tb/unit/tb_sbox_equiv.sv)) |
 | 5 | Mode Controller & Security Gate | `COMPLETED` | 1,089 AEAD and 1,025 Hash KATs pass; plaintext gate suppresses unauthenticated data |

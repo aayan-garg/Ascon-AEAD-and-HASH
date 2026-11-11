@@ -4,6 +4,15 @@ This document records all architectural improvements, audit remediations, verifi
 
 ---
 
+## 0. Final Metric Reconciliation & Repository Cleanup (November 11, 2026)
+
+- **Dynamic Engine Table Fix (`scripts/generate_engine_table.py`, `results/performance/engine_comparison_table.md`)**: Refactored Section 3 ("Key Observations") to compute peak throughput (`3,691.74 Mbps`) and kernel S-box Fmax (`128.63 MHz`) dynamically from parsed `.rpt` files rather than stale hardcoded literals.
+- **Metric & Narrative Reconciliation Across Docs & Decisions**: Reconciled stale OOC, SoC, and ILA metrics against committed raw `.rpt`/`.txt`/`.log` evidence across `docs/decisions/sbox_optimization.md`, `docs/decisions/paper_design_technique.md`, `docs/status.md`, `docs/requirements_traceability.md`, `docs/final_report.md`, `docs/AUDIT_RESPONSE.md`, `results/board/phase2_bringup.md`, `results/board/boot_matrix/boot_matrix_summary.md`, and `README.md` (`+1.510 ns` / `117.79 MHz` baseline `top_bringup_board` timing; `+1.042 ns` post-route ILA timing; `35/35` boot-matrix assertions; `544 LUTs / +5.154 ns / 206.36 MHz` for `permutation_1r`; `+1.598 ns / 119.02 MHz` vs `+1.925 ns / 123.84 MHz` for `mode_ctrl` wrappers; exact `bram_case2_flipped.hex` filename).
+- **Hardware & ILA Verification Honesty (`results/board/ila_verification_report.md`, `docs/hardware_test_plan.md`, `results/board/HARDWARE_RUNBOOK.md`)**: Updated ILA documentation to match `scripts/build_bitstream_ila.tcl` (11 probes / 18 bits, `6,784` LUTs / `7,743` FFs / `8.5` BRAMs, `+1.042 ns` WNS), separated XSim reference cycle counts from actual `-trigger_now` steady-state hardware CSV captures (`ila_capture_normal_boot.csv`, `ila_capture_fault_injection.csv`), removed phantom UART references and unused switch descriptions, and clearly listed pending board items (`SW1` physical confirmation, rising-edge transient ILA waveform, on-board latency measurement, and on-board KAT execution).
+- **Repository Hygiene & Obsolete Clutter Removal**: Updated `docs/directory_structure.md` and removed obsolete/duplicate logs (`tight_setup_hold_pins.txt`, `case_*_HAND_WRITTEN_REPLACED.log`, orphaned legacy NuSMV logs, byte-identical `ila_capture_now.csv`), dead/superseded helper scripts (`scripts/reproduce_sbox_espresso.py`, `scripts/gen_espresso_pla.py`, `results/synthesis/sbox5_espresso_rtl_as_pla.pla`, `scripts/parse_engine_synth.py`, `scripts/run_full_kats.tcl`, `scripts/create_vivado_project.tcl`, `scripts/open_*.bat`, `scripts/view_waveform.py`, `scripts/sim_procedures.tcl`, `tests/.gitkeep`), and untracked local Vivado/XSim/scratch clutter.
+
+---
+
 ## 1. Final Pre-Hardware Polish & Hygiene Pass (November 6, 2026)
 
 ### T1: Clean-Clone Link Resolution
@@ -134,7 +143,7 @@ Four redundant, conflicting documents were retired and removed from version cont
 - **ESPRESSO S-Box Provenance:** Corrected to state that equations were minimized externally with ESPRESSO; this repository only verifies them against NIST Table 6.
 
 ### B. SoC Timing Closure & Buffer Sizing (T2)
-- **Timing Closure:** Restructured wide barrel-shifts and carry arithmetic in `mode_ctrl.sv` into LUT-based decoders (`byte_mask64` and `pad_bit_word64`). Achieved positive timing closure: $WNS = +1.570\text{ ns}$ at 100 MHz ($F_{max} = 118.62\text{ MHz}$, 0 failing endpoints).
+- **Timing Closure:** Restructured wide barrel-shifts and carry arithmetic in `mode_ctrl.sv` into LUT-based decoders (`byte_mask64` and `pad_bit_word64`). Achieved positive timing closure in that initial SoC run: $WNS = +1.570\text{ ns}$ at 100 MHz ($F_{max} = 118.62\text{ MHz}$, 0 failing endpoints); final committed baseline `top_bringup_board` synthesis/implementation reports in `results/timing/timing_bringup.txt` close at **WNS = +1.510 ns** ($F_{max} = 117.79\text{ MHz}$).
 - **Buffer Optimization:** Parameterized `BUFFER_DEPTH=32` (256 B) in `top_bringup.sv` and `axil_regs.sv`, reducing SoC resource utilization from 9,232 to 5,088 Slice LUTs (28.91% of XC7Z010).
 
 ### C. Secure Boot & Fetch Guard Verification (T3, T4, B1, B2)
@@ -160,6 +169,6 @@ Four redundant, conflicting documents were retired and removed from version cont
 ## 4. Full Automated Regression Suite (B5)
 
 - **Execution Script:** `scripts/run_regression.py`
-- **Result:** **39/39 suites passed** (100% PASS in 858.38s).
+- **Result:** **39/39 suites passed** (100% PASS in 858.38s in that Nov 6 pass; latest committed `results/regression.log` shows **39/39 PASS** in **1540.04s**).
 - **Transcript File:** [`results/regression.log`](../results/regression.log).
 - **Coverage:** Golden Model NIST KATs (2,120 vectors), NuSMV Formal CTL model checking, 30 SystemVerilog unit suites, and 7 SystemVerilog integration suites.

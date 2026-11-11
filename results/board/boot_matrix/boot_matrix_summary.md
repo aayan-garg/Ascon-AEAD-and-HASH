@@ -40,7 +40,7 @@ Verification was executed via the end-to-end integration testbench [`tb/integrat
 | **8** | Reset Mid-Verification | Asynchronous reset asserted mid-flight | `4'b0000` | `0` | `0` | **PASS** | [`case_8_sim.log`](case_8_sim.log) |
 | **9** | Repeated Boot Attempt | Re-trigger start after refusal lockout | `4'b1010` | `0` | `0` | **PASS** | [`case_9_sim.log`](case_9_sim.log) |
 
-**Total Assertions:** 31 / 31 passed (100% success rate).
+**Total Assertions:** 35 / 35 passed (100% success rate).
 
 ---
 
@@ -56,7 +56,7 @@ Verification was executed via the end-to-end integration testbench [`tb/integrat
 
 The boot matrix comprises **5 pre-compiled candidate hex images** stored on disk in `firmware/tests/boot_matrix/`:
 1. `bram_case1_valid.hex`: Valid, untampered 64-byte payload with authentic NIST SP 800-232 hash digest.
-2. `bram_case2_byte_flip.hex`: Payload bit-flip fault injection (byte 10 altered).
+2. `bram_case2_flipped.hex`: Payload bit-flip fault injection (byte 10 altered).
 3. `bram_case3_wrong_digest.hex`: Header altered with corrupt expected digest.
 4. `bram_case4_invalid_len.hex`: Header declares invalid 0-byte payload length.
 5. `bram_case5_bad_magic.hex`: Corrupted magic word (`0xDEADBEEF` instead of `"ASCN"`).

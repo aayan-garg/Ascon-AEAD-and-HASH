@@ -41,14 +41,14 @@ The foundational Graz University of Technology paper explores hardware trade-off
 ## 3. Real Empirical Comparison (AMD-Xilinx XC7Z010 @ 100 MHz)
 
 ### A. Permutation Core Level
-*Reports: [`results/synthesis/permutation_serial32_util.rpt`](../../results/synthesis/permutation_serial32_util.rpt), [`results/timing/permutation_serial32_timing.rpt`](../../results/timing/permutation_serial32_timing.rpt)*
+*Reports: [`results/synthesis/permutation_1r_util.rpt`](../../results/synthesis/permutation_1r_util.rpt), [`results/timing/permutation_1r_timing.rpt`](../../results/timing/permutation_1r_timing.rpt), [`results/synthesis/permutation_serial32_util.rpt`](../../results/synthesis/permutation_serial32_util.rpt), [`results/timing/permutation_serial32_timing.rpt`](../../results/timing/permutation_serial32_timing.rpt)*
 
 | Architecture Variant | Style | Slice LUTs | Slice FFs | WNS @ 100 MHz | Fmax (MHz) |
 |---|---|:---:|:---:|:---:|:---:|
-| **`permutation_1r`** | Baseline (1R/cyc, 64 S-boxes) | 620 | 320 | +3.506 ns | 153.99 MHz |
+| **`permutation_1r`** | Baseline (1R/cyc, 64 S-boxes) | 544 | 335 | +5.154 ns | 206.36 MHz |
 | **`permutation_serial32`** | Serial-32 (2 cyc/R, 32 S-boxes) | 722 | 497 | +3.506 ns | 153.99 MHz |
 
-*FPGA Architectural Analysis:* In ASIC standard-cell libraries, halving S-box count yields significant area savings because S-boxes dominate cell area. On modern 6-input FPGA LUTs (Xilinx 7-Series), an entire 5-input S-box function fits into single LUTs. Consequently, the additional 2:1 multiplexers required to steer 32-bit state halves into shared S-boxes, plus the extra pipeline flip-flops (497 FFs vs 320 FFs), exceed the raw S-box savings, resulting in 722 LUTs (+16.4% LUT overhead) on FPGA.
+*FPGA Architectural Analysis:* In ASIC standard-cell libraries, halving S-box count yields significant area savings because S-boxes dominate cell area. On modern 6-input FPGA LUTs (Xilinx 7-Series), an entire 5-input S-box function fits into single LUTs. Consequently, the additional 2:1 multiplexers required to steer 32-bit state halves into shared S-boxes, plus the extra pipeline flip-flops (497 FFs vs 335 FFs), exceed the raw S-box savings, resulting in 722 LUTs (+32.7% LUT overhead over 544 LUTs) on FPGA.
 
 ---
 
@@ -59,8 +59,8 @@ The foundational Graz University of Technology paper explores hardware trade-off
 |---|:---:|:---:|:---:|
 | **Slice LUTs** | 3,353 | 3,191 | +5.1% |
 | **Slice FFs** | 4,180 | 4,015 | +4.1% |
-| **WNS @ 100 MHz** | +1.900 ns | +2.130 ns | Both `[MET]` |
-| **Fmax** | 123.46 MHz | 127.06 MHz | -2.8% |
+| **WNS @ 100 MHz** | +1.598 ns | +1.925 ns | Both `[MET]` |
+| **Fmax** | 119.02 MHz | 123.84 MHz | -3.9% |
 | **Cycles per 128-bit AEAD Block** | 16 cycles | 8 cycles | 2.0x latency |
 | **AEAD Throughput @ 100 MHz** | 800.00 Mbps | 1,600.00 Mbps | 0.50x |
 | **Area Efficiency ($TP/A$)** | 238.59 kbps/LUT | 501.41 kbps/LUT | 0.476x |

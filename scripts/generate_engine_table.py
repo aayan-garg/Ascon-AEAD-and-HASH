@@ -147,15 +147,54 @@ with open(OUTPUT_MD, "w", encoding="utf-8") as f:
         eff_100 = (tp_aead_100 * 1000.0) / v['lut']
         f.write(f"| **{v['variant']}** | {v['cyc_aead']} | {v['cyc_hash']} | {tp_aead_100:.2f} Mbps | {tp_aead_fmax:.2f} Mbps | {tp_hash_100:.2f} Mbps | {tp_hash_fmax:.2f} Mbps | {eff_100:.2f} |\n")
 
+    by_name = {v["name"]: v for v in parsed_variants}
+    b1r = by_name["mode_ctrl_1r_wrap"]
+    e2r = by_name["mode_ctrl_2r_wrap"]
+    ehalf = by_name["mode_ctrl_half_wrap"]
+    es32 = by_name["mode_ctrl_serial32_wrap"]
+    ekern = by_name["mode_ctrl_1r_kernel_wrap"]
+    ebdd = by_name["mode_ctrl_1r_bdd_wrap"]
+    eesp = by_name["mode_ctrl_1r_espresso_wrap"]
+
+    def _tp_aead_100(v):
+        return (128.0 / v["cyc_aead"]) * 100.0
+
+    def _tp_aead_fmax(v):
+        return (128.0 / v["cyc_aead"]) * v["fmax"]
+
+    def _eff_100(v):
+        return (_tp_aead_100(v) * 1000.0) / v["lut"]
+
+    sbox_luts = [b1r["lut"], ekern["lut"], ebdd["lut"], eesp["lut"]]
+    lut_spread_pct = ((max(sbox_luts) - min(sbox_luts)) / min(sbox_luts)) * 100.0
+
     f.write("\n## 3. Key Observations\n\n")
-    f.write("1. **2-Round Unrolled** achieves the highest raw throughput at 3,200.00 Mbps @ 100 MHz and 3,719.16 Mbps @ Fmax, with 887.90 kbps/LUT and 3,604 LUTs (+12.9% area vs. 1R baseline).\n")
-    f.write("2. **Half-Round (0.5R)** minimizes engine area (2,995 LUTs, -6.1% vs. 1R baseline) by folding round operations over 2 clock cycles, delivering 800.00 Mbps @ 100 MHz (267.11 kbps/LUT).\n")
-    f.write("3. **Serial-32 Datapath** on Xilinx 7-series FPGA consumes more LUTs than 1R baseline (3,353 vs 3,191 LUTs, +5.1%) and requires 2x cycles per block (16 cycles AEAD, 24 cycles Hash), resulting in lower efficiency (238.59 kbps/LUT vs 501.41 kbps/LUT for 1R baseline). The 6-input LUT architecture makes 1R bit-sliced S-boxes compact, so the multiplexing and state partitioning overhead exceeds the logic sharing savings.\n")
+    f.write(
+        f"1. **2-Round Unrolled** achieves the highest raw throughput at {_tp_aead_100(e2r):,.2f} Mbps @ 100 MHz "
+        f"and {_tp_aead_fmax(e2r):,.2f} Mbps @ Fmax, with {_eff_100(e2r):.2f} kbps/LUT and {e2r['lut']:,} LUTs "
+        f"({((e2r['lut'] - b1r['lut']) / b1r['lut']) * 100:+.1f}% area vs. 1R baseline).\n"
+    )
+    f.write(
+        f"2. **Half-Round (0.5R)** minimizes engine area ({ehalf['lut']:,} LUTs, "
+        f"{((ehalf['lut'] - b1r['lut']) / b1r['lut']) * 100:+.1f}% vs. 1R baseline) by folding round operations over 2 clock cycles, "
+        f"delivering {_tp_aead_100(ehalf):,.2f} Mbps @ 100 MHz ({_eff_100(ehalf):.2f} kbps/LUT).\n"
+    )
+    f.write(
+        f"3. **Serial-32 Datapath** on Xilinx 7-series FPGA consumes more LUTs than 1R baseline ({es32['lut']:,} vs {b1r['lut']:,} LUTs, "
+        f"{((es32['lut'] - b1r['lut']) / b1r['lut']) * 100:+.1f}%) and requires 2x cycles per block (16 cycles AEAD, 24 cycles Hash), "
+        f"resulting in lower efficiency ({_eff_100(es32):.2f} kbps/LUT vs {_eff_100(b1r):.2f} kbps/LUT for 1R baseline). "
+        "The 6-input LUT architecture makes 1R bit-sliced S-boxes compact, so the multiplexing and state partitioning overhead exceeds the logic sharing savings.\n"
+    )
     f.write("4. **S-Box Variant Comparison Across Identical Engine Wrappers:**\n")
-    f.write("   - **1R Baseline (Canonical Bit-Sliced):** 3,191 LUTs, 4,015 FFs, WNS +1.925 ns (123.84 MHz).\n")
-    f.write("   - **1R Kernel (Brayton-McMullen Factored):** 3,192 LUTs, 4,015 FFs, WNS +2.226 ns (128.64 MHz).\n")
-    f.write("   - **1R BDD (Optimal ROBDD Mux Network):** 3,225 LUTs, 4,015 FFs, WNS +1.856 ns (122.79 MHz).\n")
-    f.write("   - **1R ESPRESSO (Exact 30-Cube SOP):** 3,258 LUTs, 4,015 FFs, WNS +1.621 ns (119.35 MHz).\n")
-    f.write("   - **Hardware Impact Analysis:** A 5-bit Ascon S-box maps to only a few 6-input LUTs (LUT6) on Xilinx 7-series architectures. Because Vivado synthesis re-maps and flattens small Boolean networks into LUT6 primitives during physical technology mapping, differences within ~2% (3,191 to 3,258 LUTs) across identical engine wrappers represent synthesis mapping noise rather than a fundamental architecture benefit, demonstrating that all three optimization paradigms achieve equivalent high-quality hardware realization.\n")
+    f.write(f"   - **1R Baseline (Canonical Bit-Sliced):** {b1r['lut']:,} LUTs, {b1r['ff']:,} FFs, WNS +{b1r['wns']:.3f} ns ({b1r['fmax']:.2f} MHz).\n")
+    f.write(f"   - **1R Kernel (Brayton-McMullen Factored):** {ekern['lut']:,} LUTs, {ekern['ff']:,} FFs, WNS +{ekern['wns']:.3f} ns ({ekern['fmax']:.2f} MHz).\n")
+    f.write(f"   - **1R BDD (Optimal ROBDD Mux Network):** {ebdd['lut']:,} LUTs, {ebdd['ff']:,} FFs, WNS +{ebdd['wns']:.3f} ns ({ebdd['fmax']:.2f} MHz).\n")
+    f.write(f"   - **1R ESPRESSO (Exact 30-Cube SOP):** {eesp['lut']:,} LUTs, {eesp['ff']:,} FFs, WNS +{eesp['wns']:.3f} ns ({eesp['fmax']:.2f} MHz).\n")
+    f.write(
+        f"   - **Hardware Impact Analysis:** A 5-bit Ascon S-box maps to only a few 6-input LUTs (LUT6) on Xilinx 7-series architectures. "
+        f"Because Vivado synthesis re-maps and flattens small Boolean networks into LUT6 primitives during physical technology mapping, "
+        f"differences within ~{lut_spread_pct:.1f}% ({min(sbox_luts):,} to {max(sbox_luts):,} LUTs) across identical engine wrappers represent synthesis mapping noise rather than a fundamental architecture benefit, "
+        "demonstrating that all three optimization paradigms achieve equivalent high-quality hardware realization.\n"
+    )
 
 print(f"Generated {OUTPUT_MD}")

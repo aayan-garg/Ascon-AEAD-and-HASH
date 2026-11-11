@@ -40,7 +40,7 @@ All four S-box engines were synthesized and implemented out-of-context at 100 MH
 |---|---|:---:|:---:|:---:|:---:|
 | **Baseline (Canonical Bit-sliced)** | `mode_ctrl_1r_wrap` | 3,191 | 4,015 | +1.925 ns | 123.84 MHz |
 | **ESPRESSO SOP (Exact 30-cube)** | `mode_ctrl_1r_espresso_wrap` | 3,258 | 4,015 | +1.621 ns | 119.35 MHz |
-| **Kernel Extraction (Brayton-McMullen)** | `mode_ctrl_1r_kernel_wrap` | 3,192 | 4,015 | +2.226 ns | 128.64 MHz |
+| **Kernel Extraction (Brayton-McMullen)** | `mode_ctrl_1r_kernel_wrap` | 3,192 | 4,015 | +2.226 ns | 128.63 MHz |
 | **ROBDD Decomposition (Interleaved)** | `mode_ctrl_1r_bdd_wrap` | 3,225 | 4,015 | +1.856 ns | 122.79 MHz |
 
 ### Architectural Conclusion
