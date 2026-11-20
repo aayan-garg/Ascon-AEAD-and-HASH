@@ -53,17 +53,38 @@ In both steady-state captures, `dma_start = 0`, `dma_busy = 0`, `dma_stream_vali
 
 ---
 
-## 3. Simulated Transient Timing vs. Pending Hardware Captures
+## 2A. Armed Rising-Edge Transient ILA Captures & Cycle Measurement (`2026-11-11`, Presentation Build)
 
-Cycle-by-cycle transient transitions during boot are verified in **Vivado XSim simulation** rather than captured yet with an armed rising-edge trigger on silicon:
+On November 11, 2026, all three armed rising-edge transient waveforms were captured live in Vivado 2025.1 Hardware Manager on the Digilent Zybo Z7-10 (`XC7Z010-1CLG400C`) from `Presentation/vivado_demo/ascon_presentation.xpr` (post-route ILA build `top_bringup_board.bit` + `top_bringup_board.ltx`: `WNS = +1.007 ns`, `WHS = +0.023 ns`, `0` Errors, `0` Critical Warnings):
 
-- **Simulated Reference (`tb_secure_boot.sv` / `boot_timing_sim.log` / `boot_scaling_benchmark.log`):**
-  - **Valid Boot (Case 1, 64 B):** `reset_to_jump = 906 cycles (9.06 us)`, `reset_to_test_pass = 1,342 cycles (13.42 us)` at `100 MHz`.
+| Screenshot Artifact | Mode / Switch Stimulus | Trigger & Position | Observed Rising-Edge Transition (`clk_100mhz`, `10 ns`/sample) |
+|---|---|---|
+| [`ila_rising_normal_boot_186cyc.png`](ila_traces/ila_rising_normal_boot_186cyc.png) | **Test A — Normal Verified Boot** (`SW0=0`, `SW1=0`, `BTN0` pressed) | `u_soc/dma_start == R` @ sample `64` | `dma_busy=1` (`~65..170`) with 8 `dma_stream_valid`/`ready` handshake bursts -> `dma_done=1` -> **`hash_ok` asserts `0 -> 1` at cursor sample `250`** (**`186` clock cycles = `1.86 us`** from `dma_start`), followed 1 cycle later (`251`) by `led_OBUF[3:0]: 0x1 -> 0xF` (`4'b1111`) and `rgb_led[2:0]: 0x4 -> 0x2` (Green `LD6`), `boot_refuse=0`. |
+| [`ila_rising_fault_sw0.png`](ila_traces/ila_rising_fault_sw0.png) | **Test B — Corrupt Boot Refusal** (`SW0=1`, `SW1=0`, `BTN0` pressed) | `u_soc/dma_start == R` @ sample `64` | Identical 8-burst DMA stream (`~65..170`) with `sw_IBUF[1:0]=0x1` -> **`hash_ok` remains `0`**, **`u_soc/boot_refuse` asserts `0 -> 1`** (cursor `251`), `led_OBUF[3:0]: 0x1 -> 0xA` (`4'b1010`), and `rgb_led[2:0]: 0x4 -> 0x1` (Solid Red `LD6`). |
+| [`ila_rising_tamper_sw1.png`](ila_traces/ila_rising_tamper_sw1.png) | **Test C — Runtime Tamper Sticky Lockout** (booted Green, then `SW1` flipped `0 -> 1` without `BTN0`) | `u_soc/boot_refuse == R` @ sample `512` | Mid-execution without any `BTN0` or DMA (`dma_start=0`, `dma_busy=0`), `sw_IBUF[1:0]` jumps `0x0 -> 0x2` at `~sample 512`, immediately forcing **`u_soc/boot_refuse: 0 -> 1`**, **`hash_ok: 1 -> 0`**, **`led_OBUF[3:0]: 0xF -> 0xA`**, and **`rgb_led[2:0]: 0x2 -> 0x1`** (Green -> Solid Red). Flipping `SW1` back to `0` keeps the sticky latch asserted until `BTN0` reset. |
+
+---
+
+## 2B. Full On-Board 2,114-KAT Hardware Verification Capture (`2026-11-11`, `ascon_kat.xpr`)
+
+Using the standalone `128 KB` BRAM build (`top_kat_board.sv`, `top_kat_soc.sv`, Vivado project `ascon_kat.xpr`: `WNS = +1.118 ns`, `WHS = +0.021 ns`, `35.5 / 60` BRAM tiles, `0` Errors, `0` Critical Warnings; located in workspace `Presentation/kat_board/` and `Presentation/vivado_kat/`), the bare-metal KAT runner (`kat_board.c`) executed the **entire NIST SP 800-232 KAT suite natively on Zybo Z7-10 silicon at `100.0 MHz`** and triggered `u_ila_0` (`2026-11-11 20:59:56`) at sample `512` on `u_soc/kat_done == R`:
+
+| Evidence File | Captured Sequence | Live `hw_ila_1` Measurements (`clk_100mhz`, `10 ns`/sample) |
+|---|---|---|
+| [`ila_onboard_kat_all2114.png`](ila_traces/ila_onboard_kat_all2114.png) | Core ID check (`ASC1`) -> Tampered-Tag Plaintext-Gate zeroization -> All `1,025` Ascon-Hash256 KATs (`0..1024 B`) -> All `1,089` Ascon-AEAD128 KATs (`AD=0..32 B` x `PT=0..32 B`, Encrypt CT+Tag + Decrypt Tag+PT) | - `u_soc/kat_hash_pass[11:0]` = **`0x401`** (**`1,025`** passed)<br>- `u_soc/kat_aead_enc_pass[11:0]` = **`0x441`** (**`1,089`** passed)<br>- `u_soc/kat_aead_dec_pass[11:0]` = `0x440` -> **`0x441`** live transition at `~sample 345` (**`1,089`** passed)<br>- `u_soc/kat_fail_cnt[11:0]` = **`0x000`** (**`0` failures** across `3,204` crypto checks)<br>- `u_soc/kat_cycles[31:0]` = **`0x007c4cee`** (**`8,146,158` cycles = `81.46 ms`** @ `100 MHz`)<br>- `u_soc/kat_status[15:0]`: `0x440c` (`idx=1088, done=0`) -> **`0x441f`** (`idx=1089, all_pass=1, done=1`) at trigger `512`<br>- `u_soc/kat_done` = `1`, `u_soc/kat_all_pass` = `1`, `led_OBUF[3:0]` = `2 -> f` (`4'b1111`), `u_soc/rgb_led[2:0]` = `4 -> 2` (Solid **Green** `LD6`) |
+
+---
+
+## 3. Simulated Reference vs. On-Board Hardware Status
+
+- **Simulated Full Reset-to-Jump Reference (`tb_secure_boot.sv` / `boot_timing_sim.log` / `boot_scaling_benchmark.log`):**
+  - **Valid Boot (Case 1, 64 B):** `reset_to_jump = 906 cycles (9.06 us)` (measured from reset release rather than `dma_start`), `reset_to_test_pass = 1,342 cycles (13.42 us)` at `100 MHz`.
   - **Refusal Paths (Cases 2–9):** `boot_refuse` locks at `1`, `boot_jump_enable` remains `0`, discrete LEDs drive `4'b1010`, and `fetch_guard` intercepts application fetches with RISC-V NOP (`0x0000_0013`).
-- **Pending On-Board Edge-Triggered / Bench Items (`STATUS: PENDING`):**
-  1. **Armed Rising-Edge Normal Boot ILA Capture:** Run `capture_ila.tcl` in `normal` mode (trigger on `u_soc/dma_start == 1`, press `BTN0` while armed) to record the transient `0 -> dma_start -> hash_ok -> GREEN` transition on silicon.
-  2. **Armed Rising-Edge Fault ILA Capture:** Run `capture_ila.tcl` in `fault` mode (trigger on `u_soc/boot_refuse == 1` with `SW0 = 1`, press `BTN0`) to record the transient refusal transition on silicon.
-  3. **Physical `SW1` Tamper Bench Log:** Verify `SW1 = 1` lockout and post-`SW1 -> 0` sticky persistence until `BTN0` reset on the physical board (verified in RTL simulation Case 9 and NuSMV CTL proof).
+- **On-Board Silicon Checklist (`2026-11-11` Update):**
+  1. **Armed Rising-Edge Normal Boot (`SW0=0`):** **DONE-VERIFIED** ([`ila_rising_normal_boot_186cyc.png`](ila_traces/ila_rising_normal_boot_186cyc.png), `dma_start -> hash_ok` measured at **`186` cycles / `1.86 us`** @ `100 MHz`).
+  2. **Armed Rising-Edge Fault Injection (`SW0=1`):** **DONE-VERIFIED** ([`ila_rising_fault_sw0.png`](ila_traces/ila_rising_fault_sw0.png)).
+  3. **Physical + Rising-Edge ILA `SW1` Runtime Tamper Lockout:** **DONE-VERIFIED** ([`ila_rising_tamper_sw1.png`](ila_traces/ila_rising_tamper_sw1.png)).
+  4. **Full On-Board NIST KAT Execution (`1,025` Hash + `1,089` AEAD Enc/Dec + Tampered-Tag Gate):** **DONE-VERIFIED** ([`ila_onboard_kat_all2114.png`](ila_traces/ila_onboard_kat_all2114.png), `0x401` = `1,025` Hash, `0x441` = `1,089` AEAD Enc, `0x441` = `1,089` AEAD Dec, `fail=0`, `0x007c4cee` = `8,146,158` cycles / `81.46 ms` @ `100 MHz`).
 
 ---
 
@@ -76,7 +97,7 @@ In Phase 9, NuSMV 2.6.0 proved all five CTL safety properties on [`formal/ctl/bo
 - `AG(DECIDE & !hash_ok -> AX REFUSE)`
 - `AG(refuse -> AG refuse)`
 
-On silicon, the committed `-trigger_now` captures corroborate the reachable terminal invariants (`hash_ok = 1, boot_refuse = 0, rgb_led = GREEN` for untampered boot vs. `hash_ok = 0, boot_refuse = 1, rgb_led = RED` under `SW0 = 1` fault injection). Rising-edge cycle ordering on the live FPGA fabric will be confirmed once the armed `normal` / `fault` ILA captures are run.
+On silicon, both the steady-state `-trigger_now` captures and the 2026-11-11 rising-edge captures directly confirm the causal cycle ordering (`dma_start -> dma_done -> hash_ok=1` unlocking `4'b1111` Green for Untampered Boot vs. `boot_refuse=1` locking `4'b1010` Red under `SW0=1` fault injection and `SW1=1` runtime tamper).
 
 ---
 

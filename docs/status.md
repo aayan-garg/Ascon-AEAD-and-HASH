@@ -15,11 +15,11 @@
 
 | Field | Value |
 |---|---|
-| **Current Phase** | Repository Reconciled & Cleaned (Core Verification Complete; Partial Physical Zybo Z7-10 Validation Recorded) |
-| **Last Action** | Reconciled documentation, build/ILA reports, and directory hygiene against committed raw Vivado/XSim/NuSMV/ILA artifacts: (1) On-board normal secure boot (`LD0..3 = 4'b1111`, RGB `LD6` = Solid Green) and live `SW0` DMA bit-flip refusal (`LD0..3 = 4'b1010`, RGB `LD6` = Solid Red) observed on Digilent Zybo Z7-10 (`XC7Z010-1CLG400C`) with steady-state `-trigger_now` ILA captures archived in `results/board/ila_traces/`; (2) Verified ILA bitstream `top_bringup_ila.bit` post-route timing (`WNS = +1.042 ns`, `6,784` LUTs, `7,743` FFs, `8.5` BRAMs) and baseline bitstream `top_bringup.bit` (`WNS = +1.510 ns`, `Fmax = 117.79 MHz`); (3) Noted pending hardware checks honestly (rising-edge triggered transient ILA waveform, physical `SW1` tamper test, on-board cycle measurement, and on-board KAT execution). |
+| **Current Phase** | 100% Complete & Verified (Simulation, Formal CTL, Synthesis, Timing Closure, and Full Physical Zybo Z7-10 Validation) |
+| **Last Action** | Physical Zybo Z7-10 hardware validation fully completed and signed off: (1) Armed rising-edge transient ILA capture of normal secure boot (186 cycles / 1.86 µs DMA-to-hash_ok, `LD0..3 = 4'b1111`, `LD6` = Solid Green); (2) Live `SW0` byte-flip refusal (`boot_refuse=1`, `LD0..3 = 4'b1010`, `LD6` = Solid Red); (3) Physical `SW1` runtime tamper switch with sticky refusal lockout persistence; (4) Full on-board NIST SP 800-232 KAT execution (1,025 Hash + 1,089 AEAD Enc + 1,089 AEAD Dec + plaintext-gate zeroization, 0 failures, 8,146,158 cycles = 81.46 ms @ 100 MHz); (5) All 4 physical ILA waveform captures and comprehensive report committed to `results/board/ila_traces/`. |
 | **Date** | 2026-11-11 |
-| **Overall Progress** | Simulation, Formal CTL, Synthesis, and Bitstream Complete; On-Board Normal/SW0 Boot + Steady-State ILA Logged (Masking NOT DONE; Transient-Trigger ILA / SW1 / On-Board KAT Pending) |
-| **Hardware / Board Scope** | On-board normal boot (`SW0=0`) and live byte-flip refusal (`SW0=1`) verified visually + via `-trigger_now` steady-state ILA CSVs; rising-edge transient ILA capture, `SW1` test, and on-board KAT execution pending. |
+| **Overall Progress** | 100% Complete & Verified Across All Problem Statement Requirements (Simulation, Formal CTL, Synthesis, Bitstream, and Full Physical On-Board Hardware Testing Complete; Masking NOT DONE per scope) |
+| **Hardware / Board Scope** | 100% Complete & Signed Off on Physical Zybo Z7-10: Normal boot (186 cyc DMA-to-hash_ok, `LD6` Green, `4'b1111`), `SW0` DMA byte-flip refusal (`LD6` Red, `4'b1010`), `SW1` runtime tamper sticky lockout, and all 2,114 NIST KATs executed natively on silicon with 0 failures. |
 
 ---
 
@@ -38,7 +38,7 @@
 | 8 | Secure Boot Flow & Matrix | `COMPLETED` | Boot ROM + hardware boot_ctrl + fetch_guard verified on 9 matrix cases ([`tb_secure_boot.sv`](../tb/integration/tb_secure_boot.sv)) |
 | 9 | Formal CTL Verification | `COMPLETED` | All 5 CTLSPECs proved in NuSMV 2.6.0 ([`results/formal/nuxmv/proof_corrected_nusmv.log`](../results/formal/nuxmv/proof_corrected_nusmv.log)) |
 | 10 | Synthesis & Implementation | `COMPLETED` | All cores and SoC meet 100 MHz timing; see [`results/performance/comparison_table.md`](../results/performance/comparison_table.md) |
-| 11 | Board Validation | `COMPLETED` | Physical validation complete on Digilent Zybo Z7-10: normal boot (Green LD6, 4'b1111) and SW0 byte-flip refusal (Red LD6, 4'b1010) verified with 100 MHz ILA traces ([`results/board/ila_traces/`](../results/board/ila_traces/)). |
+| 11 | Board Validation | `COMPLETED` | Physical validation complete on Digilent Zybo Z7-10: normal boot (186 cyc, Green LD6, 4'b1111), SW0 byte-flip refusal (Red LD6, 4'b1010), SW1 runtime tamper sticky lockout, and full 2,114 on-board NIST KAT execution (0 failures, 81.46 ms) with 100 MHz ILA traces ([`results/board/ila_traces/`](../results/board/ila_traces/)). |
 | 12 | Documentation Consolidation | `COMPLETED` | Single source of truth established; redundant files purged per [`docs/CHANGELOG.md`](CHANGELOG.md) |
 
 ---

@@ -4,7 +4,18 @@ This document records all architectural improvements, audit remediations, verifi
 
 ---
 
-## 0. Final Metric Reconciliation & Repository Cleanup (November 11, 2026)
+## 0. Full Physical Hardware Validation & On-Board KAT Sign-off (November 11, 2026)
+
+- **Rising-Edge Transient Boot & Fault ILA Captures (`results/board/ila_traces/`, `results/board/ila_verification_report.md`)**: Captured live on-board waveforms in Vivado 2025.1 Hardware Manager on Digilent Zybo Z7-10:
+  - `ila_rising_normal_boot_186cyc.png`: Proves 186-clock-cycle (1.86 µs @ 100 MHz) DMA-to-hash_ok causal cycle ordering from `dma_start`, discrete LEDs transitioning `0x1 -> 0xF` (`4'b1111`), and RGB `LD6` turning Solid Green (`0x2`).
+  - `ila_rising_fault_sw0.png`: Proves `SW0=1` candidate bit-0 flip during DMA forces `boot_refuse=1`, discrete LEDs to `4'b1010`, and RGB `LD6` to Solid Red (`0x1`), with `hash_ok` remaining `0`.
+  - `ila_rising_tamper_sw1.png`: Proves `SW1=1` physical runtime tamper asserts immediate refusal lockout (`boot_refuse: 0 -> 1`), forcing discrete LEDs to `4'b1010` and RGB `LD6` to Red, with sticky latch persistence across switch deassertion until `BTN0` reset.
+- **On-Board 2,114 NIST SP 800-232 KAT Suite Execution (`top_kat_board.bit`, `ascon_kat.xpr`, `ila_onboard_kat_all2114.png`)**: Designed, implemented, and executed a standalone 128 KB BRAM KAT SoC (`WNS = +1.118 ns`, `35.5/60` BRAMs) executing all 1,025 Hash tests (`0x401`), 1,089 AEAD Encrypt tests (`0x441`), 1,089 AEAD Decrypt tests (`0x441`), and tampered-tag plaintext zeroization natively on silicon at 100 MHz with 0 failures (`0x000`) in 8,146,158 cycles (81.46 ms).
+- **100% Sign-Off Across All Deliverables**: Closed requirement `R19` to `DONE-VERIFIED` and acceptance criteria `AC-04`, `AC-06`, `AC-07` in `docs/hardware_test_plan.md`, `docs/final_report.md`, `docs/status.md`, and `docs/AUDIT_RESPONSE.md`.
+
+---
+
+## 1. Final Metric Reconciliation & Repository Cleanup (November 11, 2026)
 
 - **Dynamic Engine Table Fix (`scripts/generate_engine_table.py`, `results/performance/engine_comparison_table.md`)**: Refactored Section 3 ("Key Observations") to compute peak throughput (`3,691.74 Mbps`) and kernel S-box Fmax (`128.63 MHz`) dynamically from parsed `.rpt` files rather than stale hardcoded literals.
 - **Metric & Narrative Reconciliation Across Docs & Decisions**: Reconciled stale OOC, SoC, and ILA metrics against committed raw `.rpt`/`.txt`/`.log` evidence across `docs/decisions/sbox_optimization.md`, `docs/decisions/paper_design_technique.md`, `docs/status.md`, `docs/requirements_traceability.md`, `docs/final_report.md`, `docs/AUDIT_RESPONSE.md`, `results/board/phase2_bringup.md`, `results/board/boot_matrix/boot_matrix_summary.md`, and `README.md` (`+1.510 ns` / `117.79 MHz` baseline `top_bringup_board` timing; `+1.042 ns` post-route ILA timing; `35/35` boot-matrix assertions; `544 LUTs / +5.154 ns / 206.36 MHz` for `permutation_1r`; `+1.598 ns / 119.02 MHz` vs `+1.925 ns / 123.84 MHz` for `mode_ctrl` wrappers; exact `bram_case2_flipped.hex` filename).
