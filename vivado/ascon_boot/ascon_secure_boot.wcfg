@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wave_config>
+   <wave_state>
+   </wave_state>
+   <db_ref_list>
+      <db_ref path="tb_secure_boot_behav.wdb" id="1">
+         <top_modules>
+            <top_module name="tb_secure_boot" />
+            <top_module name="glbl" />
+         </top_modules>
+      </db_ref>
+   </db_ref_list>
+   <zoom_setting>
+      <ZoomStartTime time="0.000000 us"></ZoomStartTime>
+      <ZoomEndTime time="25.000001 us"></ZoomEndTime>
+      <Cursor1Time time="13.420000 us"></Cursor1Time>
+   </zoom_setting>
+   <column_width_setting>
+      <NameColumnWidth column_width="220"></NameColumnWidth>
+      <ValueColumnWidth column_width="140"></ValueColumnWidth>
+   </column_width_setting>
+   <WVObjectSize size="22" />
+   <wvobject type="divider" fp_name="divider1">
+      <obj_property name="label">=== 1. VERIFICATION CASE &amp; STATUS ===</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_secure_boot/case_name" type="array">
+      <obj_property name="ElementShortName">case_name</obj_property>
+      <obj_property name="ObjectShortName">case_name</obj_property>
+      <obj_property name="Radix">ASCIIRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_secure_boot/boot_phase" type="array">
+      <obj_property name="ElementShortName">boot_phase</obj_property>
+      <obj_property name="ObjectShortName">boot_phase</obj_property>
+      <obj_property name="Radix">ASCIIRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_secure_boot/fsm_state_name" type="array">
+      <obj_property name="ElementShortName">fsm_state_name</obj_property>
+      <obj_property name="ObjectShortName">fsm_state_name</obj_property>
+      <obj_property name="Radix">ASCIIRADIX</obj_property>
+   </wvobject>
+   <wvobject type="divider" fp_name="divider2">
+      <obj_property name="label">=== 2. PHYSICAL ZYBO BOARD LEDS ===</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_secure_boot/rgb_color_name" type="array">
+      <obj_property name="ElementShortName">rgb_color_name</obj_property>
+      <obj_property name="ObjectShortName">rgb_color_name</obj_property>
+      <obj_property name="Radix">ASCIIRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_secure_boot/rgb_led" type="array">
+      <obj_property name="ElementShortName">rgb_led[2:0]</obj_property>
+      <obj_property name="ObjectShortName">rgb_led[2:0]</obj_property>
+      <obj_property name="Radix">BINARYRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_secure_boot/led_status_name" type="array">
+      <obj_property name="ElementShortName">led_status_name</obj_property>
+      <obj_property name="ObjectShortName">led_status_name</obj_property>
+      <obj_property name="Radix">ASCIIRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_secure_boot/led" type="array">
+      <obj_property name="ElementShortName">led[3:0]</obj_property>
+      <obj_property name="ObjectShortName">led[3:0]</obj_property>
+      <obj_property name="Radix">BINARYRADIX</obj_property>
+   </wvobject>
+   <wvobject type="divider" fp_name="divider3">
+      <obj_property name="label">=== 3. HARDWARE SECURITY GATES ===</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_secure_boot/boot_jump_enable" type="logic">
+      <obj_property name="ElementShortName">boot_jump_enable</obj_property>
+      <obj_property name="ObjectShortName">boot_jump_enable</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_secure_boot/boot_refuse" type="logic">
+      <obj_property name="ElementShortName">boot_refuse</obj_property>
+      <obj_property name="ObjectShortName">boot_refuse</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_secure_boot/hash_ok" type="logic">
+      <obj_property name="ElementShortName">hash_ok</obj_property>
+      <obj_property name="ObjectShortName">hash_ok</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_secure_boot/tamper_latched" type="logic">
+      <obj_property name="ElementShortName">tamper_latched</obj_property>
+      <obj_property name="ObjectShortName">tamper_latched</obj_property>
+   </wvobject>
+   <wvobject type="divider" fp_name="divider4">
+      <obj_property name="label">=== 4. ASCON CRYPTO &amp; DMA ===</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_secure_boot/dma_start" type="logic">
+      <obj_property name="ElementShortName">dma_start</obj_property>
+      <obj_property name="ObjectShortName">dma_start</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_secure_boot/dma_busy" type="logic">
+      <obj_property name="ElementShortName">dma_busy</obj_property>
+      <obj_property name="ObjectShortName">dma_busy</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_secure_boot/dma_done" type="logic">
+      <obj_property name="ElementShortName">dma_done</obj_property>
+      <obj_property name="ObjectShortName">dma_done</obj_property>
+   </wvobject>
+   <wvobject type="divider" fp_name="divider5">
+      <obj_property name="label">=== 5. CONTROLS &amp; PASS / FAIL COUNTERS ===</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_secure_boot/rst_n" type="logic">
+      <obj_property name="ElementShortName">rst_n</obj_property>
+      <obj_property name="ObjectShortName">rst_n</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_secure_boot/tamper_det" type="logic">
+      <obj_property name="ElementShortName">tamper_det</obj_property>
+      <obj_property name="ObjectShortName">tamper_det</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_secure_boot/total_pass" type="array">
+      <obj_property name="ElementShortName">total_pass[31:0]</obj_property>
+      <obj_property name="ObjectShortName">total_pass[31:0]</obj_property>
+      <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_secure_boot/total_fail" type="array">
+      <obj_property name="ElementShortName">total_fail[31:0]</obj_property>
+      <obj_property name="ObjectShortName">total_fail[31:0]</obj_property>
+      <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+   </wvobject>
+</wave_config>

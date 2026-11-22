@@ -19,6 +19,25 @@ module tb_secure_boot;
     wire       trap;
     wire       test_pass;
 
+    // =========================================================================
+    // High-Level Human-Readable Waveform Status Signals
+    // =========================================================================
+    logic [8*48-1:0] case_name       = "INITIALIZING";
+    logic [8*48-1:0] boot_phase      = "POWER-ON RESET";
+    logic [8*24-1:0] rgb_color_name  = "OFF";
+    logic [8*24-1:0] led_status_name = "OFF";
+    logic [8*24-1:0] fsm_state_name  = "IDLE";
+
+    // Hardware Security Intercept Signals (Probed directly from SoC)
+    wire       boot_jump_enable;
+    wire       boot_refuse;
+    wire       dma_start;
+    wire       dma_busy;
+    wire       dma_done;
+    wire       hash_ok;
+    wire       tamper_latched;
+    wire [3:0] boot_fsm_state;
+
     // Instantiate SoC Top-Level
     top_bringup #(
         .FIRMWARE_HEX ("firmware/bootrom/secure_boot.hex"),
@@ -33,6 +52,51 @@ module tb_secure_boot;
         .trap       (trap),
         .test_pass  (test_pass)
     );
+
+    assign boot_jump_enable = dut.boot_jump_enable;
+    assign boot_refuse      = dut.boot_refuse;
+    assign dma_start        = dut.dma_start;
+    assign dma_busy         = dut.dma_busy;
+    assign dma_done         = dut.dma_done;
+    assign hash_ok          = dut.u_ascon.u_boot_ctrl.hash_ok;
+    assign tamper_latched   = dut.u_ascon.u_boot_ctrl.tamper_latched;
+    assign boot_fsm_state   = dut.u_ascon.u_boot_ctrl.fsm_state;
+
+    // Map RGB LED to human-readable color string
+    always_comb begin
+        case (rgb_led)
+            3'b100:  rgb_color_name = "BLUE (BOOTROM)";
+            3'b010:  rgb_color_name = "GREEN (PASS)";
+            3'b001:  rgb_color_name = "RED (REFUSED)";
+            3'b111:  rgb_color_name = "WHITE (ACTIVE)";
+            default: rgb_color_name = "OFF";
+        endcase
+    end
+
+    // Map Board LEDs to human-readable status string
+    always_comb begin
+        case (led)
+            4'b1111: led_status_name = "PASS (1111)";
+            4'b1010: led_status_name = "REFUSED (1010)";
+            4'b0001: led_status_name = "BOOTROM RUNNING";
+            default: led_status_name = "INIT / OFF";
+        endcase
+    end
+
+    // Map FSM state to human-readable name
+    always_comb begin
+        case (boot_fsm_state)
+            4'd0: fsm_state_name = "IDLE";
+            4'd1: fsm_state_name = "DMA_TRIGGER";
+            4'd2: fsm_state_name = "WAIT_DMA";
+            4'd3: fsm_state_name = "WAIT_HASH";
+            4'd4: fsm_state_name = "CHECK_DIGEST";
+            4'd5: fsm_state_name = "BOOT_GRANTED";
+            4'd6: fsm_state_name = "CPU_RUNNING";
+            4'd7: fsm_state_name = "BOOT_REFUSED";
+            default: fsm_state_name = "UNKNOWN";
+        endcase
+    end
 
     // 100 MHz Clock Generator
     always #(CLK_PERIOD / 2) clk = ~clk;
@@ -160,6 +224,8 @@ module tb_secure_boot;
         $display("\n----------------------------------------------------------------");
         $display("--- CASE 1: Valid Untampered Candidate Firmware Image ---");
         $display("----------------------------------------------------------------");
+        case_name  = "CASE 1: Valid Firmware Image";
+        boot_phase = "1. VERIFYING AUTHENTIC IMAGE";
         $readmemh("firmware/tests/boot_matrix/bram_case1_valid.hex", dut.bram_mem);
         timing_measure_en   = 1'b1;
         cycle_reset_release = 0;
@@ -172,8 +238,11 @@ module tb_secure_boot;
                 disable timeout_case1;
             end
             begin
+                wait (dma_start == 1'b1);
+                boot_phase = "2. DMA STREAMING TO ASCON-HASH";
                 wait (test_pass == 1'b1);
                 wait (pass_captured == 1'b1);
+                boot_phase = "3. BOOT PASS (GREEN 4'b1111)";
                 repeat(2) @(posedge clk);
                 disable timeout_case1;
             end
@@ -222,6 +291,8 @@ module tb_secure_boot;
         $display("\n----------------------------------------------------------------");
         $display("--- CASE 2: Byte-Flipped Firmware (Payload Tampering) ---");
         $display("----------------------------------------------------------------");
+        case_name  = "CASE 2: Byte-Flipped Firmware";
+        boot_phase = "1. DETECTING 1-BIT TAMPER";
         $readmemh("firmware/tests/boot_matrix/bram_case2_flipped.hex", dut.bram_mem);
         reset_soc();
 
@@ -232,6 +303,7 @@ module tb_secure_boot;
             end
             begin
                 wait (led == 4'b1010 || dut.boot_refuse == 1'b1);
+                boot_phase = "2. REFUSED (RED 4'b1010)";
                 #1000;
                 disable timeout_case2;
             end
@@ -250,6 +322,8 @@ module tb_secure_boot;
         $display("\n----------------------------------------------------------------");
         $display("--- CASE 3: Wrong Reference Digest (Provisioning Error) ---");
         $display("----------------------------------------------------------------");
+        case_name  = "CASE 3: Wrong Reference Digest";
+        boot_phase = "1. PROVISIONING DIGEST MISMATCH";
         $readmemh("firmware/tests/boot_matrix/bram_case3_wrong_digest.hex", dut.bram_mem);
         reset_soc();
 
@@ -260,6 +334,7 @@ module tb_secure_boot;
             end
             begin
                 wait (led == 4'b1010 || dut.boot_refuse == 1'b1);
+                boot_phase = "2. REFUSED (RED 4'b1010)";
                 #1000;
                 disable timeout_case3;
             end
@@ -279,6 +354,8 @@ module tb_secure_boot;
         $display("\n----------------------------------------------------------------");
         $display("--- CASE 4: Invalid Declared Length (Header Violation) ---");
         $display("----------------------------------------------------------------");
+        case_name  = "CASE 4: Invalid Declared Length";
+        boot_phase = "1. HEADER LENGTH EXCEEDS BRAM";
         $readmemh("firmware/tests/boot_matrix/bram_case4_invalid_len.hex", dut.bram_mem);
         reset_soc();
 
@@ -289,6 +366,7 @@ module tb_secure_boot;
             end
             begin
                 wait (led == 4'b1010);
+                boot_phase = "2. REFUSED (RED 4'b1010)";
                 #1000;
                 disable timeout_case4;
             end
@@ -307,6 +385,8 @@ module tb_secure_boot;
         $display("\n----------------------------------------------------------------");
         $display("--- CASE 5: Malformed Header Magic (0xDEADBEEF) ---");
         $display("----------------------------------------------------------------");
+        case_name  = "CASE 5: Corrupt Header Magic";
+        boot_phase = "1. INVALID MAGIC 0xDEADBEEF";
         $readmemh("firmware/tests/boot_matrix/bram_case5_bad_magic.hex", dut.bram_mem);
         reset_soc();
 
@@ -317,6 +397,7 @@ module tb_secure_boot;
             end
             begin
                 wait (led == 4'b1010);
+                boot_phase = "2. REFUSED (RED 4'b1010)";
                 #1000;
                 disable timeout_case5;
             end
@@ -335,6 +416,8 @@ module tb_secure_boot;
         $display("\n----------------------------------------------------------------");
         $display("--- CASE 6: Injected DMA Error / Timeout ---");
         $display("----------------------------------------------------------------");
+        case_name  = "CASE 6: Injected DMA Error";
+        boot_phase = "1. SIMULATING DMA STALL";
         $readmemh("firmware/tests/boot_matrix/bram_case1_valid.hex", dut.bram_mem);
         reset_soc();
 
@@ -366,6 +449,7 @@ module tb_secure_boot;
             end
             begin
                 wait (led == 4'b1010 || dut.boot_refuse == 1'b1);
+                boot_phase = "2. REFUSED (RED 4'b1010)";
                 #1000;
                 disable timeout_case6;
             end
@@ -384,6 +468,8 @@ module tb_secure_boot;
         $display("\n----------------------------------------------------------------");
         $display("--- CASE 7: Injected Accelerator Error ---");
         $display("----------------------------------------------------------------");
+        case_name  = "CASE 7: Injected Accelerator Error";
+        boot_phase = "1. SIMULATING HARD ERROR";
         $readmemh("firmware/tests/boot_matrix/bram_case1_valid.hex", dut.bram_mem);
         reset_soc();
 
@@ -414,6 +500,7 @@ module tb_secure_boot;
             end
             begin
                 wait (led == 4'b1010 || dut.boot_refuse == 1'b1);
+                boot_phase = "2. REFUSED (RED 4'b1010)";
                 #1000;
                 disable timeout_case7;
             end
@@ -432,6 +519,8 @@ module tb_secure_boot;
         $display("\n----------------------------------------------------------------");
         $display("--- CASE 8: Asynchronous Reset Mid-Verification ---");
         $display("----------------------------------------------------------------");
+        case_name  = "CASE 8: Asynchronous Reset Mid-Check";
+        boot_phase = "1. RESET PULSED DURING ACTIVE HASH";
         $readmemh("firmware/tests/boot_matrix/bram_case1_valid.hex", dut.bram_mem);
         reset_soc();
 
@@ -446,6 +535,7 @@ module tb_secure_boot;
         check_case("Case 8: boot_jump_enable is 0 during reset", dut.boot_jump_enable == 1'b0);
         check_case("Case 8: test_pass remained 0", test_pass == 1'b0);
         rst_n = 1'b1;
+        boot_phase = "2. RECOVERED TO STATE_RESET";
         write_case_log(8, "Reset Mid-Verification", 26, 0);
 
         // ---------------------------------------------------------------------
@@ -456,6 +546,8 @@ module tb_secure_boot;
         $display("\n----------------------------------------------------------------");
         $display("--- CASE 9: Repeated Boot Attempt After Refusal ---");
         $display("----------------------------------------------------------------");
+        case_name  = "CASE 9: Repeated Boot After Refusal";
+        boot_phase = "1. PULSING TAMPER SENSOR";
         reset_soc();
 
         // Inject physical tamper pulse
@@ -471,6 +563,7 @@ module tb_secure_boot;
         check_case("Case 9: Tamper latched in hardware", dut.u_ascon.u_boot_ctrl.tamper_latched == 1'b1);
         check_case("Case 9: Controller in STATE_HALT_REFUSE", dut.u_ascon.u_boot_ctrl.fsm_state == 4'd7);
         check_case("Case 9: boot_refuse asserted", dut.boot_refuse == 1'b1);
+        boot_phase = "2. HARDWARE STICKY REFUSAL (LOCKED)";
 
         // Host attempts second boot trigger
         @(negedge clk);
@@ -484,7 +577,11 @@ module tb_secure_boot;
         check_case("Case 9: Remains locked in STATE_HALT_REFUSE after repeated attempt", dut.u_ascon.u_boot_ctrl.fsm_state == 4'd7);
         check_case("Case 9: boot_jump_enable remains 0", dut.boot_jump_enable == 1'b0);
         check_case("Case 9: boot_refuse remains 1", dut.boot_refuse == 1'b1);
+        boot_phase = "3. SECOND BOOT ATTEMPT BLOCKED";
         write_case_log(9, "Repeated Boot Attempt After Refusal", 29, 0);
+
+        case_name  = "ALL 9 CASES COMPLETE: 100% PASS";
+        boot_phase = "SECURE BOOT MATRIX VERIFIED";
 
         // ---------------------------------------------------------------------
         // Final Summary

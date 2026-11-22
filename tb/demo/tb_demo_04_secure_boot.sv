@@ -30,6 +30,8 @@ module tb_demo_04_secure_boot #(
     logic [8*48-1:0] scenario        = "INITIALIZING";
     logic [8*48-1:0] security_status = "POWER-ON RESET";
     logic [8*32-1:0] fsm_state_name  = "IDLE";
+    logic [8*24-1:0] rgb_color_name  = "OFF";
+    logic [8*24-1:0] led_status_name = "OFF";
 
     // ==========================================================================
     // 2. Clean Top-Level Board & Security Signals (No clk / trap clutter)
@@ -98,6 +100,27 @@ module tb_demo_04_secure_boot #(
             4'd6: fsm_state_name = "CPU_RUNNING";
             4'd7: fsm_state_name = "BOOT_REFUSED";
             default: fsm_state_name = "UNKNOWN";
+        endcase
+    end
+
+    // Map RGB LED to human-readable color string
+    always_comb begin
+        case (rgb_led)
+            3'b100:  rgb_color_name = "BLUE (BOOTROM)";
+            3'b010:  rgb_color_name = "GREEN (PASS)";
+            3'b001:  rgb_color_name = "RED (REFUSED)";
+            3'b111:  rgb_color_name = "WHITE (ACTIVE)";
+            default: rgb_color_name = "OFF";
+        endcase
+    end
+
+    // Map Board LEDs to human-readable status string
+    always_comb begin
+        case (led)
+            4'b1111: led_status_name = "PASS (1111)";
+            4'b1010: led_status_name = "REFUSED (1010)";
+            4'b0001: led_status_name = "BOOTROM RUNNING";
+            default: led_status_name = "INIT / OFF";
         endcase
     end
 

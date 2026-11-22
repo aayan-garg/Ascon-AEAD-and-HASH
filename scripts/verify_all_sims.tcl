@@ -43,6 +43,9 @@ proc run_sim_test {prj_path tb_name sim_time} {
 # Primary Presentation Demo: Full 3-Scenario RISC-V Secure Boot
 run_sim_test "vivado/ascon_boot/ascon_boot.xpr" "tb_demo_04_secure_boot" "40us"
 
+# Full 9-Case Integration Secure Boot Regression Matrix
+run_sim_test "vivado/ascon_boot/ascon_boot.xpr" "tb_secure_boot" "30us"
+
 # Presentation Demo 01: S-Box Equivalence & Permutation Tradeoffs
 run_sim_test "vivado/ascon_boot/ascon_boot.xpr" "tb_demo_01_sbox_and_perm" "2us"
 
