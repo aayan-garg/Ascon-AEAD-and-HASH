@@ -13,6 +13,7 @@
 *.dcp
 *.wdb
 *.wcfg
+!vivado/**/*.wcfg
 *.pb
 dfx_runtime.txt
 webtalk*

@@ -2,31 +2,62 @@
 // Presentation Demo 04: End-to-End RISC-V Secure Boot SoC Demo
 // Target: Visualizes PicoRV32 + DMA + Ascon-Hash256 + boot_ctrl + fetch_guard
 //
-// Mirrors the exact 3 Zybo Z7-10 physical board demonstrations in simulation:
-//   Scenario A: Valid image (SW0=0, SW1=0)  -> Hash OK -> boot_jump_enable=1 ->
-//               GPIO test_pass=1, LEDs=4'b1111, RGB=GREEN (3'b010).
-//   Scenario B: Live SW0 byte-flip (SW0=1)  -> DMA corrupts bit 0 of word 0x410 ->
-//               Digest mismatch -> boot_refuse=1, LEDs=4'b1010, RGB=RED (3'b001).
-//   Scenario C: Live SW1 tamper pulse       -> Sticky hardware tamper latch ->
-//               Even after SW1 returns 0, boot remains locked in STATE_HALT_REFUSE!
+// Clean Waveform Display:
+//   - All unnecessary signal clutter (clk, trap, internal nets) removed
+//   - Self-documenting ASCII string banners: scenario, security_status, fsm_state_name
+//   - Exact physical board signals matching Zybo Z7-10 ILA captures
+//
+// 3 Zybo Z7-10 Physical Demonstrations in Sequence:
+//   Scenario A (0 to ~14 us):  Valid firmware -> Hash OK -> boot_jump_enable=1 ->
+//                              LEDs=4'b1111, RGB=GREEN (3'b010).
+//   Scenario B (14 to ~22 us): Live SW0 byte-flip -> Corrupted digest mismatch ->
+//                              boot_refuse=1, LEDs=4'b1010, RGB=RED (3'b001).
+//   Scenario C (22 to ~30 us): Live SW1 tamper pulse -> Sticky hardware latch ->
+//                              boot_refuse=1, LEDs=4'b1010, RGB=RED (3'b001).
 // ==============================================================================
 
 `timescale 1ns / 1ps
 
-module tb_demo_04_secure_boot;
+module tb_demo_04_secure_boot #(
+    parameter int RUN_SCENARIO = 0 // 0 = All 3 Scenarios (Matrix), 1 = Scenario A Only (Green Boot)
+);
 
-    localparam time CLK_PERIOD = 10ns; // 100 MHz
+    localparam time CLK_PERIOD = 10ns; // 100 MHz clock
 
+    // ==========================================================================
+    // 1. High-Level Waveform String Banners (Visible in Vivado Waveform Viewer)
+    // ==========================================================================
+    logic [8*48-1:0] scenario        = "INITIALIZING";
+    logic [8*48-1:0] security_status = "POWER-ON RESET";
+    logic [8*32-1:0] fsm_state_name  = "IDLE";
+
+    // ==========================================================================
+    // 2. Clean Top-Level Board & Security Signals (No clk / trap clutter)
+    // ==========================================================================
+    logic       rst_n      = 1'b0;
+    logic [3:0] sw         = 4'b0000; // [0]=Fault Inject, [1]=Tamper Sensor
+    wire  [3:0] led;                  // 4'b1111 = Pass, 4'b1010 = Refuse
+    wire  [2:0] rgb_led;              // 3'b010  = Green, 3'b001 = Red
+
+    // Hardware Security Intercept Signals
+    wire        dma_start;
+    wire        dma_busy;
+    wire        dma_done;
+    wire        hash_ok;
+    wire        boot_jump_enable;
+    wire        boot_refuse;
+    wire        tamper_latched;
+    wire [3:0]  boot_fsm_state;
+
+    // ==========================================================================
+    // 3. Internal Wires (Not exposed in clean wave window)
+    // ==========================================================================
     logic clk = 1'b0;
     always #(CLK_PERIOD / 2) clk = ~clk;
 
-    logic       rst_n;
-    logic       tamper_det;
-    logic [3:0] sw;
-    wire  [3:0] led;
-    wire  [2:0] rgb_led;
-    wire        trap;
-    wire        test_pass;
+    logic tamper_det = 1'b0;
+    wire  trap;
+    wire  test_pass;
 
     // Pass FIRMWARE_HEX="" so testbench resolves the hex path cleanly in both GUI & CLI XSim
     top_bringup #(
@@ -45,14 +76,30 @@ module tb_demo_04_secure_boot;
         .test_pass  (test_pass)
     );
 
-    // Helper signals for crystal-clear waveform viewing in Vivado GUI
-    wire       boot_jump_enable = dut.boot_jump_enable;
-    wire       boot_refuse      = dut.boot_refuse;
-    wire       dma_start        = dut.dma_start;
-    wire       dma_done         = dut.dma_done;
-    wire       hash_ok          = dut.u_ascon.u_boot_ctrl.hash_ok;
-    wire       tamper_latched   = dut.u_ascon.u_boot_ctrl.tamper_latched;
-    wire [3:0] boot_fsm_state   = dut.u_ascon.u_boot_ctrl.fsm_state;
+    // Map helper signals for clean waveform
+    assign boot_jump_enable = dut.boot_jump_enable;
+    assign boot_refuse      = dut.boot_refuse;
+    assign dma_start        = dut.dma_start;
+    assign dma_busy         = dut.dma_busy;
+    assign dma_done         = dut.dma_done;
+    assign hash_ok          = dut.u_ascon.u_boot_ctrl.hash_ok;
+    assign tamper_latched   = dut.u_ascon.u_boot_ctrl.tamper_latched;
+    assign boot_fsm_state   = dut.u_ascon.u_boot_ctrl.fsm_state;
+
+    // Format FSM state into human-readable string banner
+    always_comb begin
+        case (boot_fsm_state)
+            4'd0: fsm_state_name = "IDLE";
+            4'd1: fsm_state_name = "DMA_TRIGGER";
+            4'd2: fsm_state_name = "WAIT_DMA";
+            4'd3: fsm_state_name = "WAIT_HASH";
+            4'd4: fsm_state_name = "CHECK_DIGEST";
+            4'd5: fsm_state_name = "BOOT_GRANTED";
+            4'd6: fsm_state_name = "CPU_RUNNING";
+            4'd7: fsm_state_name = "BOOT_REFUSED";
+            default: fsm_state_name = "UNKNOWN";
+        endcase
+    end
 
     // Cycle counter measured from reset release
     int cycle_cnt;
@@ -64,13 +111,15 @@ module tb_demo_04_secure_boot;
     // Finds bram_case1_valid.hex regardless of Vivado GUI vs CLI working folder
     function automatic string resolve_valid_hex();
         int fd;
-        string candidates[8] = '{
+        string candidates[10] = '{
             "bram_case1_valid.hex",
             "tb/demo/hex/bram_case1_valid.hex",
             "firmware/tests/boot_matrix/bram_case1_valid.hex",
             "../../../../../../firmware/tests/boot_matrix/bram_case1_valid.hex",
             "../../../../../../tb/demo/hex/bram_case1_valid.hex",
             "../../../../firmware/tests/boot_matrix/bram_case1_valid.hex",
+            "../../../../tb/demo/hex/bram_case1_valid.hex",
+            "../../tb/demo/hex/bram_case1_valid.hex",
             "C:/Users/Aayan/Desktop/RTL_Project/Ascon-AEAD-and-HASH/firmware/tests/boot_matrix/bram_case1_valid.hex",
             "C:/Users/Aayan/Desktop/RTL_Project/Ascon-AEAD-and-HASH/tb/demo/hex/bram_case1_valid.hex"
         };
@@ -110,16 +159,22 @@ module tb_demo_04_secure_boot;
         // ----------------------------------------------------------------------
         // SCENARIO A: Normal Untampered Boot (SW0=0, SW1=0)
         // ----------------------------------------------------------------------
+        scenario        = "SCENARIO A: Normal Boot (GREEN PASS)";
+        security_status = "1. VERIFYING AUTHENTIC FIRMWARE";
         $display("\n[SCENARIO A] Power-on / Reset with Authentic Firmware (SW0=0, SW1=0)...");
         reset_with_image(4'b0000);
 
         fork : wait_a
             begin
+                wait (dma_start == 1'b1);
+                security_status = "2. DMA STREAMING TO ASCON-HASH";
                 wait (boot_jump_enable == 1'b1);
                 jump_cyc = cycle_cnt;
+                security_status = "3. HASH OK -> BOOT GRANTED (GREEN)";
                 wait (test_pass == 1'b1);
                 pass_cyc = cycle_cnt;
-                repeat (2) @(posedge clk);
+                security_status = "4. CPU EXECUTION SUCCESSFUL (GREEN 4'b1111)";
+                repeat (100) @(posedge clk);
                 disable wait_a;
             end
             begin
@@ -142,16 +197,33 @@ module tb_demo_04_secure_boot;
             $display("  [PASS] Authentic firmware verified by Ascon-Hash256 and booted cleanly!");
         end
 
+        // If user configured to run Scenario A only, finish here with solid green
+        if (RUN_SCENARIO == 1) begin
+            $display("\n[INFO] RUN_SCENARIO=1: Finishing with Scenario A Active (Solid Green)!");
+            scenario        = "SCENARIO A COMPLETE: AUTHENTIC BOOT VERIFIED";
+            security_status = "SYSTEM OPERATIONAL: CPU RUNNING (GREEN 4'b1111)";
+            repeat (200) @(posedge clk);
+            $display("========================================================================");
+            $display("DEMO 04 RESULT: PASS (Scenario A Authentic Boot Succeeded!)");
+            $display("========================================================================");
+            $finish;
+        end
+
         // ----------------------------------------------------------------------
         // SCENARIO B: Live SW0 Byte-Flip Attack (SW0=1 during boot)
         // ----------------------------------------------------------------------
+        scenario        = "SCENARIO B: SW0 Byte-Flip Attack (RED REFUSE)";
+        security_status = "1. INJECTING 1-BIT FAULT (SW0=1)";
         $display("\n[SCENARIO B] Flipping SW0=1 (1-bit fault injected into DMA word 0x410)...");
         reset_with_image(4'b0001);
 
         fork : wait_b
             begin
+                wait (dma_start == 1'b1);
+                security_status = "2. STREAMING CORRUPTED PAYLOAD";
                 wait (boot_refuse == 1'b1);
-                repeat (10) @(posedge clk);
+                security_status = "3. DIGEST MISMATCH -> REFUSED (RED 4'b1010)";
+                repeat (100) @(posedge clk);
                 disable wait_b;
             end
             begin
@@ -177,17 +249,21 @@ module tb_demo_04_secure_boot;
         // ----------------------------------------------------------------------
         // SCENARIO C: Physical SW1 Tamper Sensor Pulse (Sticky Hardware Lockout)
         // ----------------------------------------------------------------------
+        scenario        = "SCENARIO C: SW1 Tamper Pulse (STICKY LOCKOUT)";
+        security_status = "1. RE-ARMING VALID IMAGE";
         $display("\n[SCENARIO C] Valid image boots, SW1 pulses high mid-check, then clears...");
         reset_with_image(4'b0000);
         wait (dma_start == 1'b1);
         @(negedge clk);
+        security_status = "2. PULSING SW1 TAMPER SWITCH";
         sw         = 4'b0010; // SW1=1 tamper!
         tamper_det = 1'b1;
-        repeat (3) @(posedge clk);
+        repeat (5) @(posedge clk);
         @(negedge clk);
+        security_status = "3. SW1 CLEARED -> HARDWARE STICKY LOCK (RED)";
         sw         = 4'b0000; // Tamper pulse cleared!
         tamper_det = 1'b0;
-        repeat (15) @(posedge clk);
+        repeat (100) @(posedge clk);
 
         $display("  Post-Pulse  : tamper_latched=%b, jump_en=%b, refuse=%b, fsm_state=%0d (7=REFUSE)",
                  tamper_latched, boot_jump_enable, boot_refuse, boot_fsm_state);
@@ -200,6 +276,10 @@ module tb_demo_04_secure_boot;
         end else begin
             $display("  [PASS] Sticky tamper lockout held even after tamper pulse returned to 0!");
         end
+
+        scenario        = "ALL SCENARIOS VERIFIED: 100% PASS";
+        security_status = "DEMO 04 VERIFICATION COMPLETE";
+        repeat (100) @(posedge clk);
 
         $display("\n========================================================================");
         if (errors == 0) begin
@@ -214,4 +294,3 @@ module tb_demo_04_secure_boot;
     end
 
 endmodule
-

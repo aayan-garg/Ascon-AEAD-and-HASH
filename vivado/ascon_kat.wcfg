@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wave_config>
+   <wave_state>
+   </wave_state>
+   <db_ref_list>
+      <db_ref path="tb_kat_soc_behav.wdb" id="1">
+         <top_modules>
+            <top_module name="tb_kat_soc" />
+            <top_module name="glbl" />
+         </top_modules>
+      </db_ref>
+   </db_ref_list>
+   <zoom_setting>
+      <ZoomStartTime time="0.000000 us"></ZoomStartTime>
+      <ZoomEndTime time="100.000000 us"></ZoomEndTime>
+      <Cursor1Time time="50.000000 us"></Cursor1Time>
+   </zoom_setting>
+   <column_width_setting>
+      <NameColumnWidth column_width="220"></NameColumnWidth>
+      <ValueColumnWidth column_width="140"></ValueColumnWidth>
+   </column_width_setting>
+   <WVObjectSize size="18" />
+   <wvobject type="divider" fp_name="divider1">
+      <obj_property name="label">=== 1. NIST KAT RUNNER STATUS ===</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_kat_soc/kat_phase" type="array">
+      <obj_property name="ElementShortName">kat_phase</obj_property>
+      <obj_property name="ObjectShortName">kat_phase</obj_property>
+      <obj_property name="Radix">ASCIIRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_kat_soc/rst_n" type="logic">
+      <obj_property name="ElementShortName">rst_n</obj_property>
+      <obj_property name="ObjectShortName">rst_n</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_kat_soc/kat_done" type="logic">
+      <obj_property name="ElementShortName">kat_done</obj_property>
+      <obj_property name="ObjectShortName">kat_done</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_kat_soc/kat_all_pass" type="logic">
+      <obj_property name="ElementShortName">kat_all_pass</obj_property>
+      <obj_property name="ObjectShortName">kat_all_pass</obj_property>
+   </wvobject>
+   <wvobject type="divider" fp_name="divider2">
+      <obj_property name="label">=== 2. NIST SP 800-232 PASS COUNTERS ===</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_kat_soc/kat_hash_pass" type="array">
+      <obj_property name="ElementShortName">kat_hash_pass[11:0]</obj_property>
+      <obj_property name="ObjectShortName">kat_hash_pass[11:0]</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_kat_soc/kat_aead_enc_pass" type="array">
+      <obj_property name="ElementShortName">kat_aead_enc_pass[11:0]</obj_property>
+      <obj_property name="ObjectShortName">kat_aead_enc_pass[11:0]</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_kat_soc/kat_aead_dec_pass" type="array">
+      <obj_property name="ElementShortName">kat_aead_dec_pass[11:0]</obj_property>
+      <obj_property name="ObjectShortName">kat_aead_dec_pass[11:0]</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_kat_soc/kat_fail_cnt" type="array">
+      <obj_property name="ElementShortName">kat_fail_cnt[11:0]</obj_property>
+      <obj_property name="ObjectShortName">kat_fail_cnt[11:0]</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_kat_soc/kat_cycles" type="array">
+      <obj_property name="ElementShortName">kat_cycles[31:0]</obj_property>
+      <obj_property name="ObjectShortName">kat_cycles[31:0]</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_kat_soc/kat_status" type="array">
+      <obj_property name="ElementShortName">kat_status[15:0]</obj_property>
+      <obj_property name="ObjectShortName">kat_status[15:0]</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
+   </wvobject>
+   <wvobject type="divider" fp_name="divider3">
+      <obj_property name="label">=== 3. ASCON ACCELERATOR DMA ===</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_kat_soc/dma_start" type="logic">
+      <obj_property name="ElementShortName">dma_start</obj_property>
+      <obj_property name="ObjectShortName">dma_start</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_kat_soc/dma_done" type="logic">
+      <obj_property name="ElementShortName">dma_done</obj_property>
+      <obj_property name="ObjectShortName">dma_done</obj_property>
+   </wvobject>
+   <wvobject type="divider" fp_name="divider4">
+      <obj_property name="label">=== 4. ZYBO BOARD PHYSICAL LEDS ===</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_kat_soc/led" type="array">
+      <obj_property name="ElementShortName">led[3:0]</obj_property>
+      <obj_property name="ObjectShortName">led[3:0]</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_kat_soc/rgb_led" type="array">
+      <obj_property name="ElementShortName">rgb_led[2:0]</obj_property>
+      <obj_property name="ObjectShortName">rgb_led[2:0]</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
+   </wvobject>
+</wave_config>
