@@ -64,11 +64,15 @@ module tb_demo_04_secure_boot;
     // Finds bram_case1_valid.hex regardless of Vivado GUI vs CLI working folder
     function automatic string resolve_valid_hex();
         int fd;
-        string candidates[4] = '{
+        string candidates[8] = '{
             "bram_case1_valid.hex",
-            "sim/hex/bram_case1_valid.hex",
-            "../../../../sim/hex/bram_case1_valid.hex",
-            "C:/Users/Aayan/Desktop/RTL_Project/Presentation/sim/hex/bram_case1_valid.hex"
+            "tb/demo/hex/bram_case1_valid.hex",
+            "firmware/tests/boot_matrix/bram_case1_valid.hex",
+            "../../../../../../firmware/tests/boot_matrix/bram_case1_valid.hex",
+            "../../../../../../tb/demo/hex/bram_case1_valid.hex",
+            "../../../../firmware/tests/boot_matrix/bram_case1_valid.hex",
+            "C:/Users/Aayan/Desktop/RTL_Project/Ascon-AEAD-and-HASH/firmware/tests/boot_matrix/bram_case1_valid.hex",
+            "C:/Users/Aayan/Desktop/RTL_Project/Ascon-AEAD-and-HASH/tb/demo/hex/bram_case1_valid.hex"
         };
         foreach (candidates[idx]) begin
             fd = $fopen(candidates[idx], "r");

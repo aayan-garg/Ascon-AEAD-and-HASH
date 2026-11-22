@@ -64,7 +64,7 @@ set_property is_enabled false [get_files "*timing_ooc.xdc"]
 set_property used_in_synthesis false [get_files "*ila_boot.xdc"]
 set_property STEPS.SYNTH_DESIGN.ARGS.FLATTEN_HIERARCHY none [get_runs synth_1]
 
-# 3. Simulation Testbenches
+# 3. Simulation Testbenches & Hex Firmware Images
 set sim_files [list \
     "$REPO_ROOT/tb/demo/tb_demo_01_sbox_and_perm.sv" \
     "$REPO_ROOT/tb/demo/tb_demo_02_hash_digest.sv" \
@@ -72,10 +72,13 @@ set sim_files [list \
     "$REPO_ROOT/tb/demo/tb_demo_04_secure_boot.sv" \
     "$REPO_ROOT/tb/demo/tb_demo_05_fetch_guard.sv" \
     "$REPO_ROOT/tb/integration/tb_secure_boot.sv" \
+    "$REPO_ROOT/firmware/tests/boot_matrix/bram_case1_valid.hex" \
+    "$REPO_ROOT/firmware/tests/forced_jump.hex" \
 ]
 
 add_files -fileset sim_1 -norecurse $sim_files
 set_property top tb_demo_04_secure_boot [get_filesets sim_1]
+set_property -name {xsim.simulate.runtime} -value {50us} -objects [get_filesets sim_1]
 
 update_compile_order -fileset sources_1
 update_compile_order -fileset sim_1
