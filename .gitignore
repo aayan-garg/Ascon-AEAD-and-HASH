@@ -19,6 +19,11 @@ webtalk*
 clockInfo.txt
 .Xil/
 vivado_*.backup.*
+*.cache/
+*.hw/
+*.ip_user_files/
+*.runs/
+*.sim/
 
 # Simulation dumps
 *.vcd
