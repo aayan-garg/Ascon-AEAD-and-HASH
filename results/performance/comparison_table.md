@@ -67,3 +67,23 @@
   - `permutation_half`: `results/synthesis/permutation_half_util.rpt` and `results/timing/permutation_half_timing.rpt`
   - `permutation_1r_espresso`: `results/synthesis/permutation_1r_espresso_util.rpt` and `results/timing/permutation_1r_espresso_timing.rpt`
   - `permutation_serial32`: `results/synthesis/permutation_serial32_util.rpt` and `results/timing/permutation_serial32_timing.rpt`
+
+## 5. Post-Route Power Consumption on Zybo Z7-10 (100.0 MHz)
+
+Generated via Vivado `report_power` on fully placed and routed bitstreams on AMD-Xilinx Zynq-7000 (`XC7Z010-1CLG400C`):
+
+| Configuration | Total On-Chip Power | Dynamic Power | Device Static Power | Junction Temperature | Max Ambient | Report File |
+|---|:---:|:---:|:---:|:---:|:---:|---|
+| **SoC + Secure Boot + ILA (`top_bringup_board`)** | **0.277 W (277 mW)** | 0.185 W (185 mW) | 0.092 W (92 mW) | 28.2 °C | 81.8 °C | [`power_bringup_routed.rpt`](power_bringup_routed.rpt) |
+| **KAT SoC + 128KB BRAM + ILA (`top_kat_board`)** | **0.365 W (365 mW)** | 0.267 W (267 mW) | 0.098 W (98 mW) | 29.2 °C | 80.8 °C | [`power_kat_routed.rpt`](power_kat_routed.rpt) |
+
+### Power Breakdown & Thermal Analysis:
+- **Baseline Dynamic Power Contributors:**
+  - **MMCM Clock Synthesizer:** 0.106 W (57.3% of dynamic power).
+  - **Routing Signals:** 0.029 W (15.7%).
+  - **Slice Logic (LUTs/FFs):** 0.026 W (14.1%).
+  - **Clock Trees:** 0.021 W (11.4%).
+  - **Block RAM:** 0.002 W (1.1%).
+  - **I/O:** < 0.001 W (< 0.5%).
+- **Thermal Margin:** Junction temperature operates at 28.2 °C at nominal 25.0 °C ambient temperature, representing a minimal thermal rise of only +3.2 °C without requiring active cooling.
+

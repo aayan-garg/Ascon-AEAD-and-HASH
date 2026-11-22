@@ -67,7 +67,7 @@ On November 11, 2026, all three armed rising-edge transient waveforms were captu
 
 ## 2B. Full On-Board 2,114-KAT Hardware Verification Capture (`2026-11-11`, `ascon_kat.xpr`)
 
-Using the standalone `128 KB` BRAM build (`top_kat_board.sv`, `top_kat_soc.sv`, Vivado project `ascon_kat.xpr`: `WNS = +1.118 ns`, `WHS = +0.021 ns`, `35.5 / 60` BRAM tiles, `0` Errors, `0` Critical Warnings; located in workspace `Presentation/kat_board/` and `Presentation/vivado_kat/`), the bare-metal KAT runner (`kat_board.c`) executed the **entire NIST SP 800-232 KAT suite natively on Zybo Z7-10 silicon at `100.0 MHz`** and triggered `u_ila_0` (`2026-11-11 20:59:56`) at sample `512` on `u_soc/kat_done == R`:
+Using the standalone `128 KB` BRAM build ([`top_kat_board.sv`](../../board/kat_runner/rtl/top_kat_board.sv), [`top_kat_soc.sv`](../../board/kat_runner/rtl/top_kat_soc.sv), Vivado demo project `ascon_kat.xpr`: `WNS = +1.118 ns`, `WHS = +0.021 ns`, `35.5 / 60` BRAM tiles, `0` Errors, `0` Critical Warnings), the bare-metal KAT runner ([`kat_board.c`](../../board/kat_runner/fw/kat_board.c)) executed the **entire NIST SP 800-232 KAT suite natively on Zybo Z7-10 silicon at `100.0 MHz`** and triggered `u_ila_0` (`2026-11-11 20:59:56`) at sample `512` on `u_soc/kat_done == R`:
 
 | Evidence File | Captured Sequence | Live `hw_ila_1` Measurements (`clk_100mhz`, `10 ns`/sample) |
 |---|---|---|
