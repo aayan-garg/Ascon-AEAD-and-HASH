@@ -95,15 +95,14 @@ module tb_kat_soc;
     // Resolves kat_preflight.hex dynamically
     function automatic string resolve_kat_hex();
         int fd;
-        string candidates[8] = '{
+        string candidates[7] = '{
             "kat_preflight.hex",
             "board/kat_runner/fw/kat_preflight.hex",
             "../../../../../../board/kat_runner/fw/kat_preflight.hex",
             "../../../../board/kat_runner/fw/kat_preflight.hex",
             "../../board/kat_runner/fw/kat_preflight.hex",
             "kat_board_all2114.hex",
-            "board/kat_runner/fw/kat_board_all2114.hex",
-            "C:/Users/Aayan/Desktop/RTL_Project/Ascon-AEAD-and-HASH/board/kat_runner/fw/kat_preflight.hex"
+            "board/kat_runner/fw/kat_board_all2114.hex"
         };
         foreach (candidates[idx]) begin
             fd = $fopen(candidates[idx], "r");

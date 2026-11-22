@@ -66,15 +66,13 @@ module tb_demo_05_fetch_guard;
 
     function automatic string resolve_forced_jump_hex();
         int fd;
-        string candidates[8] = '{
+        string candidates[6] = '{
             "forced_jump.hex",
             "tb/demo/hex/forced_jump.hex",
             "firmware/tests/forced_jump.hex",
             "../../../../../../firmware/tests/forced_jump.hex",
             "../../../../../../tb/demo/hex/forced_jump.hex",
-            "../../../../firmware/tests/forced_jump.hex",
-            "C:/Users/Aayan/Desktop/RTL_Project/Ascon-AEAD-and-HASH/firmware/tests/forced_jump.hex",
-            "C:/Users/Aayan/Desktop/RTL_Project/Ascon-AEAD-and-HASH/tb/demo/hex/forced_jump.hex"
+            "../../../../firmware/tests/forced_jump.hex"
         };
         foreach (candidates[idx]) begin
             fd = $fopen(candidates[idx], "r");
